@@ -4,6 +4,9 @@
 *.xlsx
 *.gz
 
+# Drafts folder to ignore
+drafts_ignore/
+
 # Mac
 .DS_Store
 
