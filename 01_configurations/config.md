@@ -4,10 +4,11 @@ For the **Digital Literacy EU Capstone Project** I set up `dbt` and `PostgreSQL`
 
 ---
 ### `PostgreSQL` Local Setup
-1. Install the latest version off PostgreSQL locally (run in terminal):   
-`brew install postgresql`
+1. Install the latest version off PostgreSQL locally (run in terminal):      
 
-It will automatically create a PostgreSQL database called `postgres` with a user name as the current Mac username and with empty password.
+    `brew install postgresql`
+
+    It will automatically create a PostgreSQL database called `postgres` with a user name as the current Mac username and with empty password.
 
 For more information, check relevant [documentation](https://wiki.postgresql.org/wiki/Homebrew).
 
@@ -79,3 +80,5 @@ To check the connection, terminal will offer to run `dbt debug`. For successfull
 - go to the Home folder (~/.dbt)
 - find file `profiles.yaml`
 - change the credentials inside (e.g., database name).
+
+If when you open the project repository again, and VS Code (or another EDA) throws an error and marks `.yaml` project file as un-executable, select a different interpreter (the one which has access to `dbt-postgres` installed). Find command `Select Interpreter` and choose one from the conda environment with the libraries installed (in this case -- `dbt_project` coda env).
