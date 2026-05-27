@@ -1,6 +1,22 @@
 # dbt and PostgreSQL Local Configurations
 
-For the **Digital Literacy EU Capstone Project** I set up `dbt` and `PostgreSQL` locally. The purpose of this setup is to process similar `.csv` and `.tsv` data files from Eurostat in the same manner, creating a powerful transformation instrument with `dbt`.  Here are the main steps I took to create this setup locally:
+For the **Digital Literacy EU Capstone Project** I set up `dbt` and `PostgreSQL` locally. The purpose of this setup is to process similar `.csv` and `.tsv` data files from Eurostat in the same manner, creating a powerful transformation instrument with `dbt`.  Here are the main steps I took to create this setup locally.
+
+---
+### `PostgreSQL` Local Setup
+1. Install the latest version off PostgreSQL locally (run in terminal):   
+`brew install postgresql`
+
+It will automatically create a PostgreSQL database called `postgres` with a user name as the current Mac username and with empty password.
+
+For more information, check relevant [documentation](https://wiki.postgresql.org/wiki/Homebrew).
+
+2. To create a new database for a particular project use `psql` commands (or see below).
+
+
+
+--- 
+### `dbt postgres` Local Setup
 
 1. Create a new environment for a `dbt` project:
 ``` bash
