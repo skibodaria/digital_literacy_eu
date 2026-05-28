@@ -10,6 +10,8 @@ import psycopg2
 import pandas as pd
 from dotenv import load_dotenv
 
+load_dotenv(dotenv_path='.env')
+
 # defining the function
 def fetch_and_load_eurostat(dataset_id:str):
     """
