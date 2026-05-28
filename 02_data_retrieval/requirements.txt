@@ -1,0 +1,4 @@
+pandas
+eurostat
+psycopg2-binary
+python-dotenv

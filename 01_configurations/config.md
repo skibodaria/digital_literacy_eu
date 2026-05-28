@@ -35,7 +35,7 @@ In the current setup the environment management is performed by `miniconda` and 
 In case some updates are needed, the following command can be used:  
 `conda update -n base -c defaults conda`
 
-2. Install `dbt_postgres`:  
+2. Install `dbt-postgres`:  
 `pip install dbt-postgres`  
 Documentation on `dbt-postgres` is provided on [official website](https://docs.getdbt.com/docs/local/connect-data-platform/postgres-setup?version=1.12_). 
 
