@@ -64,11 +64,12 @@ def clean_eurobarometer(dict_of_dfs, sheet:str, map_path):
         mapping_df['phrase_len'] = mapping_df['raw_phrase'].str.len()
         mapping_df = mapping_df.sort_values(by='phrase_len', ascending=False)
         column_replacements = dict(zip(mapping_df['raw_phrase'], mapping_df['clean_phrase']))
+        mapping_df.to_csv('mapping_columns.csv', index=False)
     except Exception as e:
         print(f"Error loading mapping file: {e}.")
 
     try: 
-        df = dict_of_dfs[sheet].drop(columns={'<<Back to content','UE27\nEU27'})
+        df = dict_of_dfs[sheet].drop(columns={'<<Back to content','UE27\nEU27', 'UE27\\nEU27'},errors='ignore')
         num_cols = df.columns.drop('Unnamed: 1')
         df[num_cols] = df[num_cols].apply(pd.to_numeric, errors='coerce')
         df = df[df['BE'] < 1]
@@ -84,14 +85,28 @@ def clean_eurobarometer(dict_of_dfs, sheet:str, map_path):
             if col == 'country':
                 cleaned_cols.append(col)
             else:
-                col_str = f"{sheet}_".lower() + str(col).lower().strip()
+                col_str = str(col).lower().strip()
                 col_str = col_str.replace("'", "").replace(",", "")
                 col_str = col_str.replace(":", "_").replace(" ", "_")
-                col_str = re.sub(r'_+', '_', col_str)  # Collapses ___ down to _
+                col_str = re.sub(r'_+', '_', col_str)  # collapses ___ down to _
                 cleaned_cols.append(col_str)
+        df.columns = cleaned_cols
+
+        for long_phrase, short_phrase in column_replacements.items():
+            df.columns = df.columns.str.replace(long_phrase, short_phrase, regex=False)
+
+        prefixed_cols = []
+    
+        for col in df.columns:
+            if col == 'country':
+                prefixed_cols.append(col)
+            else:
+                prefixed_cols.append(f"{sheet}_".lower() + col)
+            
         final_cols = []
         counts = {}
-        for col in cleaned_cols:
+
+        for col in prefixed_cols:
             if col in final_cols:
                 counts[col]=counts.get(col,1)+1
                 final_cols.append(f"{col}_{counts[col]}") # ensures that if there are duplicated columns, they both will be saved and names altered
@@ -99,12 +114,9 @@ def clean_eurobarometer(dict_of_dfs, sheet:str, map_path):
                 final_cols.append(col)
         df.columns = final_cols
 
-        for long_phrase, short_phrase in column_replacements.items():
-            df.columns = df.columns.str.replace(long_phrase, short_phrase, regex=False)
-
         long_cols = [col for col in df.columns if len(col) > 63]
         if long_cols:
-            print(f"⚠️ Warning in sheet '{sheet}': Columns exceed 63 chars: {long_cols}")
+            print(f"Warning in sheet '{sheet}': Columns exceed 63 chars: {long_cols}")
 
         return df
     except Exception as e:
@@ -171,41 +183,60 @@ def upload_to_postgres(df, connection_string:str, table_name: str):
 # =====================================================================
 if __name__ == "__main__":
 
-    # ADDITIONAL TEST on D7 with Column Names Mapping:
-    # path_test = './eurobarometer_data/eb_sp566.xlsx'
+    # FINAL RUN (table sp566):
+    # path = './eurobarometer_data/eb_sp566.xlsx'
+    # dict_dfs = read_eurobarometer(path)
+
+    # all_tabs = []
     # map_path = 'mapping_columns.csv'
-    # dict_test = read_eurobarometer(path_test)
-    # df_test = clean_eurobarometer(dict_test, 'D7', map_path)
+    # for sheet_name, df in dict_dfs.items():
+    #     df_clean = clean_eurobarometer(dict_dfs,sheet_name,map_path)
+    #     all_tabs.append(df_clean)
+
+    # df_final = reduce(lambda left, right: pd.merge(left, right, on=['country'], how='inner'), all_tabs)
+    # df_final['year']=2025
 
     # load_dotenv(dotenv_path='.env')
-    # test_name = os.getenv('DB_NAME')
-    # test_user = os.getenv('DB_USER')
-    # connection_string_test = f'dbname = {test_name} user = {test_user}'
-    # table_test = 'eurobarometer_d7_test'
+    # db_name = os.getenv('DB_NAME')
+    # db_user = os.getenv('DB_USER')
+    # connection_string_final = f'dbname = {db_name} user = {db_user}'
+    # table_name = 'eurobarometer_sp566'
+    # upload_to_postgres(df_final, connection_string_final, table_name)
 
-    # upload_to_postgres(df_test, connection_string_test, table_test)
-
-
-
-    # FINAL RUN:
-    path = './eurobarometer_data/eb_sp566.xlsx'
+    # Try on a different table:
+    path = './eurobarometer_data/eb_105.xlsx'
     dict_dfs = read_eurobarometer(path)
+    map_path = 'mapping_columns.csv'
+
+    eu_countries = [
+        'BE', 'BG', 'CZ', 'DK', 'DE', 'EE', 'IE', 'EL', 'ES', 'FR', 
+        'HR', 'IT', 'CY', 'LV', 'LT', 'LU', 'HU', 'MT', 'NL', 'AT', 
+        'PL', 'PT', 'RO', 'SI', 'SK', 'FI', 'SE'
+    ]
 
     all_tabs = []
-    map_path = 'mapping_columns.csv'
-    for sheet_name, df in dict_dfs.items():
+    for sheet_name, raw_df in dict_dfs.items():
+        sheet_cols = [str(c).upper().strip() for c in raw_df.columns]
+        has_eu_data = any(country in sheet_cols for country in eu_countries)
+        if not has_eu_data:
+            print(f"Skipping regional/candidate sheet: {sheet_name}. No EU-columns found.")
+            continue
         df_clean = clean_eurobarometer(dict_dfs,sheet_name,map_path)
-        all_tabs.append(df_clean)
+        if df_clean is not None:
+            all_tabs.append(df_clean)
 
-    df_final = reduce(lambda left, right: pd.merge(left, right, on=['country'], how='inner'), all_tabs)
-    df_final['year']=2025
+    if all_tabs:
+        df_final = reduce(lambda left, right: pd.merge(left, right, on=['country'], how='inner'), all_tabs)
+        df_final['year']=2026
 
-    load_dotenv(dotenv_path='.env')
-    db_name = os.getenv('DB_NAME')
-    db_user = os.getenv('DB_USER')
-    connection_string_final = f'dbname = {db_name} user = {db_user}'
-    table_name = 'eurobarometer_sp566'
-    upload_to_postgres(df_final, connection_string_final, table_name)
+        load_dotenv(dotenv_path='.env')
+        db_name = os.getenv('DB_NAME')
+        db_user = os.getenv('DB_USER')
+        connection_string_final = f'dbname = {db_name} user = {db_user}'
+        table_name = 'eurobarometer_105'
+        upload_to_postgres(df_final, connection_string_final, table_name)
+    else:
+        print("No valid EU-27 dtaframes were obtained")
 
 
 
