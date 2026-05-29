@@ -1,5 +1,5 @@
 # =====================================================================
-# Data Retrieval for Eurostat
+# DATA RETRIEVAL EUROSTAT
 # =====================================================================
 
 # importing libraries:
@@ -9,8 +9,6 @@ import eurostat
 import psycopg2
 import pandas as pd
 from dotenv import load_dotenv
-
-load_dotenv(dotenv_path='.env')
 
 # defining the function
 def fetch_and_load_eurostat(dataset_id:str):
@@ -60,11 +58,13 @@ def fetch_and_load_eurostat(dataset_id:str):
                 conn.rollback()
 
 # =====================================================================
-# THE MAIN EXECUTION BLOCK (The part recruiters love to see)
+# THE MAIN EXECUTION BLOCK
 # =====================================================================
 if __name__ == "__main__":
     # This code only runs when you execute this file directly.
-    # It acts as the "control room" of your script.
+    
+    # get the .env file:
+    load_dotenv(dotenv_path='.env')
     
     # read the file with all tables names and codes:
     df_tables = pd.read_csv('eurostat_tables.csv')
