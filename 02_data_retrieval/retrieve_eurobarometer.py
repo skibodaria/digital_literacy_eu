@@ -40,12 +40,11 @@ def read_eurobarometer(file_path:str, header=8):
 
 
 # data cleaner
-def clean_eurobarometer(dict_of_dfs, sheet:str, map_path):
+def clean_eurobarometer(dict_of_dfs, sheet:str):
     """This function helps to deal with messy data from Eurobarometer.
-    It takes three arguments: 
+    It takes two arguments: 
     - a dictionary of dataframes (dict_of_dfs)
     - a name of a tab from Excel file (string)
-    - map (a .csv file for column names mapping)
     Cleans it, pivots it, re-assigns data types and removes obsolete data.
     It also drops all the countries which are not EU.
     It returns a clean data frame.
@@ -56,106 +55,77 @@ def clean_eurobarometer(dict_of_dfs, sheet:str, map_path):
         'HR', 'IT', 'CY', 'LV', 'LT', 'LU', 'HU', 'MT', 'NL', 'AT', 
         'PL', 'PT', 'RO', 'SI', 'SK', 'FI', 'SE'
     ]
-    try:
-        mapping_df = pd.read_csv(map_path)
-        mapping_df['raw_phrase'] = mapping_df['raw_phrase'].astype(str).str.lower().str.strip()
-        mapping_df['clean_phrase'] = mapping_df['clean_phrase'].astype(str).str.lower().str.strip()
-        
-        mapping_df['phrase_len'] = mapping_df['raw_phrase'].str.len()
-        mapping_df = mapping_df.sort_values(by='phrase_len', ascending=False)
-        column_replacements = dict(zip(mapping_df['raw_phrase'], mapping_df['clean_phrase']))
-        mapping_df.to_csv('mapping_columns.csv', index=False)
-    except Exception as e:
-        print(f"Error loading mapping file: {e}.")
 
     try: 
+        # drop emptty columns + totals for EU:
         df = dict_of_dfs[sheet].drop(columns={'<<Back to content','UE27\nEU27', 'UE27\\nEU27'},errors='ignore').copy()
+        # drop first two rows:
+        df = df.drop(df.index[:2])
+        df.reset_index()
+        # drop all rows with French / absolute numbers
+        df = df.iloc[1::2]
+        # turn all columns to numeric
         num_cols = df.columns.drop('Unnamed: 1')
         df[num_cols] = df[num_cols].apply(pd.to_numeric, errors='coerce')
-        df = df[df['BE'] < 1]
+        # ret index for the answers:
         df.set_index('Unnamed: 1',inplace=True)
+        # flip the table:
         df = df.T
+        # name the new index column:
         df.index.name = 'country'
+        # drop all rows which are not in the list of the EU countries
         df = df[df.index.isin(eu_countries)]
+        # reset index:
         df.reset_index(inplace=True)
         df.columns.name = None
 
-        cleaned_cols = []
+        # rename columns to match the map:
+        indexed_cols = []
+        col_num = 1
         for col in df.columns:
             if col == 'country':
-                cleaned_cols.append(col)
+                indexed_cols.append(col)
             else:
-                col_str = str(col).lower().strip()
-                col_str = col_str.replace("'", "").replace(",", "")
-                col_str = col_str.replace(":", "_").replace(" ", "_")
-                col_str = re.sub(r'_+', '_', col_str)  # collapses ___ down to _
-                cleaned_cols.append(col_str)
-        df.columns = cleaned_cols
-
-        for long_phrase, short_phrase in column_replacements.items():
-            df.columns = df.columns.str.replace(long_phrase, short_phrase, regex=False)
-
-        prefixed_cols = []
-    
-        for col in df.columns:
-            if col == 'country':
-                prefixed_cols.append(col)
-            else:
-                prefixed_cols.append(f"{sheet}_".lower() + col)
-            
-        final_cols = []
-        counts = {}
-
-        for col in prefixed_cols:
-            if col in final_cols:
-                counts[col]=counts.get(col,1)+1
-                final_cols.append(f"{col}_{counts[col]}") # ensures that if there are duplicated columns, they both will be saved and names altered
-            else:
-                final_cols.append(col)
-        df.columns = final_cols
-
-        long_cols = [col for col in df.columns if len(col) > 63]
-        if long_cols:
-            print(f"Warning in sheet '{sheet}': Columns exceed 63 chars: {long_cols}")
+                col_str = f'{sheet}_'.lower() + str(col_num)
+                indexed_cols.append(col_str)
+                col_num = col_num + 1
+        df.columns = indexed_cols
 
         return df
     except Exception as e:
         print(f"Something went wrong with cleaning {sheet}: {e}.")
 
-# cleaning audit:
-def audit_mapping(df, map_path, sheet):
+# create map:
+def map_questions(file_path):
+    """Reads an Excel file, returns a DataFrame of sheet_names and questions.
     """
-    Compares actual cleaned column names against mapping file.
-    Reports: which mappings never fired, and which long columns slipped through.
+    try: 
+        df = pd.read_excel(file_path, sheet_name='Content', header=4)
+        df = df.drop(columns={'Question French'})
+        df = df.drop(df.index[0])
+        df = df.replace(',', '', regex=True)
+        return df
+    except Exception as e:
+        print(f'Something went wrong with building a map of questions: {e}.')
+
+def map_answers(dict_of_dfs,map_path):
+    """Maps answers from a dataframe.
+    Saves them, matches them to questions and saves them to a file with questions.
     """
-    mapping_df = pd.read_csv(map_path)
-    raw_phrases = set(mapping_df['raw_phrase'].str.lower().str.strip())
-    clean_phrases = set(mapping_df['clean_phrase'].str.lower().str.strip())
-
-    actual_cols = set(df.columns) - {'country'}
-
-    # 1. Long columns that should have been shortened but weren't
-    long_cols = [c for c in actual_cols if len(c) > 63]
-    if long_cols:
-        print(f"\n[{sheet}] Long columns that mapping DIDN'T catch:")
-        for c in long_cols:
-            # Strip the sheet prefix to get what the raw_phrase should look like
-            stripped = c[len(sheet)+1:]  # removes e.g. "qa7b_"
-            print(f"  actual:   '{stripped}'")
-            # Find closest match in mapping keys
-            close = [r for r in raw_phrases if r[:20] == stripped[:20]]
-            if close:
-                print(f"  closest in mapping: '{close[0]}'")
-            else:
-                print(f"  --> NOT FOUND in mapping at all")
-
-    # 2. Mappings that exist in CSV but never matched anything
-    unused = raw_phrases - {c[len(sheet)+1:] for c in actual_cols}
-    if unused:
-        print(f"\n[{sheet}] Mapping rules that fired on NOTHING (probably key mismatch):")
-        for u in sorted(unused):
-            if len(u) > 40:  # only care about the long ones
-                print(f"  '{u}'")
+    with map_path:
+        try:
+            mapped_columns = []
+            for sheet_name, df in dict_of_dfs.items():
+                for col in df.columns:
+                    if col == 'country':
+                        continue
+                    else:
+                        col_str = str(col).lower().strip()
+                        col_str = col_str.replace("'", "").replace(",", "")
+                        col_str = col_str.replace(":", "").replace(" ", "_")
+                        col_str = col_str.replace("(", "").replace(")", "")
+                        mapped_columns.append(col_str)
+        mapped_columns
 
 
 # table creator for PostgreSQL:
@@ -256,7 +226,7 @@ if __name__ == "__main__":
         if not has_eu_data:
             print(f"Skipping regional/candidate sheet: {sheet_name}. No EU-columns found.")
             continue
-        df_clean = clean_eurobarometer(dict_dfs,sheet_name,map_path)
+        df_clean = clean_eurobarometer(dict_dfs,sheet_name)
         # if df_clean is not None:
         #     all_tabs.append(df_clean)
         all_tabs = []
