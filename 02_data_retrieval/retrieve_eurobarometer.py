@@ -79,7 +79,12 @@ def clean_eurobarometer(dict_of_dfs, sheet:str):
         df.reset_index(inplace=True)
         df.columns.name = None
 
-        # rename columns to match the map:
+        return df
+    except Exception as e:
+        print(f"Something went wrong with cleaning {sheet}: {e}.")
+
+# re-indexing columns: WRITE IT TOMORROW!
+# rename columns to match the map:
         indexed_cols = []
         col_num = 1
         for col in df.columns:
@@ -91,10 +96,6 @@ def clean_eurobarometer(dict_of_dfs, sheet:str):
                 col_num = col_num + 1
         df.columns = indexed_cols
 
-        return df
-    except Exception as e:
-        print(f"Something went wrong with cleaning {sheet}: {e}.")
-
 # create map:
 def map_questions(file_path):
     """Reads an Excel file, returns a DataFrame of sheet_names and questions.
@@ -102,31 +103,58 @@ def map_questions(file_path):
     try: 
         df = pd.read_excel(file_path, sheet_name='Content', header=4)
         df = df.drop(columns={'Question French'})
+        df = df.rename(columns=str.lower)
         df = df.drop(df.index[0])
         df = df.replace(',', '', regex=True)
         return df
     except Exception as e:
         print(f'Something went wrong with building a map of questions: {e}.')
 
-def map_answers(dict_of_dfs,map_path):
+def map_answers(dict_of_dfs):
     """Maps answers from a dataframe.
     Saves them, matches them to questions and saves them to a file with questions.
     """
-    with map_path:
-        try:
-            mapped_columns = []
-            for sheet_name, df in dict_of_dfs.items():
-                for col in df.columns:
-                    if col == 'country':
-                        continue
-                    else:
-                        col_str = str(col).lower().strip()
-                        col_str = col_str.replace("'", "").replace(",", "")
-                        col_str = col_str.replace(":", "").replace(" ", "_")
-                        col_str = col_str.replace("(", "").replace(")", "")
-                        mapped_columns.append(col_str)
-        mapped_columns
+    try:
+        all_rows = []  # Flat list to store every answer row across all sheets
+        
+        for sheet_name, df in dict_of_dfs.items():
+            # Reset the counter for each individual sheet (so answer_id starts at 1 for each question)
+            answer_counter = 1 
+            
+            for col in df.columns:
+                if str(col).lower().strip() == 'country':
+                    continue
+                
+                # Clean the column text
+                col_str = str(col).lower().strip()    
+                col_str = col_str.replace("'", "").replace(",", "")
+                col_str = col_str.replace(":", "").replace(" ", "_")
+                col_str = col_str.replace("(", "").replace(")", "")
+                
+                # Append a distinct dictionary for THIS specific answer row
+                all_rows.append({
+                    'sheet': sheet_name,
+                    'answer_id': f"{sheet_name}_{answer_counter}",
+                    'answer_text': col_str
+                })
+                
+                answer_counter += 1 
+        df_answers = pd.DataFrame(all_rows)
+        return df_answers
 
+    except Exception as e:
+        print(f'Something went wrong with mapping answers: {e}.')
+        return None
+
+def write_map(df_questions, df_answers, map_path):
+    """Merges together questions map and answers map. 
+    Writes it to a csv file.
+    """
+    try:
+        result_df = pd.merge(df_questions, df_answers, on='sheet', how='outer')
+        result_df.to_csv(map_path)
+    except Exception as e:
+        print(f"Couldn't write questions/answers map: {e}.")
 
 # table creator for PostgreSQL:
 def create_table(df):
@@ -210,44 +238,10 @@ if __name__ == "__main__":
 
     # Try on a different table:
     path = './eurobarometer_data/eb_105.xlsx'
-    dict_dfs = read_eurobarometer(path)
-    map_path = 'mapping_columns.csv'
-
-    eu_countries = [
-        'BE', 'BG', 'CZ', 'DK', 'DE', 'EE', 'IE', 'EL', 'ES', 'FR', 
-        'HR', 'IT', 'CY', 'LV', 'LT', 'LU', 'HU', 'MT', 'NL', 'AT', 
-        'PL', 'PT', 'RO', 'SI', 'SK', 'FI', 'SE'
-    ]
-
-    all_tabs = []
-    for sheet_name, raw_df in dict_dfs.items():
-        sheet_cols = [str(c).upper().strip() for c in raw_df.columns]
-        has_eu_data = any(country in sheet_cols for country in eu_countries)
-        if not has_eu_data:
-            print(f"Skipping regional/candidate sheet: {sheet_name}. No EU-columns found.")
-            continue
-        df_clean = clean_eurobarometer(dict_dfs,sheet_name)
-        # if df_clean is not None:
-        #     all_tabs.append(df_clean)
-        all_tabs = []
-        if df_clean is not None:
-            audit_mapping(df_clean, map_path, sheet_name.lower())
-            all_tabs.append(df_clean)
-
-    # if all_tabs:
-    #     df_final = reduce(lambda left, right: pd.merge(left, right, on=['country'], how='inner'), all_tabs)
-    #     df_final['year']=2026
-
-    #     load_dotenv(dotenv_path='.env')
-    #     db_name = os.getenv('DB_NAME')
-    #     db_user = os.getenv('DB_USER')
-    #     connection_string_final = f'dbname = {db_name} user = {db_user}'
-    #     table_name = 'eurobarometer_105'
-    #     upload_to_postgres(df_final, connection_string_final, table_name)
-    # else:
-    #     print("No valid EU-27 dtaframes were obtained")
-
-
-
-
+    dictionary_test = read_eurobarometer(path)
+    questions = map_questions(path)
+    print(map_answers(dictionary_test))
+    #answers = map_answers(path)
+    #path_map = 'map_test.csv'
+    #map_full = write_map(questions,answers,path_map)
 
