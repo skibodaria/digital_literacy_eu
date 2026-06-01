@@ -5,6 +5,7 @@ sources:
     schema: public
     tables:
       - name: isoc_ai_iaiu
+      - name: eurostat_indicators
 
 models:
   - name: test_eurostat

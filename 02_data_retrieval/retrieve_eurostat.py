@@ -26,6 +26,11 @@ def fetch_and_load_eurostat(dataset_id:str):
                 print(f"Starting pipeline for dataset: {dataset_id}...")
                 df = eurostat.get_data_df(dataset_id)
                 df = df.rename(columns={r'geo\TIME_PERIOD':'country'})
+                df.columns = [
+                    f"year_{int(float(col))}" if str(col).replace('.0', '').isdigit() 
+                    else col 
+                    for col in df.columns
+                ]
                 
                 raw_columns = df.columns.tolist()
                 output_buffer = io.StringIO()
