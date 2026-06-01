@@ -9,18 +9,23 @@ The pipeline on this stage looks the following way:
 The second part of the data retrieval is the **Eurobarometer** data. To extract and upload to PostgreSQL messy Excel files, use `retrieve_eurobarometer.py`.
 
 The pipeline for this data looks the following way:
-- read Excel file from hard drive
-- edit it by getting read of obsolete tabs, repetative data, etc.
-- clean column names, assign data types
-- merge all the tabs together (if working with multiple tabs)
-- connect to PostgreSQL and upload clean table there
+- read Excel file from hard drive;
+- edit it by getting read of obsolete tabs, repetative data, etc.;
+- clean column names, assign data types;
+- deals with length of column names which are too long by re-indexing them to standard IDs;
+- merge all the tabs together (if working with multiple tabs);
+- connect to PostgreSQL and upload clean table there.
+
+At the same time the same `.py` script:
+- extracts questions and their codes from Excel file,
+- saves them together with answers,
+- uploads the created 'map' to PortgreSQL as a table.
 
 
 Important notes:
 - `.env` file with credentials to access PostgreSQL is needed in the current folder;
 - `requrements.txt` should be executed in order to install neccessarily Python libraries;
-- `eurostat_tables.csv` has table codes and table names; the ones used here were important for the current project
-- `mapping_columns.csv` is needed to deal with messy column names in Eurobarometer data; this file can be edited or replaces with a different approach to mapping long and messy columns to something more readable; **Note** PostgreSQL column names can be maximum **64 characters**.
+- `eurostat_tables.csv` has table codes and table names; the ones used here were important for the current project.
 
 File `01_data_sources.md` describes the tables I'm using for the current project and also stating the reasons for this choice.
 
