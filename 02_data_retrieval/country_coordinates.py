@@ -14,7 +14,7 @@ def load_eu_country_coordinates():
     Fetches canonical country coordinates, filters strictly for the 27 EU 
     member states (handling the Eurostat 'EL' exception), and loads to PostgreSQL.
     """
-    load_dotenv(dotenv_path='.env')
+    load_dotenv()
     db_name = os.getenv("DB_NAME")
     db_user = os.getenv("DB_USER")
     connection_string = f'dbname={db_name} user={db_user}'

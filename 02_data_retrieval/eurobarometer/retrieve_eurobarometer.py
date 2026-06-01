@@ -353,7 +353,7 @@ def process_eurobarometer(
 if __name__ == "__main__":
 
     # run on Eurobarometer Standard 105 (2026):
-    load_dotenv(dotenv_path='.env')
+    load_dotenv()
     db_name = os.getenv('DB_NAME')
     db_user = os.getenv('DB_USER')
     connection_string_final = f'dbname = {db_name} user = {db_user}'
