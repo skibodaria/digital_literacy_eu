@@ -297,7 +297,8 @@ def process_eurobarometer(
         file_path: str,
         data_table_name: str,
         map_table_name: str,
-        connection_string: str
+        connection_string: str,
+        survey_year: int
 ):
     """Runs the entire Eurobarometer ETL/ELT pipeline:
     1. Extracts and cleans meta-data (questions + answers mapping)
@@ -336,7 +337,8 @@ def process_eurobarometer(
             return
         
         df_final = reduce(lambda left, right: pd.merge(left, right, on=['country'], how='inner'), all_tabs)
-        print(f"Final DataFrame created. Shape to upload: {df_final.shape}.")
+        df_final['year'] = survey_year
+        print(f"Final DataFrame created with year {survey_year}. Shape to upload: {df_final.shape}.")
         
         upload_to_postgres(df_final, connection_string, data_table_name, 'data')
         print(f"Successfully processed and uploaded everything for {file_path}.")
@@ -350,11 +352,31 @@ def process_eurobarometer(
 # =====================================================================
 if __name__ == "__main__":
 
+    # run on Eurobarometer Standard 105 (2026):
     load_dotenv(dotenv_path='.env')
     db_name = os.getenv('DB_NAME')
     db_user = os.getenv('DB_USER')
     connection_string_final = f'dbname = {db_name} user = {db_user}'
     path_test = './eurobarometer_data/eb_105.xlsx'
+    data_table_name = 'eurobatometer_105_data'
+    map_table_name = 'eurobarometer_105_map'
+    year = 2026
+    process_eurobarometer(path_test, data_table_name, map_table_name, connection_string_final, year)
+    # successfull!
 
-    process_eurobarometer(path_test, 'eb_105_test', 'map_105_test', connection_string_final)
+    # run on Special Eurobarometer SP566 (2025):
+    # path_test = './eurobarometer_data/eb_sp566.xlsx'
+    # data_table_name = 'eurobatometer_sp566_data'
+    # map_table_name = 'eurobarometer_sp566_map'
+    # year = 2025
+    # process_eurobarometer(path_test, data_table_name, map_table_name, connection_string_final, year)
+    # successfull!
+
+    # run on Standard Eurobarometer 104 (2025)
+    # path_test = './eurobarometer_data/eb_104.xlsx'
+    # data_table_name = 'eurobatometer_104_data'
+    # map_table_name = 'eurobarometer_104_map'
+    # year = 2025
+    # process_eurobarometer(path_test, data_table_name, map_table_name, connection_string_final, year)
+    # successfull!
 

@@ -1,34 +1,47 @@
-# Data Retrieval | Folder Structure
-This folder consists of several files, which are relevant to the process of obtaining data from `Eurostat` website. The documents here give explanations about different approaches to the data retrieval, present Jupiter Notebooks in which I develop the approach, and, in the end, provide user with `retrieve_eurostat.py` script that allows to automate obtaining data.
+# Data Retrieval & Pipeline Layer
 
-The pipeline on this stage looks the following way:
-- grab a table name (dataset_id) from a file
-- connect to **Eurostat** API using `eurostat` library and get this table
-- upload it to PostgreSQL.
+This directory contains the pipeline modules, development notebooks, and documentation required to programmatically ingest, clean, and load data from **Eurostat** and **Eurobarometer Surveys** into a PostgreSQL data warehouse.
 
-The second part of the data retrieval is the **Eurobarometer** data. To extract and upload to PostgreSQL messy Excel files, use `retrieve_eurobarometer.py`.
+---
 
-The pipeline for this data looks the following way:
-- read Excel file from hard drive;
-- edit it by getting read of obsolete tabs, repetative data, etc.;
-- clean column names, assign data types;
-- deals with length of column names which are too long by re-indexing them to standard IDs;
-- merge all the tabs together (if working with multiple tabs);
-- connect to PostgreSQL and upload clean table there.
+## System Prerequisites
 
-At the same time the same `.py` script:
-- extracts questions and their codes from Excel file,
-- saves them together with answers,
-- uploads the created 'map' to PortgreSQL as a table.
+Before running the automation scripts, ensure your local environment is configured:
 
+1. **Dependencies**: Install the required Python packages:
+   ```bash 
+   pip install -r requirements.txt
+   ``` 
 
-Important notes:
-- `.env` file with credentials to access PostgreSQL is needed in the current folder;
-- `requrements.txt` should be executed in order to install neccessarily Python libraries;
-- `eurostat_tables.csv` has table codes and table names; the ones used here were important for the current project.
+2. **Environment Variables**: Create a `.env` file in this directory with your PostgreSQL credentials:
+    ```bash
+    DB_NAME=your_database_name
+    DB_USER=your_database_user
+---
+## Data Obtaining Pipelines 
+1. **Eurostat Automation** (`retrieve_eurostat.py`)  
+This script automates data fetching from the official Eurostat API using a configuration-driven approach:
+- **Configuration**: Reads targeted dataset IDs directly from `eurostat_tables.csv`.
+- **Obtaining**: Connects to the `Eurostat API` using the `eurostat` Python library.
+- **Storage**: Dynamically builds database schemas and loads the raw tables into `PostgreSQL`.
 
-File `01_data_sources.md` describes the tables I'm using for the current project and also stating the reasons for this choice.
-
-Jupiter Notebook `02_data_extraction_eurostat.ipynb` is kept here since the project is part of my Data Analytics Bootcamp and illustrates the learning curve and the teaching journey. It might be useful to get more understanding of the 'how' and gives more context about possible scenarios of data retrieval (and why I didn't go with some of them).
-
-Jupiter Notebook `03_data_extraction_eurobarometer.ipynb` is kept for the same reason: it has all the steps of developing the final Python script to read messy Excel files, deal with the structure of tabs, edit columns, convert the whole file intoa neat `.csv` and upload it to PostgreSQL.
+2. **Eurobarometer ETL Pipeline** (`terrieve_eurobarometer.py`)
+Eurobarometer data is distributed in highly nested, multi-tab Excel workbooks. This robust ETL script standardizes and flattens the layout into an analytics-ready structure:
+- **Extraction**: Obtains complex local Excel workbooks (e.g., `eb_105.xlsx`).
+- **Data Cleaning & Filtering**: Isolates core data rows, handles missing metrics, drops non-data tabs, and filters specifically for the EU-27 member states while skipping candidate or regional breakdown tabs.
+- **Column Re-indexing**: Supports PostgreSQL column length limits by mapping long-form survey questions to short alphanumeric IDs (e.g., `d71_1`, `c2_1`).
+- **Merging**: Uses a functional `reduce` outer merge to horizontally unify over a hundred survey tabs into a single table indexed by country and tracking year.
+- **Metadata Mapping**: Simultaneously extracts survey questions text and response choices, generating a relational metadata "map" table uploaded to Postgres alongside the core dataset.
+---
+## Directory Structure & Additional Files
+|File/Folder|Description|
+|---|---|
+|`retrieve_eurostat.py`|Automated script for the Eurostat API pipeline|
+|`retrieve_eurobarometer.py`|Complete ETL pipeline script for processing and loading Eurobarometer workbooks|
+|`eurostat_tables.csv`|Look-up file containing the list of Eurostat table codes and descriptions utilized in this project|
+|`requirements.txt`|Python dependencies required for this pipeline|
+|`01_data_sources.md`|Documentation detailing the specific tables selected for the project scope and the analytical justification behind them|
+|`02_data_extraction_eurostat.ipynb`|Learning materials for building a pipeline on Eurostat data (part of the Capstone project). Explores the initial API approaches, alternative extraction techniques, and details why specific data obraining pathways were chosen|
+|`03_data_extraction_eurobarometer.ipynb`|Learning materials for building a pipeline on Eurobarometer data (also part of the Capstone project). Documents the iterative development of the Excel transposing logic, regex cleaning patterns, and the debugging steps required to solve the structural tab-merge challenges|
+|`.env`|Hidden file with credentials for PostgreSQL accessl see `.gitignore`|
+|`eurobarometer_data`|Folder (not git-tracked) with raw Eurobarometer data; see `.gitignore`|
