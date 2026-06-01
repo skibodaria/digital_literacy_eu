@@ -1,25 +1,18 @@
 version: 2
 
 sources:
-  - name: raw_data
+  - name: eurostat
     schema: public
     tables:
       - name: eurostat_indicators
+      - name: eurostat_bridge
+      - name: eurostat_table_catalog
 
 models:
-  - name: test_eurostat
-    description: "A test model for Eurostat data"
+  - name: eurostat_map_full
+    description: "Full catalog of indicators and tables for Eurostat data."
     columns:
-      - name: id
-        description: "The primary key for this table"
-        data_tests:
-          - unique
-          - not_null
-
-  - name: test_eurobatometer
-    description: "A test model for Eurobarometer data"
-    columns:
-      - name: id
+      - name: indicator_code
         description: "The primary key for this table"
         data_tests:
           - unique

@@ -1,4 +1,18 @@
-pandas
-eurostat
-psycopg2-binary
-python-dotenv
+# --- Data Manipulation ---
+pandas>=2.0.0
+psycopg2-binary>=2.9.0
+
+# --- Access to Credentials ---
+python-dotenv>=1.0.0
+
+# --- API & Web Scraping ---
+requests>=2.31.0
+eurostat>=1.0.1
+lxml>=4.9.0          # coordinates script
+html5lib>=1.1      
+
+# --- Excel Processing (Eurobarometer) ---
+openpyxl>=3.1.0      # required by pandas
+
+# --- Visualization (EDA part) ---
+matplotlib>=3.7.0
