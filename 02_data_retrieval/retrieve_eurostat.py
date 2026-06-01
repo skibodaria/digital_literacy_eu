@@ -26,12 +26,17 @@ def fetch_and_load_eurostat(dataset_id:str):
                 print(f"Starting pipeline for dataset: {dataset_id}...")
                 df = eurostat.get_data_df(dataset_id)
                 df = df.rename(columns={r'geo\TIME_PERIOD':'country'})
-                df.columns = [
-                    f"year_{int(float(col))}" if str(col).replace('.0', '').isdigit() 
-                    else col 
-                    for col in df.columns
-                ]
+                df.columns = [str(col).strip() for col in df.columns]
                 
+                cleaned_columns = []
+                for col in df.columns:
+                    clean_col = col.replace('.0', '')
+                    if clean_col.isdigit() and len(clean_col) == 4:
+                        cleaned_columns.append(f"year_{clean_col}")
+                    else:
+                        cleaned_columns.append(col)
+                df.columns = cleaned_columns
+
                 raw_columns = df.columns.tolist()
                 output_buffer = io.StringIO()
                 df.to_csv(output_buffer, index=False, header=True)
@@ -39,7 +44,7 @@ def fetch_and_load_eurostat(dataset_id:str):
 
                 structure_elements = []
                 for col in raw_columns:
-                    if str(col).isdigit() and len(str(col)) == 4:
+                    if str(col).startswith("year_"):
                         structure_elements.append(f'"{col}" numeric')
                     else:
                         structure_elements.append(f'"{col}" varchar')

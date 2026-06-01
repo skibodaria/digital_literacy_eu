@@ -4,7 +4,6 @@ sources:
   - name: raw_data
     schema: public
     tables:
-      - name: isoc_ai_iaiu
       - name: eurostat_indicators
 
 models:
