@@ -15,93 +15,114 @@ import re
 # DECLARING THE FUNCTIONS:
 
 # data extractor
-def read_eurobarometer(file_path:str, header=8):
+def read_eurobarometer(file_path:str, sheet_name=None):
     """This functions reads an Excel file to get each tab from it and save it a dictionary of pandas dataframes.
     Takes two arguments:
     - a path to the file (string)
-    - amount of rows before the header (by default 8 as in most of the Eurobarometer files) (integer)
-    The function drops first two tabs (normally Content and Countries).
-    Returns a dictionary of dataframes.
+    - sheet_name (a string); by defalut takes all data-strings (no meta-data tabs like Content and B (Countries))
+    Returns dataframe (if sheet_name is Content) -- for questions/answers mapping;
+    returns dictionary of dataframes (if sheet_name is not specified, process all the data tabs).
     """
     # read all the sheets as dictionary of dataframes:
     try: 
-        dict_of_dfs = pd.read_excel(file_path, sheet_name=None, header=8)
+        if sheet_name == 'Content':
+            df_content = pd.read_excel(file_path, sheet_name='Content', header=4)
+            return df_content
+        if sheet_name == 'B':
+            print('You are trying to process meta-data tab "Countries".')
+        else:
+            dict_of_dfs = pd.read_excel(file_path, sheet_name=None, header=8)
 
-        # get rid of the front page and country list:
-        front_page = next(iter(dict_of_dfs))
-        del dict_of_dfs[front_page]
-        country_page = next(iter(dict_of_dfs))
-        del dict_of_dfs[country_page]
+            # get rid of the front page and country list:
+            front_page = next(iter(dict_of_dfs))
+            del dict_of_dfs[front_page]
+            country_page = next(iter(dict_of_dfs))
+            del dict_of_dfs[country_page]
 
-        return dict_of_dfs
+            return dict_of_dfs
     
     except Exception as e:
         print(f"Something went wrong with file reading: {e}.")
 
 
-# data cleaner
-def clean_eurobarometer(dict_of_dfs, sheet:str):
-    """This function helps to deal with messy data from Eurobarometer.
-    It takes two arguments: 
-    - a dictionary of dataframes (dict_of_dfs)
-    - a name of a tab from Excel file (string)
-    Cleans it, pivots it, re-assigns data types and removes obsolete data.
-    It also drops all the countries which are not EU.
-    It returns a clean data frame.
-    """
-
+# clean one tab:
+def clean_single_sheet(df_raw, sheet_name: str):
+    """Helper function containing your original cleaning logic for a single DataFrame."""
     eu_countries = [
         'BE', 'BG', 'CZ', 'DK', 'DE', 'EE', 'IE', 'EL', 'ES', 'FR', 
         'HR', 'IT', 'CY', 'LV', 'LT', 'LU', 'HU', 'MT', 'NL', 'AT', 
         'PL', 'PT', 'RO', 'SI', 'SK', 'FI', 'SE'
     ]
-
-    try: 
-        # drop emptty columns + totals for EU:
-        df = dict_of_dfs[sheet].drop(columns={'<<Back to content','UE27\nEU27', 'UE27\\nEU27'},errors='ignore').copy()
-        # drop first two rows:
+    
+    try:
+        df = df_raw.drop(columns={'<<Back to content','UE27\nEU27', 'UE27\\nEU27'}, errors='ignore').copy()
         df = df.drop(df.index[:2])
-        df.reset_index()
-        # drop all rows with French / absolute numbers
         df = df.iloc[1::2]
-        # turn all columns to numeric
+    
         num_cols = df.columns.drop('Unnamed: 1')
         df[num_cols] = df[num_cols].apply(pd.to_numeric, errors='coerce')
-        # ret index for the answers:
-        df.set_index('Unnamed: 1',inplace=True)
-        # flip the table:
+        df.set_index('Unnamed: 1', inplace=True)
         df = df.T
-        # name the new index column:
         df.index.name = 'country'
-        # drop all rows which are not in the list of the EU countries
         df = df[df.index.isin(eu_countries)]
-        # reset index:
         df.reset_index(inplace=True)
         df.columns.name = None
-
         return df
     except Exception as e:
-        print(f"Something went wrong with cleaning {sheet}: {e}.")
+        print(f"Fail to clean sheet {sheet_name}: {e}.")
 
-# re-indexing columns: WRITE IT TOMORROW!
-# rename columns to match the map:
-        indexed_cols = []
-        col_num = 1
-        for col in df.columns:
-            if col == 'country':
-                indexed_cols.append(col)
-            else:
-                col_str = f'{sheet}_'.lower() + str(col_num)
-                indexed_cols.append(col_str)
-                col_num = col_num + 1
-        df.columns = indexed_cols
+
+def clean_eurobarometer(dict_of_dfs, sheet: str = None):
+    """Cleans messy data from Eurobarometer.
+    Takes two arguments:
+    - dict_of_dfs: a dictionary of dataframes
+    - sheet: (string, optional) Name of a specific tab. Default is None.
+    
+    Returns:
+    - A single cleaned DataFrame if a sheet name is provided.
+    - A dictionary of cleaned DataFrames if sheet=None.
+    """
+    try:
+        # Case 1: Work with a single specified sheet
+        if sheet is not None:
+            if sheet not in dict_of_dfs:
+                print(f"Sheet '{sheet}' not found in the dictionary.")
+                return None
+            return clean_single_sheet(dict_of_dfs[sheet], sheet)
+            
+        # Case 2: Work with ALL sheets if sheet=None
+        else:
+            cleaned_dict = {}
+            for sheet_name, df_raw in dict_of_dfs.items():
+                print(f"Processing and cleaning sheet: {sheet_name}")
+                cleaned_dict[sheet_name] = clean_single_sheet(df_raw, sheet_name)
+            return cleaned_dict
+            
+    except Exception as e:
+        target = sheet if sheet is not None else "all sheets"
+        print(f"Something went wrong with cleaning {target}: {e}.")
+        return None
+
+
+# # re-indexing columns: WRITE IT TOMORROW!
+# # rename columns to match the map:
+#         indexed_cols = []
+#         col_num = 1
+#         for col in df.columns:
+#             if col == 'country':
+#                 indexed_cols.append(col)
+#             else:
+#                 col_str = f'{sheet}_'.lower() + str(col_num)
+#                 indexed_cols.append(col_str)
+#                 col_num = col_num + 1
+#         df.columns = indexed_cols
 
 # create map:
 def map_questions(file_path):
     """Reads an Excel file, returns a DataFrame of sheet_names and questions.
     """
     try: 
-        df = pd.read_excel(file_path, sheet_name='Content', header=4)
+        df = read_eurobarometer(file_path, sheet_name='Content')
         df = df.drop(columns={'Question French'})
         df = df.rename(columns=str.lower)
         df = df.drop(df.index[0])
@@ -236,12 +257,23 @@ if __name__ == "__main__":
     # table_name = 'eurobarometer_sp566'
     # upload_to_postgres(df_final, connection_string_final, table_name)
 
-    # Try on a different table:
     path = './eurobarometer_data/eb_105.xlsx'
-    dictionary_test = read_eurobarometer(path)
+    
+    # 1. Get the questions map (returns a Single DataFrame)
     questions = map_questions(path)
-    print(map_answers(dictionary_test))
-    #answers = map_answers(path)
-    #path_map = 'map_test.csv'
-    #map_full = write_map(questions,answers,path_map)
+    
+    # 2. Get the data dictionary (Do NOT pass sheet_name='Content' here!)
+    # This reads all tabs, drops meta tabs, and returns a TRUE dictionary
+    dictionary_test = read_eurobarometer(path) 
+
+    dictionary_clean_test = clean_eurobarometer(dictionary_test)
+    
+    # 3. Map the answers using the full dictionary
+    answers = map_answers(dictionary_clean_test)
+    
+    # 4. Save your mapping configuration file
+    path_map = 'map_test.csv'
+    write_map(questions, answers, path_map)
+    
+    print("Successfully built and saved maps!")
 
