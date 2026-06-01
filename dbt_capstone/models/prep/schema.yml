@@ -1,8 +1,14 @@
 version: 2
 
+sources:
+  - name: raw_data
+    schema: public
+    tables:
+      - name: isoc_ai_iaiu
+
 models:
-  - name: my_first_dbt_model
-    description: "A starter dbt model"
+  - name: test_eurostat
+    description: "A test model for Eurostat data"
     columns:
       - name: id
         description: "The primary key for this table"
@@ -10,8 +16,8 @@ models:
           - unique
           - not_null
 
-  - name: my_second_dbt_model
-    description: "A starter dbt model"
+  - name: test_eurobatometer
+    description: "A test model for Eurobarometer data"
     columns:
       - name: id
         description: "The primary key for this table"

@@ -25,6 +25,7 @@ def fetch_and_load_eurostat(dataset_id:str):
             try:
                 print(f"Starting pipeline for dataset: {dataset_id}...")
                 df = eurostat.get_data_df(dataset_id)
+                df = df.rename(columns={r'geo\TIME_PERIOD':'country'})
                 
                 raw_columns = df.columns.tolist()
                 output_buffer = io.StringIO()
