@@ -6,6 +6,12 @@
 # Drafts folder to ignore
 drafts_ignore/
 
+# dbt_capstone folders to ignore:
+target/
+dbt_packages/
+logs/
+
+
 # Mac
 .DS_Store
 
