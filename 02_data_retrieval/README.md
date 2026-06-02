@@ -42,22 +42,28 @@ To build a fully relational reporting layer, these specialized modules scrape or
 
 ---
 ## Directory Structure & Additional Files
-|File/Folder|Structural Role|Description|
-|---|---|---|
-|`retrieve_eurostat.py`|Pipeline Script|Core automated pipeline for processing the Eurostat API|
-|`retrieve_eurobarometer.py`|Pipeline Script|ETL pipeline for processing, cleaning and linking complex Eurobarometer Excel sheets|
-|`country_coordinates.py`|Mapping Tool|Fetches, adjusts, and uploads coordinates for the 27 EU member states|
-|`eurostat_tables_map.py`|Mapping Tool|Generates a clean table connecting physical Eurostat table codes to readable titles|
-|`eurostat_mapping.py`|Mapping Tool|Fetches and saves codes and names of Eurostat indicators|
-|`eurostat_units_map.py`|Mapping Tool|Downloads and saves Eurostat measurement unit descriptions|
-|`eurostat_map_individuals.py`|Mapping Tool|Maps socio-demographic individual category types into a table|
-|`eurostat_tables.csv`|Configuration File|Contains targeted Eurostat tables used for processing in Eurostat pipeline|
-|`requirements.txt`|Dependencies|List of required Python packages for the Data Retrieval stage|
-|`01_data_sources.md`|Documentation|Analytical explanation and catalog of datasets selected for the project|
-|`02_data_extraction_eurostat.ipynb`|Progress Tracking Notebook|Playground exploring early workflows, alternative query methods, and architectural notes|
-|`03_data_extraction_eurobarometer.ipynb`|Progress Tracking Notebook|Playground documenting regex patterns, Excel transposing logic, and tab-merge testing|
-|`eurobarometer_data/`|Data Staging Area|Local directory containing raw input Eurobarometer `.xlsx` workfiles (*Ignored by Git*)|
-|`.env`|Credentials|Contains local environment variables and database access parameters (*Ignored by Git*)|
+
+The files are now divided in two folders -- related to `eurobarometer/` and to `eurostat/`.
+
+|File/Folder|Description|
+|---|---|
+|Pipeline Scripts|
+|`retrieve_eurostat.py`|Core automated pipeline for processing the Eurostat API|
+|`retrieve_eurobarometer.py`|ETL pipeline for processing, cleaning and linking complex Eurobarometer Excel sheets|
+| Mapping Tools|
+|`country_coordinates.py`|Fetches, adjusts, and uploads coordinates for the 27 EU member states|
+|`eurostat_tables_map.py`|Generates a clean table connecting physical Eurostat table codes to readable titles|
+|`eurostat_indicators.py`|Fetches and saves codes and names of Eurostat indicators|
+|`eurostat_units_map.py`|Downloads and saves Eurostat measurement unit descriptions|
+|`eurostat_map_individuals.py`|Maps socio-demographic individual category types into a table|
+|`eurostat_tables.csv`|Contains targeted Eurostat tables used for processing in Eurostat pipeline (configuration file)|
+|Other files|
+|`requirements.txt`|List of required Python packages for the Data Retrieval stage (dependencies)|
+|`01_data_sources.md`|Analytical explanation and catalog of datasets selected for the project (documentation)|
+|`02_data_extraction_eurostat.ipynb`|Playground exploring early workflows, alternative query methods, and architectural notes (progress tracking notebook)|
+|`03_data_extraction_eurobarometer.ipynb`|Playground documenting regex patterns, Excel transposing logic, and tab-merge testing (progress tracking notebook)|
+|`eurobarometer_data/`|Local directory containing raw input Eurobarometer `.xlsx` workfiles (*Ignored by Git*) (data staging area)|
+|`.env`|Contains local environment variables and database access parameters (*Ignored by Git*)(credentials)|
 ---
 ## Recommended Execution Order
 To safely generate the database tables alongside their foundational lookup definitions, run the scripts sequentially from within this directory:
