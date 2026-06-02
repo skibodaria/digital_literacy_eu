@@ -3,7 +3,6 @@
 This directory contains the pipeline modules, development notebooks, and documentation required to programmatically ingest, clean, and load data from **Eurostat** and **Eurobarometer Surveys** into a PostgreSQL data warehouse.
 
 ---
-
 ## System Prerequisites
 
 Before running the automation scripts, ensure your local environment is configured:
