@@ -13,7 +13,7 @@ SELECT
 	c.lat,
 	c.lon,
 	--f.unit,
-	--f.ind_type,
+	f.ind_type,
 	f."year"
 	--f.origin_table,
     --f.table_name
