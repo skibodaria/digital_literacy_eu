@@ -6,7 +6,10 @@ Before starting the data transformations with `dbt`, several additional issues h
 ## Prep Step
 - created a mapping file of all the indicators and tables together; see `models/prep/prep_eurostat_map.sql`;
 - created master table by melting `year_XXX` columns and `UNION ALL` all the 34 `Eurostat` tables together (see `models/prep/prep_eurostat_melted_long.sql`)
-- created a filtered table (e.g., removed `units` that I won't use for the analysis, or categories of individuals which are not in focus (e.g., by employment status, or by type of household, etc.))
+- created a filtered table:
+    - removed `units` that I won't use for the analysis, 
+    - removed categories of individuals which are not in focus (e.g., by employment status, or by type of household, etc.),
+    - removed non-EU countries (kept 27 entries)
 
 # Staging Step
 Here I need to develop three models for three different hypotheses:

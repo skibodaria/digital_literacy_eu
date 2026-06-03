@@ -7,7 +7,7 @@ WITH melted_data AS (
 )
 SELECT 
 	table_code AS origin_table,
-	indicator_code AS indicator,
+	indicator_code,
 	country_code,
 	ind_type,
 	unit,
@@ -22,3 +22,8 @@ WHERE
     'M_I0_2_75_89','M_I3_4_75_89', 'M_I5_8_75_89','Y16_17','Y16_24','Y16_29', 'Y25_54', 'Y25_64', 'Y16_24HI',
     'Y16_24LO','Y16_24ME', 'Y25_29', 'Y25_64HI', 'Y25_64LO', 'Y25_64ME', 'Y25_64_RETIROTH', 'Y25_64_SALSELFFAM',
     'Y25_64_UNE', 'Y55_74'])
+    AND country_code IN (
+        'AT', 'BE', 'BG', 'CY', 'CZ', 'DE', 'DK', 'EE', 'EL', 
+        'ES', 'FI', 'FR', 'HR', 'HU', 'IE', 'IT', 'LT', 'LU', 
+        'LV', 'MT', 'NL', 'PL', 'PT', 'RO', 'SE', 'SI', 'SK'
+    )
