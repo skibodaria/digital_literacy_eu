@@ -1,0 +1,41 @@
+version: 2
+
+sources:
+  - name: eurostat_raw
+    schema: public
+    tables:
+      - name: countries
+      - name: isoc_ai_iaiu
+      - name: isoc_ai_iaiuxr
+      - name: isoc_cbs
+      - name: isoc_ci_ac_i
+      - name: isoc_ci_hm
+      - name: isoc_ci_ifp_fu
+      - name: isoc_ci_ifp_iu
+      - name: isoc_ci_in_h
+      - name: isoc_ciegi_ac
+      - name: isoc_ciegi_pb22
+      - name: isoc_cisci_ip20
+      - name: isoc_cisci_prv20
+      - name: isoc_eid_ieid
+      - name: isoc_iiu_iuprb
+      - name: isoc_iiu_iuxr
+      - name: isoc_pbo
+      - name: isoc_sk_cskl_i21
+      - name: isoc_sk_dskl_i21
+      - name: isoc_sk_edic_i21
+      - name: isoc_tf
+      - name: tin00028
+      - name: tin00091
+      - name: tin00092
+      - name: tin00093
+      - name: tin00094
+      - name: tin00095
+      - name: tin00098
+      - name: tin00099
+      - name: tin00101
+      - name: tin00102
+      - name: tin00103
+      - name: tin00127
+      - name: tin00129
+      - name: tin00134

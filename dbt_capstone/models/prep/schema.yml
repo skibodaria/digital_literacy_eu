@@ -9,7 +9,7 @@ sources:
       - name: eurostat_table_catalog
 
 models:
-  - name: eurostat_map_full
+  - name: prep_eurostat_map
     description: "Full catalog of indicators and tables for Eurostat data."
     columns:
       - name: indicator_code
