@@ -1,5 +1,5 @@
 -- models/prep/prep_eurostat_melted_long.sql
-{{ config(materialized='table') }}
+-- {{ config(materialized='table') }}
 
 {% set tables = [
     'isoc_ai_iaiu', 'isoc_ai_iaiuxr', 'isoc_cbs', 'isoc_ci_ac_i', 'isoc_ci_hm',
