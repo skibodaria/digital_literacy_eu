@@ -12,10 +12,11 @@ SELECT
 	c.country_name,
 	c.lat,
 	c.lon,
-	f.unit,
+	--f.unit,
 	--f.ind_type,
-	f."year",
-	--f.origin_table
+	f."year"
+	--f.origin_table,
+    --f.table_name
 FROM filtered_data as f
 JOIN {{ source('eurostat_raw', 'countries')}} as c USING(country_code)
 JOIN {{ ref('prep_eurostat_map')}} AS m USING(indicator_code)
