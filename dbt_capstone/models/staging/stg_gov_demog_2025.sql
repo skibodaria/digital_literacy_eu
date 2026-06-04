@@ -14,7 +14,7 @@
 -- Digital Governance Indicators, 2025:
 {% set indicator_list_new = [
     'I_IEID', 'I_IGOVAPR', 'I_IGOVBE', 'I_IGOVRCC', 
-    'I_IUGOV1', 'I_IIGOVX'
+    'I_IUGOV1', 'I_IIGOVX', 'I_IGOVTAX2'
 ] %}
 
 with filtered_source as (
