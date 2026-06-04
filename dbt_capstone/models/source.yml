@@ -25,3 +25,8 @@ sources:
       - name: isoc_sk_dskl_i21
       - name: isoc_sk_edic_i21
       - name: isoc_tf
+  - name: eurobars
+    schema: public
+    tables:
+      - name: eurobarometer_104_data
+      - name: eurobarometer_sp566_data

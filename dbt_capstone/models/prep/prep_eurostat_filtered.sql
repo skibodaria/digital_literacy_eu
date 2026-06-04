@@ -1,6 +1,5 @@
 -- models/prep/prep_eurostat_filtered.sql
-
-{{ config(materialized='table') }}
+-- {{ config(materialized='table') }}
 
 WITH melted_data AS (
     SELECT * FROM {{ ref('prep_eurostat_melted_long') }}

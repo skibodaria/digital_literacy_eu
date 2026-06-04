@@ -1,4 +1,5 @@
-{{ config(materialized='table') }}
+-- models/prep/prep_eurostat_map.sql
+--{{ config(materialized='table') }}
 
 with indicator as (
     select * from {{ source('eurostat', 'eurostat_indicators') }}
