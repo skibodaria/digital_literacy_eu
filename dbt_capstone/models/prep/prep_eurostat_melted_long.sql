@@ -5,10 +5,7 @@
     'isoc_ai_iaiu', 'isoc_ai_iaiuxr', 'isoc_cbs', 'isoc_ci_ac_i', 'isoc_ci_hm',
     'isoc_ci_ifp_fu', 'isoc_ci_ifp_iu', 'isoc_ci_in_h', 'isoc_ciegi_ac', 'isoc_ciegi_pb22',
     'isoc_cisci_ip20', 'isoc_cisci_prv20', 'isoc_eid_ieid', 'isoc_iiu_iuprb', 'isoc_iiu_iuxr',
-    'isoc_pbo', 'isoc_sk_cskl_i21', 'isoc_sk_dskl_i21', 'isoc_sk_edic_i21', 'isoc_tf',
-    'tin00028', 'tin00091', 'tin00092', 'tin00093', 'tin00094', 'tin00095',
-    'tin00098', 'tin00099', 'tin00101', 'tin00102', 'tin00103', 'tin00127',
-    'tin00129', 'tin00134'
+    'isoc_pbo', 'isoc_sk_cskl_i21', 'isoc_sk_dskl_i21', 'isoc_sk_edic_i21', 'isoc_tf'
 ] %}
 
 {% for table in tables %}
