@@ -56,4 +56,8 @@ Once the database serves a flat table, the Python environment focuses exclusivel
 - The Macro View: Isolates rows restricted to national totals and primary denominators (`PC_IND` - Percentage of Individuals) to construct a high-level country baseline. This allows clear analysis of macro trends (e.g., correlating overall national digital literacy with baseline economic metrics).
 - The Micro/Demographic View: Evaluates targeted sub-matrices (e.g., intersectional groups like gender paired with education level) across smaller thematic buckets to uncover micro-sociological insights without causing data density errors or sparse matrices (`NaN` values).
 --- 
-
+## 3. Last Available Year (LAY) Approach for EU Baseline Metrics
+Eurostat indicators are asynchronous; some surveys are run annually, some biennially, and others every three to five years.
+Since the goal of this project is a macro **cross-sectional baseline of Europe**, I have two standard data science strategies to handle this: choosing a strict year (e.g., 2025) and dropping the metrics which were not yer aquired or calculated for this year (approach a), or going with the last available year (approach b).
+If I strictly filtered for a single calendar year like 2025 across all 34 indicators, my baseline matrix would be riddled with missing values (NaN), completely breaking your correlation matrices and clustering algorithms.
+Instead of a strict calendar year, I define the time dimension as **the most recent state of the country**. I take the newest available data point for each specific indicator-country combination within a reasonable recent window (e.g., **between 2021 and 2025**).
