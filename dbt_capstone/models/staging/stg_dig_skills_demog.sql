@@ -1,17 +1,16 @@
 -- models/staging/stg_dig_skills_demog.sql
-
 {{ config(materialized='table') }}
 
--- 1. Declare the demographic categories:
+-- declare the demographic categories:
 {% set ind_type_list = [ 
     'F_Y16_74', 'M_Y16_74',               
     'I0_2', 'I3_4', 'I5_8',               
     'IND_DEG1', 'IND_DEG2', 'IND_DEG3',   
     'Y16_19', 'Y20_24', 'Y25_34', 'Y35_44',
-    'Y45_54', 'Y55_64', 'Y65_74', 'Y75_MAX'
+    'Y45_54', 'Y55_64', 'Y65_74'
 ] %}
 
--- 2. Declare the specific Digital Skills indicators
+-- declare the specific Digital Skills indicators
 {% set indicator_list = [
     'I_DSK2_AB', 'I_DSK2_B', 'I_DSK2_LM', 
     'I_DSK2_LW', 'I_DSK2_N', 'I_DSK2_NA', 'I_DSK2_X'
@@ -31,7 +30,7 @@ with filtered_source as (
         ) as rn
     from {{ ref('prep_eurostat_filtered') }}
     where unit = 'PC_IND'
-      -- filters for th edemographic categories in the list
+      -- filters for the demographic categories in the list
       and ind_type in (
           {% for demog in ind_type_list %}
           '{{ demog }}'{% if not loop.last %},{% endif %}

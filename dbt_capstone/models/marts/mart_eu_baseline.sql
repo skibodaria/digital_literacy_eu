@@ -3,5 +3,5 @@
 
 SELECT *
 FROM {{ ref ('stg_eurobar_2025_metrics')}}
-JOIN {{(ref 'stg_eurostat_baseline')}}
-USING(country_code);
+JOIN {{ ref ('stg_eurostat_baseline')}}
+USING(country_code)
