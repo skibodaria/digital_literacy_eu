@@ -40,7 +40,7 @@ select
     country_code
     -- generate new columns (value)
     {% for ind in indicator_list %}
-    , max(case when indicator_code = '{{ ind }}' then indicator_value end) as {{ ind | lower }}_baseline_value
+    , max(case when indicator_code = '{{ ind }}' then indicator_value end) as {{ ind | lower }}
     {% endfor %}
 
     -- generate new columns (source_year)
