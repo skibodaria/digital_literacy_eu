@@ -29,8 +29,8 @@ latest_available_records as (
 
 -- all Metrics for the EU Baseline ICT
 {% set indicator_list = [
-    'I_DSK2_AB','I_DSK2_B','I_DSK2_X',
-    'I_IDAY','I_IEID','I_IGOVAPR','I_IGOVTAX2', 'I_IMT12',
+    'I_DSK2_AB','I_DSK2_B', 'I_DKS2_LW', 'I_DSK2_N', 'I_DSK2_LM', 'I_DSK2_X',
+    'I_IDAY','I_IEID','I_IGOVAPR','I_IGOVTAX2',
     'I_IUAI','I_IUGOV1','I_IUPOL2','I_IUX','I_MAPS','I_TIC',
     'I_UDI', 'I_IREIDNO','I_IREIDNA', 'I_IREIDSEC','I_IREIDTEC', 'I_IREIDNN', 'I_IREIDDEV', 'I_IREIDOTH'
 ] %}

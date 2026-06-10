@@ -10,7 +10,6 @@
     'Y45_54', 'Y55_64', 'Y65_74'
 ] %}
 
--- The data is available for different years (2020-2024) but not 2025, so it's just a legacy model:
 {% set indicator_list = [
     'I_IDAY', 'I_IUAI', 'I_IUCPP', 'I_IUPDG','I_IUPS',
     'I_IUX','I_UDI', 'I_IUCHAT1','I_IUPOL2'

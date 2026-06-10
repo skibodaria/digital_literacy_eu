@@ -1,4 +1,4 @@
--- models/staging/mart_eu_baseline.sql
+-- models/mart/mart_eu_baseline.sql
 {{ config(materialized='table') }}
 
 SELECT *

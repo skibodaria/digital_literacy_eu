@@ -30,3 +30,5 @@ sources:
     tables:
       - name: eurobarometer_104_data
       - name: eurobarometer_sp566_data
+      - name: eurobarometer_104_map
+      - name: eurobarometer_sp566_map
