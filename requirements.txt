@@ -1,0 +1,33 @@
+# --- Data Manipulation ---
+pandas
+psycopg2
+psycopg2-binary
+dbt-postgres
+
+# --- Access to Credentials ---
+python-dotenv
+
+# --- API & Data Retrieval ---
+requests
+eurostat
+lxml # coordinates script
+html5lib      
+
+# --- Excel Processing (Eurobarometer) ---
+openpyxl  # required by pandas
+
+
+
+# --- Visualization ---
+matplotlib
+seaborn
+plotly
+
+# --- Analysis ---
+scikit-learn
+scipy
+numpy
+statsmodels
+
+# --- Streamlit ---
+streamlit
