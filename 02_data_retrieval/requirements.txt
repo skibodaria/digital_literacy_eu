@@ -21,3 +21,4 @@ plotly
 
 # --- Analysis ---
 scikit-learn
+statsmodels
