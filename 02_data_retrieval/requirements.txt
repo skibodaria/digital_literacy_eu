@@ -14,7 +14,7 @@ html5lib
 # --- Excel Processing (Eurobarometer) ---
 openpyxl  # required by pandas
 
-# --- Visualization (EDA part) ---
+# --- Visualization ---
 matplotlib
 seaborn
 plotly
@@ -22,3 +22,6 @@ plotly
 # --- Analysis ---
 scikit-learn
 statsmodels
+
+# --- Streamlit ---
+streamlit
