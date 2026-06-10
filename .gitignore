@@ -11,6 +11,9 @@ target/
 dbt_packages/
 logs/
 
+# streamlit
+.streamlit
+*.toml
 
 # Mac
 .DS_Store
