@@ -1,0 +1,51 @@
+indicator_code,aliased_column_name,dynamic_display_title
+I_DSK2_AB,i_dsk2_ab,Above Basic Digital Skills (% of individuals)
+I_DSK2_B,i_dsk2_b,Basic Digital Skills (% of individuals)
+I_DSK2_LW,i_dks2_lw,Low Digital Skills (% of individuals)
+I_DSK2_N,i_dskn,Narrow Digital Skills (% of individuals)
+I_DSK2_LM,i_dsk2_lm,Limited Digital Skills (% of individuals)
+I_DSK2_X,i_dsk_x,No Digital Skills (% of individuals)
+I_IDAY,i_iday,Daily Internet Access (% of individuals)
+I_IUAI,i_iuai,Use of Generative AI Tools (% of individuals)
+I_IEID,i_ieid,Access to Online Services via eID (% of individuals)
+I_MAPS,i_maps,"Managing Access to Personal Data, last 3 months (% of individuals)"
+I_IUCPP,i_iucpp,Internet Usage for Civic/Political Participation (% of individuals)
+I_IUPDG,i_iupdg,Internet Usage Playing and Downloading games (% of individuals)
+I_IUPS,i_iups,Difficulties Encountered When Using Internet (% of individuals)
+I_IUCHAT1,i_iuchat1,Internet Usage for Messages Exchange (% of individuals)
+I_IGOVAPR,i_igovapr,"e-Gov: Making Appointments, last 12 months (% of individuals)"
+I_IGOVTAX2,i_igovtax2,"e-Gov: Submitting Tax Declaration Online, last 12 months (% of individuals)"
+I_IUGOV1,i_iugov1,"e-Gov: General Interaction with Public Authorities, last 12 month (% of individuals)"
+I_IGOVBE,i_igovbe,"e-Gov: Request Benefits Online, last 12 months (% of individuals)"
+I_IGOVRCC,i_igovrcc,"e-Gov: Making Other Requests and Complaints Online, last 12 months (% of individuals)"
+I_IGOVRX,i_igovrx,"e-Gov: Didn't Make Any Online Requests, last 12 month (% of individuals)"
+I_IUPOL2,i_iupol2,Media: Expressing Opinions on Civic and Political Issues in Social Media (% of individuals)
+I_TIC,i_tic,Media: Checking Truthfulness of Information Online (% of individuals)
+I_UDI,i_udi,Media: Seen Untrue or Doubtful Information Online (% of individuals)
+I_IREIDNO,i_ireidno,eID Non-Use: Don't Have eID (% of individuals)
+I_IREIDNA,i_ireidna,eID Non-Use: Don't Know About eIDs (% of individuals)
+I_IREIDSEC,i_ireidsec,eID Non-Use: Security Concerns (% of individuals)
+I_IREIDTEC,i_ireidtec,eID Non-Use: Technical Difficulties (% of individuals)
+I_IREIDNN,i_ireidnn,eID Non-Use: Don't Need Access to Any Online Services (% of individuals)
+I_IREIDDEV,i_ireiddev,eID Non-Use: No Suitable Device (% of individuals)
+I_IREIDOTH,i_ireidoth,eID Non-Use: Other Reasons (% of individuals)
+I_IGOV12FM,i_igov12fm,"Legacy e-Gov: Downloading Official Forms, last 12 months (% of individuals)"
+I_IGOV12IF,i_igov12if,"Legacy e-Gov: Obraining Information from Public Authorities Online, last 12 month (% of individuals)"
+I_IIGOVX,i_iigovx,"Legacy e-Gov: Don't Have Issues with Public Authorities Web/Apps, last 12 months (% of individuals)"
+I_IUID1X,i_iuid1x,Don't Use Electronic Identification (% of individuals)
+I_IUX,i_iux,Never Used Internet (% of individuals)
+QA6_1_1,tr_party,Trust in Political Parties
+QA6_5_1,tr_authority,Trust in Local/Public Authorities
+QA6_7_1,tr_nat_gov,Trust in National Government
+QA6_8_1,tr_nat_par,Trust in National Parliament
+QA6_9_1,tr_eu,Trust in the European Union
+QA8_1_1,tr_eu_par,Trust in the European Parliament
+QE3_1_1,tr_press,Trust in the Written Press
+QE3_5_1,tr_soc_netw_online,Trust in Online Social Networks
+QE7_1_1,nat_media_tr_info,Perceived Media Trustworthiness
+QE7_4_1,nat_media_free_pressure,Perceived Media Freedom from Pressure
+QE6R_2_1,tr_info_polit_on_soc_net,Trust in Political Info on Social Networks
+QE9_9_1,eff_acc_to_tech,Digital Technologies Impact: Access to Technology
+QE1_5_1,eff_improve_democr_life,Digital Technologies Impact: Improving Democratic Life
+QE1_10_1,eff_improve_acc_pub_services,Digital Technologies Impact: Access to Public Services
+QE1_1_1,eff_work_remote,Digital Technologies Impact: Ability to Work Remotely

@@ -6,21 +6,21 @@ def load_and_clean_data():
     conn = st.connection("postgresql", type="sql")
     df_data = conn.query("SELECT * FROM public.mart_eu_baseline", ttl="10m")
 
-    year_to_check = ['i_dsk2_ab_source_year', 'i_dsk2_b_source_year',
-       'i_dsk2_x_source_year', 'i_iday_source_year', 'i_ieid_source_year',
-       'i_igovapr_source_year', 'i_igovtax2_source_year',
-       'i_imt12_source_year', 'i_iuai_source_year', 'i_iugov1_source_year',
-       'i_iupol2_source_year', 'i_iux_source_year', 'i_maps_source_year',
-       'i_tic_source_year', 'i_udi_source_year', 'i_ireidno_source_year',
-       'i_ireidna_source_year', 'i_ireidsec_source_year',
-       'i_ireidtec_source_year', 'i_ireidnn_source_year',
-       'i_ireiddev_source_year', 'i_ireidoth_source_year']
+    # year_to_check = ['i_dsk2_ab_source_year', 'i_dsk2_b_source_year',
+    #    'i_dsk2_x_source_year', 'i_iday_source_year', 'i_ieid_source_year',
+    #    'i_igovapr_source_year', 'i_igovtax2_source_year',
+    #    'i_imt12_source_year', 'i_iuai_source_year', 'i_iugov1_source_year',
+    #    'i_iupol2_source_year', 'i_iux_source_year', 'i_maps_source_year',
+    #    'i_tic_source_year', 'i_udi_source_year', 'i_ireidno_source_year',
+    #    'i_ireidna_source_year', 'i_ireidsec_source_year',
+    #    'i_ireidtec_source_year', 'i_ireidnn_source_year',
+    #    'i_ireiddev_source_year', 'i_ireidoth_source_year']
     
-    df_data = df_data.drop(columns=year_to_check)
+    # df_data = df_data.drop(columns=year_to_check)
     df_data = df_data.drop(columns=['lat','lon'])
 
     eurostat_indicators = ['country_name','country_code','i_dsk2_ab', 'i_dsk2_b', 'i_dsk2_x', 'i_iday',
-       'i_ieid', 'i_igovapr', 'i_igovtax2', 'i_imt12', 'i_iuai', 'i_iugov1',
+       'i_ieid', 'i_igovapr', 'i_igovtax2', 'i_iuai', 'i_iugov1',
        'i_iupol2', 'i_iux', 'i_maps', 'i_tic', 'i_udi', 'i_ireidno',
        'i_ireidna', 'i_ireidsec', 'i_ireidtec', 'i_ireidnn', 'i_ireiddev',
        'i_ireidoth']
