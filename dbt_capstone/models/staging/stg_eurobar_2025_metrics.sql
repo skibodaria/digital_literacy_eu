@@ -1,5 +1,5 @@
 -- models/staging/stg_eurobar_2025_metrics.sql
-{{ config(materialized='table') }}
+-- {{ config(materialized='table') }}
 
 SELECT
 	eb.country as country_code,

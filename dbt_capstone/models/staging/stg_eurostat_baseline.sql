@@ -1,5 +1,4 @@
 -- models/staging/stg_eurostat_baseline.sql
-
 {{ config(materialized='table') }}
 
 with filtered_source as (

@@ -116,7 +116,7 @@ with tabs[0]:
         st.markdown(f"""
             <div class="kpi-card">
                 <div class="kpi-label">Avg Basic Digital Skills</div>
-                <div class="kpi-value">{df_filtered['i_dsk2_b'].mean().round(2)} / 27</div>
+                <div class="kpi-value">{df_filtered['i_dsk2_b'].mean().round(2)}%</div>
             </div>
         """, unsafe_allow_html=True)
 

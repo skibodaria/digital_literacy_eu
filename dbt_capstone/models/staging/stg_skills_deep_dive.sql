@@ -1,7 +1,7 @@
--- models/staging/stg_gov_demog_2025.sql
+-- models/staging/stg_skills_deep_dive.sql
 {{ config(materialized='table') }}
 
--- 1. Declare the demographic categories:
+-- declare the demographic categories:
 {% set ind_type_list = [ 
     'F_Y16_74', 'M_Y16_74',               
     'I0_2', 'I3_4', 'I5_8',               
@@ -10,11 +10,13 @@
     'Y45_54', 'Y55_64', 'Y65_74'
 ] %}
 
--- Digital Governance Indicators, 2025:
-{% set indicator_list_new = [
-    'I_IEID', 'I_IGOVAPR', 'I_IGOVBE', 'I_IGOVRCC', 
-    'I_IUGOV1', 'I_IGOVTAX2', 'I_IGOVRX', 'I_IREIDNA',
-    'I_IREIDNO', 'I_IREIDSEC','I_IREIDTEC', 'I_IREIDNN', 'I_IREIDDEV', 'I_IREIDOTH'
+-- declare the specific Digital Skills indicators
+{% set indicator_list = [
+    'I_DSK2_PS_BAB', 
+    'I_DSK2_CC_BAB', 
+    'I_DSK2_DCC_BAB', 
+    'I_DSK2_IL_BAB', 
+    'I_DSK2_SF_BAB' 
 ] %}
 
 with filtered_source as (
@@ -31,7 +33,6 @@ with filtered_source as (
         ) as rn
     from {{ ref('prep_eurostat_filtered') }}
     where unit = 'PC_IND'
-        and year = 2025 -- enforcing the particular year
       -- filters for the demographic categories in the list
       and ind_type in (
           {% for demog in ind_type_list %}
@@ -40,7 +41,7 @@ with filtered_source as (
       )
       -- filters only the mentioned metrics
       and indicator_code in (
-          {% for ind in indicator_list_new %}
+          {% for ind in indicator_list %}
           '{{ ind }}'{% if not loop.last %},{% endif %}
           {% endfor %}
       )
@@ -59,8 +60,8 @@ latest_available_records as (
 select
     country_code
 
-    -- nested Jinja Loops: Generates columns named
-    {% for ind in indicator_list_new %}
+    -- nested Jinja Loops: Generates columns named:
+    {% for ind in indicator_list %}
         {% for demog in ind_type_list %}
         , max(case when indicator_code = '{{ ind }}' and ind_type = '{{ demog }}' then indicator_value end) as {{ ind | lower }}_{{ demog | lower }}
         {% endfor %}

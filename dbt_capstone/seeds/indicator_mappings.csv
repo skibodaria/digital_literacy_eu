@@ -49,3 +49,8 @@ QE9_9_1,eff_acc_to_tech,Digital Technologies Impact: Access to Technology
 QE1_5_1,eff_improve_democr_life,Digital Technologies Impact: Improving Democratic Life
 QE1_10_1,eff_improve_acc_pub_services,Digital Technologies Impact: Access to Public Services
 QE1_1_1,eff_work_remote,Digital Technologies Impact: Ability to Work Remotely
+I_DSK2_PS_BAB,i_dsk2_ps_bab,Basic and Above Basic Problem Solving Skills (% of individuals)
+I_DSK2_CC_BAB,i_dsk2_cc_bab,Basic and Above Basic Communication/Collaboration Skills (% of individuals)
+I_DSK2_DCC_BAB,i_dsk2_dcc_bab,Basic and Above Basic Content Creation Skills (% of individuals)
+I_DSK2_IL_BAB,i_dsk2_il_bab,Basic and Above Basic Data Literacy Skills (% of individuals)
+I_DSK2_SF_BAB,i_dsk2_sf_bab,Basic and Above Basic Safety Skills (% of individuals)

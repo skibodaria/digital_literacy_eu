@@ -1,9 +1,6 @@
 -- models/mart/mart_eu_baseline.sql
 {{ config(materialized='table') }}
 
--- models/mart/mart_eu_baseline.sql
-{{ config(materialized='table') }}
-
 WITH joined_data AS (
     SELECT *
     FROM {{ ref('stg_eurobar_2025_metrics') }}
@@ -30,13 +27,7 @@ SELECT
     i_maps,
     i_tic,
     i_udi,
-    i_ireidno, 
-    i_ireidna, 
-    i_ireidsec,
-    i_ireidtec,
-    i_ireidnn,
-    i_ireiddev,
-    i_ireidoth,
+    i_ireidno,
     
     -- all Eurobarometer but not a country code
     tr_party, tr_authority, tr_nat_gov,
