@@ -6,14 +6,14 @@ unified_metadata AS (
     SELECT 
         source_system,
         table_code,
-        indicator_code,
+        TRIM(LOWER(indicator_code)) AS indicator_code, 
         indicator_name AS original_indicator_name
     FROM {{ ref('stg_unified_indicators') }}
 ),
 
 eurostat_clean_titles AS (
     SELECT 
-        indicator_code,
+        TRIM(LOWER(indicator_code)) AS indicator_code,
         dynamic_display_title
     FROM {{ ref('indicator_mappings') }}
 )
@@ -21,8 +21,9 @@ eurostat_clean_titles AS (
 SELECT
     m.source_system,
     m.table_code,
-    m.indicator_code,
-    COALESCE(e.dynamic_display_title, m.original_indicator_name) AS dynamic_display_title
+    m.indicator_code,                -- Keep only the clean, lowercase indicator code
+    e.dynamic_display_title          -- Keep ONLY the proper title, dropping the original name
 FROM unified_metadata m
 LEFT JOIN eurostat_clean_titles e 
     ON m.indicator_code = e.indicator_code
+WHERE e.dynamic_display_title IS NOT NULL  -- Filters out all the rows you don't need!
