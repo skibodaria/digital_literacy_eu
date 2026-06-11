@@ -28,6 +28,7 @@ SELECT
     i_tic,
     i_udi,
     i_ireidno,
+    i_dsk2_bab,
     
     -- all Eurobarometer but not a country code
     tr_party, tr_authority, tr_nat_gov,

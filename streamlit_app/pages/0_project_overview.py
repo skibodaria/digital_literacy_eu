@@ -65,6 +65,8 @@ with tabs[0]:
         for proper_name, code in display_name_to_code.items() 
         if code in available_columns
     }
+
+    filtered_display_options = dict(sorted(filtered_display_options.items()))
     
     # KPI Row
     # --- 1. INJECT CUSTOM KPI CARD STYLE OVERRIDES ---
@@ -107,23 +109,23 @@ with tabs[0]:
     with col1:
         st.markdown(f"""
             <div class="kpi-card">
-                <div class="kpi-label">Avg High Digital Skills</div>
-                <div class="kpi-value">{df_filtered['i_dsk2_ab'].mean().round(2)}%</div>
+                <div class="kpi-label">Basic+ Digital Skills</div>
+                <div class="kpi-value">{df_filtered['i_dsk2_bab'].mean().round(2)}%</div>
             </div>
         """, unsafe_allow_html=True)
 
     with col2:
         st.markdown(f"""
             <div class="kpi-card">
-                <div class="kpi-label">Avg Basic Digital Skills</div>
-                <div class="kpi-value">{df_filtered['i_dsk2_b'].mean().round(2)}%</div>
+                <div class="kpi-label">EU Tagret by 2030</div>
+                <div class="kpi-value">80%</div>
             </div>
         """, unsafe_allow_html=True)
 
     with col3:
         st.markdown(f"""
             <div class="kpi-card">
-                <div class="kpi-label">Avg Daily Internet Usage</div>
+                <div class="kpi-label">Daily Internet Usage</div>
                 <div class="kpi-value">{df_filtered['i_iday'].mean().round(2)}%</div>
             </div>
         """, unsafe_allow_html=True)
@@ -131,16 +133,16 @@ with tabs[0]:
     with col4:
         st.markdown(f"""
             <div class="kpi-card">
-                <div class="kpi-label">Avg AI Usage</div>
-                <div class="kpi-value">{df_filtered['i_iuai'].mean().round(2)}%</div>
+                <div class="kpi-label">eID Usage</div>
+                <div class="kpi-value">{df_filtered['i_ieid'].mean().round(2)}%</div>
             </div>
         """, unsafe_allow_html=True)
 
     with col5:
         st.markdown(f"""
             <div class="kpi-card">
-                <div class="kpi-label">Avg Gov Trust</div>
-                <div class="kpi-value">{df_filtered['tr_nat_gov'].mean().round(2)}%</div>
+                <div class="kpi-label">AI Usage</div>
+                <div class="kpi-value">{df_filtered['i_iuai'].mean().round(2)}%</div>
             </div>
         """, unsafe_allow_html=True)
 
@@ -244,3 +246,12 @@ with tabs[3]:
         - links to documentation
         - tech stack"""
     )
+
+
+# ==============================================================================
+# FOOTER SECTION
+# ==============================================================================
+st.write("---")
+st.caption("""
+    **Data Source Reference:** Eurostat Digital Economy and Society Statistics (2025), [Eurobarometer Standard (104)](https://europa.eu/eurobarometer/surveys/detail/3378) and [Eurobarometer Special (sp566)](https://europa.eu/eurobarometer/surveys/detail/3362).
+""")

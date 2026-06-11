@@ -146,7 +146,8 @@ with tab_overview:
             showframe=False,              
             showcoastlines=True,          
             coastlinecolor="LightGray",
-            resolution=50
+            resolution=50,
+            bgcolor="rgba(0,0,0,0)"
         )
         
         fig.update_layout(
