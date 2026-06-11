@@ -35,7 +35,7 @@ demographics AS (
 SELECT
     i.source_system,
     i.table_code,
-    i.indicator_code || '_' || d.demog_key AS final_column_name,
+    i.indicator_code || '_' || d.demog_key AS indicator_code,
     i.base_title || ' - ' || d.demog_title AS dynamic_display_title
 FROM base_indicators i
 CROSS JOIN demographics d

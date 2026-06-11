@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
-import database as db
+import funcs
 import styles
 
 
@@ -12,10 +12,10 @@ import styles
 # ==========================================
 try:
     # Tab 1 & 2: Baseline Mart & Metadata
-    df_baseline, baseline_labels = db.load_tab_data("mart_eu_baseline", "mart_indicators")
+    df_baseline, baseline_labels = funcs.load_tab_data("mart_eu_baseline", "mart_indicators")
     
     # Tab 4: E-Governance Data & Metadata
-    df_egov, egov_labels = db.load_tab_data("stg_gov_demog_2025", "mart_indicators")
+    df_egov, egov_labels = funcs.load_tab_data("stg_gov_demog_2025", "mart_indicators")
     
     # add more dataframes/tables here
 except Exception as e:
