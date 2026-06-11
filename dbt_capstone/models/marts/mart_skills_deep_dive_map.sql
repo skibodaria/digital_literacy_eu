@@ -5,10 +5,11 @@ WITH base_indicators AS (
     SELECT 
         source_system,
         table_code,
-        indicator_code,    
+        -- Force the indicator code to lowercase right here
+        LOWER(indicator_code) AS indicator_code,    
         dynamic_display_title AS base_title 
     FROM {{ ref('mart_indicators') }}
-    WHERE indicator_code IN (
+    WHERE LOWER(indicator_code) IN (
         'i_dsk2_ps_bab', 
         'i_dsk2_cc_bab', 
         'i_dsk2_dcc_bab', 

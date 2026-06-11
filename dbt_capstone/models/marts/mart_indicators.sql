@@ -21,9 +21,9 @@ eurostat_clean_titles AS (
 SELECT
     m.source_system,
     m.table_code,
-    m.indicator_code,                -- Keep only the clean, lowercase indicator code
-    e.dynamic_display_title          -- Keep ONLY the proper title, dropping the original name
+    m.indicator_code,                
+    e.dynamic_display_title          
 FROM unified_metadata m
 LEFT JOIN eurostat_clean_titles e 
     ON m.indicator_code = e.indicator_code
-WHERE e.dynamic_display_title IS NOT NULL  -- Filters out all the rows you don't need!
+WHERE e.dynamic_display_title IS NOT NULL
