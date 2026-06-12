@@ -9,6 +9,11 @@ import scipy.stats as stats
 
 # -- Page configuration:
 st.set_page_config(layout="wide")
+COLOR_MAPS = {
+    "education": {'Low Edu Avd': '#cbd5e1', 'Medium Edu': '#64748b', 'High Edu': '#0f172a'},
+    "gender": {'Female': '#498cdb', 'Male': '#001f63'},
+    "urban": {'Cities': '#3b82f6', 'Suburbs': '#60a5fa', 'Rural': '#93c5fd'}
+}
 
 # ==============================================================================
 # DATA LOADING (Executed once and cached via database.py)
@@ -277,23 +282,18 @@ with tab_gender:
 
     chart_summary_rows = []
 
-    # Ensure data exists for the selected countries
     if not df_filtered_usage.empty:
         
-        # 💡 Loop directly through your paired columns array by steps of 2!
         for i in range(0, len(gen_dig_skills), 2):
             fem_col = gen_dig_skills[i]
             male_col = gen_dig_skills[i+1]
             
-            # Double-check that these columns exist in the active dataframe stream
             if fem_col in df_filtered_usage.columns and male_col in df_filtered_usage.columns:
                 mean_fem = df_filtered_usage[fem_col].mean()
                 mean_male = df_filtered_usage[male_col].mean()
                 
-                # Grab the dynamic title from your labels dictionary using the female column key
                 raw_title = usage_labels.get(fem_col, fem_col)
                 
-                # Clean up the prefixes inline instantly
                 display_label = (
                     str(raw_title)
                     .replace('Internet:', '')
@@ -308,7 +308,6 @@ with tab_gender:
                     'Male': round(mean_male, 1) if not pd.isna(mean_male) else 0
                 })
 
-        # Render only if rows were found
         if chart_summary_rows:
             df_chart = pd.DataFrame(chart_summary_rows)
             
@@ -355,25 +354,158 @@ with tab_gender:
 
 
 
+# ==============================================================================
+# --- TAB 3: EDUCATION LEVELS ---
+# ==============================================================================
+base_metrics = sorted(list(set([
+    c.split('_i0_2')[0] for c in df_filtered_usage.columns if '_i0_2' in c
+])))
 
-
-
-
-    
-
-
+edu_usage = []
+for metric in base_metrics:
+    edu_usage.extend([f"{metric}_i0_2", f"{metric}_i3_4", f"{metric}_i5_8"])
 
 with tab_edu:
     st.subheader("Granular Component Evaluation")
     st.write("Placeholder: In-depth breakdowns of specific subsets.")
 
+    col_table_edu, col_insights_edu = st.columns([3,2])
+
+    edu_metrics = sorted(list(set([
+        c.split('_i0_2')[0] for c in df_filtered_usage.columns if '_i0_2' in c
+    ])))
+
+    with col_table_edu: 
+        df_edu_results = funcs.run_friedman_multigroups(
+            df=df_usage,  # Static pipeline on full data for test validity
+            metrics_list=edu_metrics,
+            group_suffixes=['_i0_2', '_i3_4', '_i5_8'],
+            group_labels=['Low Edu', 'Medium Edu', 'High Edu'],
+            metadata_dict=usage_labels
+        )
+
+        cols_to_drop = [f"{label} Avg (%)" for label in ['Low Edu', 'Medium Edu', 'High Edu']]
+        df_display_edu = df_edu_results.drop(columns=cols_to_drop, errors='ignore')
+
+        st.dataframe(
+            df_display_edu,
+            column_config={
+            "Max Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"),
+            "P-Value": st.column_config.NumberColumn(format="%.6f") # 🎯 Force 6 decimal places
+            },
+            hide_index=True,
+            use_container_width=True
+        )
+    with col_insights_edu:
+        st.subheader("Key Insights")
+        st.expander("**1.**")
+        st.expander("**2.**")
+        st.expander("**3.**")
+
+
+
+    dynamic_title = funcs.get_dynamic_subheader(df_filtered_usage)
+
+    funcs.render_demographic_chart(
+        df_filtered_usage, 
+        edu_usage, 
+        ['Low Edu', 'Medium Edu', 'High Edu'], 
+        usage_labels,
+        color_map=COLOR_MAPS["education"]
+    )
+
 
 # ==============================================================================
-# --- REGULAR TAB LAYOUTS ---
+# --- TAB 4: URBANIZATION LEVELS ---
 # ==============================================================================
 with tab_urban:
-    st.subheader("Digital Skills vs. Sociodemographic Factors")
-    st.write("Placeholder: Cross-tabulations and distributions segmented by Education, Gender, Urbanization, and Age groups.")
+    st.markdown("### Digital Utility vs. Degree of Urbanization")
+    st.write("""
+        This module visualizes the correlation between degree of urbanization (Cities vs. Suburbs vs. Rural Areas) 
+        and digital utility. It combines a rigorous statistical test (Friedman Chi-Square) to determine 
+        if urban-rural gaps are mathematically significant, paired with an interactive chart to illustrate 
+        the intensity of those gaps across specific digital activities..
+    """)
+
+    col_table_urb, col_insights_urban = st.columns([3,2])
+    urban_metrics = sorted(list(set([
+        c.split('_ind_deg1')[0] for c in df_filtered_usage.columns if '_ind_deg1' in c
+    ])))
+
+    urban_usage = []
+
+    for metric in urban_metrics:
+        urban_usage.extend([f"{metric}_i0_2", f"{metric}_i3_4", f"{metric}_i5_8"])
+
+    with col_table_urb:
+        df_urban_results = funcs.run_friedman_multigroups(
+            df=df_usage,
+            metrics_list=urban_metrics,
+            group_suffixes=['_ind_deg1', '_ind_deg2', '_ind_deg3'],
+            group_labels=['Cities', 'Suburbs', 'Rural',],
+            metadata_dict=usage_labels
+        )
+
+        if not df_urban_results.empty:
+            st.subheader("Is Settlement Density Statistically Significant for Digital Access?")
+            st.caption("Note: This table reflects aggregate EU-wide significance statistics (N=27) and remains fixed to preserve test sample validity.")
+            
+            cols_to_drop = [f"{label} Avg (%)" for label in ['Cities', 'Suburbs', 'Rural']]
+            df_display = df_urban_results.drop(columns=cols_to_drop, errors='ignore')
+
+            st.dataframe(
+                df_display,
+                column_config={
+                    "Max Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"),
+                    "P-Value": st.column_config.NumberColumn(format="%.4f")
+                },
+                hide_index=True,
+                use_container_width=True
+            )
+        else:
+            st.warning("No tracking indicators matched your data criteria for the urbanization metrics.")
+
+    with col_insights_urban:
+        st.subheader("Key Insights")
+        with st.expander("**1. The Urban Advantage is Pervasive**"):
+            st.write(
+                """
+                - For almost every metric -- especially Use of Generative AI Tools, Messages Exchange, and Daily Access -- there is a clear, 
+                     downward trend as we move from Cities to Rural areas. 
+                - High-density urban environments act as accelerators for digital adoption.
+            """)
+        with st.expander('**2. Generative AI as the "Gap Leader"**'):
+            st.write(
+                """
+                - With a massive 15.4-point gap between cities and rural areas, Generative AI tools represent 
+                the single largest point of inequality. 
+                - Advanced or emerging tech is currently much more concentrated in metropolitan hubs compared to simpler tasks.
+            """)
+        
+        with st.expander('**3. Rural "Penalty" in Online Political Participation**'):
+            st.write(
+                """
+                - People, who live in cities, are significantly more likely to express opinions on civic/political issues and 
+                participate in political activities online compared to those in rural areas. 
+                - **Potential "civic digital divide" detected!**
+            """)
+        
+        with st.expander("**4. Digital Difficulties Are Very Egalitatian**"):
+            st.write(
+                """
+                - The analysis shows no statistically significant difference across three groups.
+                - Digital friction is "democratically" distributed: everyone, regardless of where they live,
+                struggles with digital tasks at the same rate.
+            """)
+
+
+    funcs.render_demographic_chart(
+        df_filtered_usage, 
+        urban_usage, 
+        ['City', 'Town/Suburbs', 'Rural Areas'], 
+        usage_labels,
+        color_map=COLOR_MAPS["education"]
+    )
 
 
 # ==============================================================================

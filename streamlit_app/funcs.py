@@ -5,6 +5,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import scipy.stats as stats 
 import psycopg2
+import styles
 
 @st.cache_resource
 def init_connection():
@@ -107,3 +108,173 @@ def run_t_test_pair(df, column_list, suffix_to_remove, label_dict=None):
     df_results = df_results.drop(columns={'col_code'})
             
     return df_results
+
+
+
+def run_friedman_multigroups(
+    df, 
+    metrics_list, 
+    group_suffixes, 
+    group_labels, 
+    metadata_dict=None
+):
+    """
+    Executes dynamic multi-group significance tests (Friedman Chi-Square for 3+ groups, 
+    Wilcoxon Signed-Rank for 2 groups) and generates an aggregate descriptive statistics table.
+    
+    Parameters:
+    -----------
+    df : pd.DataFrame
+        The data stream containing the target demographic columns.
+    metrics_list : list
+        List of base strings extracted from metadata (e.g., ['i_iday', 'i_iuai']).
+    group_suffixes : list
+        The specific database column suffixes matching the schema pattern (e.g., ['_i0_2', '_i3_4', '_i5_8']).
+    group_labels : list
+        Clean display titles mapped 1:1 to the suffixes (e.g., ['Low Edu', 'Medium Edu', 'High Edu']).
+    metadata_dict : dict, optional
+        Your official label mapping dictionary (e.g., usage_labels) to cleanly rename codes to display text.
+        
+    Returns:
+    --------
+    pd.DataFrame
+    """
+    summary_data = []
+    num_groups = len(group_suffixes)
+    
+    for metric in metrics_list:
+        # 1. Dynamically build expected column names
+        target_cols = [f"{metric}{suffix}" for suffix in group_suffixes]
+        
+        # 2. Check if ALL necessary column dimensions are present in the dataframe
+        if all(col in df.columns for col in target_cols):
+            cleaned_df = df[target_cols].dropna()
+            
+            if len(cleaned_df) > 0:
+                # Calculate group means dynamically
+                means = [cleaned_df[col].mean() for col in target_cols]
+                
+                # Structural metric: Max absolute gap between the highest and lowest group means
+                max_gap = max(means) - min(means)
+                
+                # 3. Route to the correct statistical test engine based on group count
+                if num_groups >= 3:
+                    # Multi-group non-parametric comparison
+                    stat, p_value = stats.friedmanchisquare(*[cleaned_df[col] for col in target_cols])
+                else:
+                    # Fallback to pairwise Wilcoxon if only 2 groups are passed (e.g., Gender)
+                    stat, p_value = stats.wilcoxon(cleaned_df[target_cols[0]], cleaned_df[target_cols[1]])
+                
+                # 4. Resolve clean display naming
+                display_name = metric
+                if metadata_dict:
+                    # Look for the root metric or the first gendered variant as a lookup fallback
+                    display_name = metadata_dict.get(metric, metadata_dict.get(f"{metric}_f_y16_74", metric))
+                    # Apply your core layout text-stripping clean sequence
+                    display_name = (
+                        str(display_name)
+                        .split(' - ')[0]
+                        .replace('Internet:', '')
+                        .replace('Media:', '')
+                        .replace('(% of individuals)', '')
+                        .strip()
+                    )
+                
+                # 5. Populate structured row payload
+                row_data = {
+                    'Indicator': display_name,
+                    'Valid Countries (N)': len(cleaned_df)
+                }
+                
+                # Dynamically inject mean columns based on the group labels provided
+                for label, mean_val in zip(group_labels, means):
+                    row_data[f'{label} Avg (%)'] = round(mean_val, 2)
+                
+                # Inject performance gap and engine probability variables
+                row_data['Max Gap (Points)'] = round(max_gap, 2)
+                row_data['P-Value'] = round(p_value, 6) if not pd.isna(p_value) else 'N/A'
+                row_data['Significant? (α=0.05)'] = 'Yes' if (not pd.isna(p_value) and p_value < 0.05) else 'No'
+                
+                summary_data.append(row_data)
+                
+    return pd.DataFrame(summary_data)
+
+
+def get_dynamic_subheader(df_filtered, title_prefix="Digital Activities Comparison"):
+    """Generates a consistent subheader string based on country selection."""
+    selected_count = df_filtered['clean_country_name'].nunique()
+    country_list = df_filtered['clean_country_name'].unique().tolist()
+    
+    if selected_count == 1:
+        return f"{title_prefix} — {country_list[0]}"
+    elif selected_count >= 27:
+        return f"{title_prefix} — EU Aggregate"
+    elif selected_count <= 3:
+        return f"{title_prefix} — {', '.join(country_list)}"
+    else:
+        return f"{title_prefix} — Aggregated ({selected_count} Countries)"
+    
+def render_demographic_chart(df_filtered, group_cols, group_labels, metadata, color_map=None):
+    """
+    Renders a dynamic horizontal bar chart comparing demographic groups.
+
+    Parameters:
+    -----------
+    df_filtered : pd.DataFrame
+        The subsetted dataframe containing the demographic columns.
+    group_cols : list
+        A list of column names in the dataframe corresponding to the demographic 
+        groups, arranged in sequential order (e.g., [fem_col1, male_col1, ...]).
+    group_labels : list
+        A list of display strings corresponding to the columns in group_cols 
+        (e.g., ['Female', 'Male']).
+    metadata : dict
+        A mapping dictionary where keys are raw column names (or base indicators) 
+        and values are the clean titles to be displayed as y-axis labels.
+
+    Returns:
+    --------
+    None
+        This function performs side-effects by rendering Streamlit widgets (selectbox) 
+        and a Plotly figure directly to the app interface.
+    """
+    selected_group = st.selectbox("Select Demographic View:", ["All"] + group_labels)
+
+    chart_summary_rows = []
+    
+    step = len(group_labels)
+    for i in range(0, len(group_cols), step):
+        current_cols = group_cols[i : i+step]
+        
+        if all(col in df_filtered.columns for col in current_cols):
+            means = [df_filtered[col].mean() for col in current_cols]
+            
+            raw_title = metadata.get(current_cols[0], current_cols[0])
+            display_label = str(raw_title).split(' - ')[0].replace('Internet:', '').replace('Media:', '').strip()
+            
+            row = {'Indicator': display_label}
+            for label, val in zip(group_labels, means):
+                row[label] = round(val, 1)
+            chart_summary_rows.append(row)
+
+    if chart_summary_rows:
+        df_chart = pd.DataFrame(chart_summary_rows)
+        df_melted = df_chart.melt(id_vars=['Indicator'], var_name='Group', value_name='Percentage (%)')
+        df_melted = df_melted.sort_values('Percentage (%)')
+        
+        if selected_group != "All":
+            df_melted = df_melted[df_melted['Group'] == selected_group]
+
+        fig = px.bar(
+            df_melted, x='Percentage (%)', y='Indicator', color='Group', barmode='group',
+            #color_discrete_map=styles.EU_CORNFLOWER,
+            height=450, labels={'Percentage (%)': 'Share', 'Group': 'Demographic'}
+        )
+        
+        fig.update_layout(xaxis_title="Average Percentage (%)", yaxis_title=None, 
+                          plot_bgcolor='rgba(0,0,0,0)', margin=dict(l=20, r=20, t=20, b=20))
+        fig.update_xaxes(showgrid=True, gridcolor='rgba(226, 232, 240, 0.5)')
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.warning("No data available for this selection.")
+
