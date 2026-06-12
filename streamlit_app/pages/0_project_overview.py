@@ -247,6 +247,14 @@ with tabs[3]:
         - tech stack"""
     )
 
+    st.subheader(
+        """Comments on Analytical Methods"""
+    )
+    st.markdown(
+        """##Wilcoxon Signed-Rank Test
+        \nBecause the dataset utilizes aggregate country-level percentages ($N=27$) which exhibit non-normal distributions and localized variance, we utilize a non-parametric Wilcoxon Signed-Rank Test rather than a standard parametric paired t-test. This provides a more robust measure of directional significance across EU member states that is unaffected by extreme country outliers."""
+    )
+
 
 # ==============================================================================
 # FOOTER SECTION
