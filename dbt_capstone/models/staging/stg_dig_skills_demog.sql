@@ -13,7 +13,7 @@
 -- declare the specific Digital Skills indicators
 {% set indicator_list = [
     'I_DSK2_AB', 'I_DSK2_B', 'I_DSK2_LM', 
-    'I_DSK2_LW', 'I_DSK2_N', 'I_DSK2_NA', 'I_DSK2_X'
+    'I_DSK2_LW', 'I_DSK2_N', 'I_DSK2_X'
 ] %}
 
 with filtered_source as (
@@ -65,12 +65,10 @@ pivoted_data as (
     from latest_available_records
     group by 1
 )
-
--- --- THE DEFINITIVE POSTGRES JOIN FIX ---
 select
     c.clean_country_name,         
     c.plotly_country_code,        
     p.*
 from pivoted_data p
 left join {{ ref('prep_countries') }} c
-    on p.country_code = c.original_country_code -- Matches your table schema exactly!
+    on p.country_code = c.original_country_code

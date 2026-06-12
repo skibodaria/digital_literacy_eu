@@ -47,16 +47,27 @@ latest_available_records as (
         ind_type,
         indicator_value
     from filtered_source
+),
+
+pivoted_data as (
+    select
+        country_code
+        -- nested Jinja Loops: Generates columns named
+        {% for ind in indicator_list_new %}
+            {% for demog in ind_type_list %}
+            , max(case when indicator_code = '{{ ind }}' and ind_type = '{{ demog }}' then indicator_value end) as {{ ind | lower }}_{{ demog | lower }}
+            {% endfor %}
+        {% endfor %}
+
+    from latest_available_records
+    group by 1
 )
 
+-- --- THE DEFINITIVE POSTGRES JOIN FIX ---
 select
-    country_code
-    -- nested Jinja Loops: Generates columns named
-    {% for ind in indicator_list_new %}
-        {% for demog in ind_type_list %}
-        , max(case when indicator_code = '{{ ind }}' and ind_type = '{{ demog }}' then indicator_value end) as {{ ind | lower }}_{{ demog | lower }}
-        {% endfor %}
-    {% endfor %}
-
-from latest_available_records
-group by 1
+    c.clean_country_name,         
+    c.plotly_country_code,        
+    p.*
+from pivoted_data p
+left join {{ ref('prep_countries') }} c
+    on p.country_code = c.original_country_code -- Matches your table schema exactly!

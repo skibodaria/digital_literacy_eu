@@ -24,6 +24,7 @@ country_reference AS (
 
 SELECT
     c.clean_country_name,
+    c.original_country_code,
     c.plotly_country_code,
     s.reporting_year,
     s.indicator_code,
