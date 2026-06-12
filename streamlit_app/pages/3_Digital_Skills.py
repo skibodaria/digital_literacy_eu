@@ -401,14 +401,14 @@ with tab_gender:
 
     df_chart = df_gender_results[['Indicator', 'Female Avg (%)', 'Male Avg (%)']].copy()
     df_chart.columns = ['Indicator', 'Female', 'Male']
-    df_chart['Skill Level'] = (
-        df_chart['Skill Level']
+    df_chart['Indicator'] = (
+        df_chart['Indicator']
         .str.replace('Digital Skills:', '', case=False)
         .str.strip()
     )
 
     df_melted = df_chart.melt(
-        id_vars=['Skill Level'], 
+        id_vars=['Indicator'], 
         value_vars=['Female', 'Male'], 
         var_name='Gender', 
         value_name='Percentage (%)'
@@ -417,7 +417,7 @@ with tab_gender:
     # 3. Create a beautiful, interactive grouped bar chart
     fig = px.bar(
         df_melted, 
-        x='Skill Level', 
+        x='Indicator', 
         y='Percentage (%)', 
         color='Gender', 
         barmode='group', # 💡 This explicitly forces them side-by-side!

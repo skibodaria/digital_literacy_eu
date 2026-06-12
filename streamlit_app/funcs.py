@@ -278,3 +278,45 @@ def render_demographic_chart(df_filtered, group_cols, group_labels, metadata, co
     else:
         st.warning("No data available for this selection.")
 
+
+def extract_demographic_metrics(df):
+    """
+    Scans a dataframe's columns and extracts structured base metrics 
+    and sequential chart-ready column lists for all four demographics.
+    """
+    columns = df.columns
+    age_tags = ['y16_19', 'y20_24', 'y25_34', 'y35_44', 'y45_54', 'y55_64', 'y65_74']
+    
+    gen_usage = [c for c in columns if ('_f_' in c) or ('_m_' in c)]
+    gen_metrics = sorted(list(set([c.split('_f_')[0] for c in columns if '_f_' in c])))
+    
+    # 2. Education
+    edu_metrics = sorted(list(set([c.split('_i0_2')[0] for c in columns if '_i0_2' in c])))
+    edu_usage = []
+    for m in edu_metrics:
+        # 🎯 Order matters! This keeps groups side-by-side for the chart loops
+        edu_usage.extend([f"{m}_i0_2", f"{m}_i3_4", f"{m}_i5_8"])
+        
+    # 3. Urbanization
+    urban_metrics = sorted(list(set([c.split('_ind_deg1')[0] for c in columns if '_ind_deg1' in c])))
+    urban_usage = []
+    for m in urban_metrics:
+        # 🎯 Order matters! This keeps groups side-by-side for the chart loops
+        urban_usage.extend([f"{m}_ind_deg1", f"{m}_ind_deg2", f"{m}_ind_deg3"])
+        
+    raw_age_cols = [
+        c for c in columns 
+        if any(tag in c for tag in age_tags) and not ('_f_' in c or '_m_' in c)
+    ]
+    age_metrics = sorted(list(set([c.split('_y16_19')[0] for c in raw_age_cols if '_y16_19' in c])))
+    age_usage = []
+    for m in age_metrics:
+        age_usage.extend([f"{m}_{tag}" for tag in age_tags])
+        
+    return {
+        "gender": {"base_metrics": gen_metrics, "chart_cols": gen_usage},
+        "education": {"base_metrics": edu_metrics, "chart_cols": edu_usage},
+        "urbanization": {"base_metrics": urban_metrics, "chart_cols": urban_usage},
+        "age": {"base_metrics": age_metrics, "chart_cols": age_usage}
+    }
+

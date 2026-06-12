@@ -10,7 +10,7 @@ import scipy.stats as stats
 # -- Page configuration:
 st.set_page_config(layout="wide")
 COLOR_MAPS = {
-    "education": {'Low Edu Avd': '#cbd5e1', 'Medium Edu': '#64748b', 'High Edu': '#0f172a'},
+    "education": {'Low Edu': '#cbd5e1', 'Medium Edu': '#64748b', 'High Edu': '#0f172a'},
     "gender": {'Female': '#498cdb', 'Male': '#001f63'},
     "urban": {'Cities': '#3b82f6', 'Suburbs': '#60a5fa', 'Rural': '#93c5fd'}
 }
@@ -25,6 +25,26 @@ try:
 except Exception as e:
     st.error(f"Database connection or query failed: {e}")
     st.stop()
+
+# ==============================================================================
+# METRICS CONFIGURATION (Global Tab Mappings)
+# ==============================================================================
+usage_maps = funcs.extract_demographic_metrics(df_usage)
+# --- Gender Tab ---
+gen_metrics = usage_maps["gender"]["base_metrics"]
+gen_columns = usage_maps["gender"]["chart_cols"]
+
+# --- Education Tab ---
+edu_metrics = usage_maps["education"]["base_metrics"]
+edu_columns = usage_maps["education"]["chart_cols"]
+
+# --- Urbanization Tab ---
+urban_metrics = usage_maps["urbanization"]["base_metrics"]
+urban_columns = usage_maps["urbanization"]["chart_cols"]
+
+# --- Age Tab ---
+age_metrics  = usage_maps["age"]["base_metrics"]
+age_columns = usage_maps["age"]["chart_cols"]
 
 # ==============================================================================
 # SIDEBAR GLOBAL FILTERS (Country Multi-Select)
@@ -66,7 +86,6 @@ st.markdown("""
     """)
 
 st.write("---")
-
 
 # ==============================================================================
 # MAIN TABS ARCHITECTURE
@@ -114,9 +133,9 @@ with tab_overview:
     # --------------------------------------------------------------------------
     # TWO COLUMN LAYOUT: MAP (LEFT) & TEXT EXPLANATION (RIGHT)
     # --------------------------------------------------------------------------
-    col_map, col_text = st.columns([3, 1])
+    col_skills_map, col_skills_text = st.columns([3, 1])
 
-    with col_map:
+    with col_skills_map:
         st.markdown("### Geographic Distribution")
         
         map_radio_options = {
@@ -167,7 +186,7 @@ with tab_overview:
         
         st.plotly_chart(fig, use_container_width=True)        
         
-    with col_text:
+    with col_skills_text:
         st.markdown("### Section Context")
         st.markdown(f"""
             This geographic baseline displays aggregated usage trends across individual member states. 
@@ -191,28 +210,22 @@ with tab_gender:
             the EU. While basic volume access converges, utility pathways diverge significantly.
         """)
 
-    internet_columns = [
-        'i_iday_f_y16_74', 'i_iday_m_y16_74',
-        'i_iuai_f_y16_74', 'i_iuai_m_y16_74',
-        'i_iucpp_f_y16_74', 'i_iucpp_m_y16_74',
-        'i_iupdg_f_y16_74', 'i_updg_m_y16_74', # Match your db typos exactly
-        'i_iups_f_y16_74', 'i_iups_m_y16_74',
-        'i_iux_f_y16_74', 'i_iux_m_y16_74',
-        'i_udi_f_y16_74', 'i_udi_m_y16_74',
-        'i_iuchat1_f_y16_74', 'i_iuchat1_m_y16_74',
-        'i_iupol2_f_y16_74', 'i_iupol2_m_y16_74'
-    ]
+    col_gen_table, col_gender_insights = st.columns([3,2])
 
-    columns = df_usage.columns
-    gen_dig_skills = [c for c in columns if ('_f_' in c) or ('_m_' in c)]
-
-    col_table, col_gender_insights = st.columns([3,2])
-
-    with col_table:
+    with col_gen_table:
         st.subheader("Is Gender Statistically Significant for Digital Skills Levels?")
         st.caption("Note: This table reflects aggregate EU-wide significance statistics (N=27) and remains fixed to preserve test sample validity.")
         
-        df_usage_gen_results = funcs.run_t_test_pair(df_usage, gen_dig_skills, '_y16_74', usage_labels)
+        paired_gen_columns = []
+        for metric in gen_metrics:
+            paired_gen_columns.extend([f"{metric}_f_y16_74", f"{metric}_m_y16_74"])
+
+        df_usage_gen_results = funcs.run_t_test_pair(
+            df=df_usage, 
+            column_list=paired_gen_columns, 
+            suffix_to_remove='_f_y16_74',
+            label_dict=usage_labels
+        )
         df_usage_gen_results.columns = ['Indicator', 'Valid Countries (N)', 'Female Avg (%)', 'Male Avg (%)', 'Gap (Points)', 'Wilcoxon P-Value', 'Significant? (α=0.05)']
         df_usage_gen_results['Indicator'] = (
             df_usage_gen_results['Indicator']
@@ -262,17 +275,7 @@ with tab_gender:
         )
     st.write("---")
 
-
-    if len(selected_countries) == 1:
-        dynamic_subheader = f"Digital Activities Comparison — {selected_countries[0]}"
-    elif len(selected_countries) == len(available_countries):
-        dynamic_subheader = "Digital Activities Comparison — EU Aggregate (All Countries)"
-    elif len(selected_countries) <= 3:
-        dynamic_subheader = f"Digital Activities Comparison — {', '.join(selected_countries)}"
-    else:
-        dynamic_subheader = f"Digital Activities Comparison — Aggregated ({len(selected_countries)} Countries)"
-
-    st.subheader(dynamic_subheader)
+    st.subheader(funcs.get_dynamic_subheader(df_filtered_usage))
     
     gender_filter = st.selectbox(
         "Select Demographic View:",
@@ -284,9 +287,9 @@ with tab_gender:
 
     if not df_filtered_usage.empty:
         
-        for i in range(0, len(gen_dig_skills), 2):
-            fem_col = gen_dig_skills[i]
-            male_col = gen_dig_skills[i+1]
+        for i in range(0, len(gen_columns), 2):
+            fem_col = gen_columns[i]
+            male_col = gen_columns[i+1]
             
             if fem_col in df_filtered_usage.columns and male_col in df_filtered_usage.columns:
                 mean_fem = df_filtered_usage[fem_col].mean()
@@ -352,28 +355,102 @@ with tab_gender:
     else:
         st.warning("Please select at least one country from the sidebar to populate the chart visualization.")
 
+# ==============================================================================
+# --- TAB 3: AGE GROUPS ---
+# ==============================================================================
+with tab_age:
+    st.markdown("### Digital Utility Splits Across Generational Cohorts")
+    st.write("""
+        This module visualizes the correlation between age groups (spanning from youth cohorts to seniors 74 years old) 
+        and digital behavioral patterns. It combines a rigorous statistical test (Friedman Chi-Square) to determine 
+        if generational gaps are mathematically significant across the EU, paired with an interactive component breakdown.
+    """)
+
+    col_table_age, col_insights_age = st.columns([3, 2])
+
+    with col_table_age:
+        # 📊 Run the statistical significance test on the aggregate data
+        df_age_results = funcs.run_friedman_multigroups(
+            df=df_usage,
+            metrics_list=age_metrics,
+            group_suffixes=['_y16_19', '_y20_24', '_y25_34', '_y35_44', '_y45_54', '_y55_64', '_y65_74'],
+            group_labels=['16-19', '20-24', '25-34', '35-44', '45-54', '55-64', '65-74'],
+            metadata_dict=usage_labels
+        )
+
+        if not df_age_results.empty:
+            st.subheader("Is Generational Cohort Statistically Significant for Digital Access?")
+            st.caption("Note: This table reflects aggregate EU-wide significance statistics (N=27) and remains fixed to preserve test sample validity.")
+            
+            # Drop the raw average percentage columns to keep the significance grid lean
+            cols_to_drop_age = [f"{label} Avg (%)" for label in ['16-19', '20-24', '25-34', '35-44', '45-54', '55-64', '65-74']]
+            df_display_age = df_age_results.drop(columns=cols_to_drop_age, errors='ignore')
+
+            st.dataframe(
+                df_display_age,
+                column_config={
+                    "Max Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"),
+                    "P-Value": st.column_config.NumberColumn(format="%.4f")
+                },
+                hide_index=True,
+                use_container_width=True
+            )
+        else:
+            st.warning("No tracking indicators matched your data criteria for the age group metrics.")
+
+    with col_insights_age:
+        st.subheader("Key Insights")
+        with st.expander("**1. The Classic Generational Gradient**"):
+            st.write(
+                """
+                - Advanced services and communication frequency scale inversely with age. 
+                - Younger cohorts (16-34) present peak usage densities, which taper off gradually through middle-aged groups and fall sharply among cohorts aged 65-74.
+                """
+            )
+        with st.expander("**2. Entertainment & Gaming Skews Heavily to Youth**"):
+            st.write(
+                """
+                - Online gaming and multimedia consumption exhibit the largest generational divides across the dataset.
+                - The point spread between the youngest cohort (16-19) and oldest cohort (65-74) marks a massive structural gap in recreational internet use.
+                """
+            )
+        with st.expander("**3. Structural Friction Affects All Ages**"):
+            st.write(
+                """
+                - Much like urbanization levels and gender, encountering technical usage difficulties presents high stability (low variance) across working age cohorts.
+                - Digital friction is experienced across the board, though the oldest brackets face compounded exclusion patterns.
+                """
+            )
+
+    st.write("---")
+    st.subheader(funcs.get_dynamic_subheader(df_filtered_usage))
+
+    # 📈 Render the interactive bar chart using the flat global columns variable
+    funcs.render_demographic_chart(
+        df_filtered_usage, 
+        age_columns, 
+        ['16-19', '20-24', '25-34', '35-44', '45-54', '55-64', '65-74'], 
+        usage_labels,
+        color_map=None  # Plotly will dynamically handle the sequential palette cleanly for 7 items
+    )
+
+
+
+
+
+
 
 
 # ==============================================================================
-# --- TAB 3: EDUCATION LEVELS ---
+# --- TAB 4: EDUCATION LEVELS ---
 # ==============================================================================
-base_metrics = sorted(list(set([
-    c.split('_i0_2')[0] for c in df_filtered_usage.columns if '_i0_2' in c
-])))
 
-edu_usage = []
-for metric in base_metrics:
-    edu_usage.extend([f"{metric}_i0_2", f"{metric}_i3_4", f"{metric}_i5_8"])
 
 with tab_edu:
     st.subheader("Granular Component Evaluation")
     st.write("Placeholder: In-depth breakdowns of specific subsets.")
 
     col_table_edu, col_insights_edu = st.columns([3,2])
-
-    edu_metrics = sorted(list(set([
-        c.split('_i0_2')[0] for c in df_filtered_usage.columns if '_i0_2' in c
-    ])))
 
     with col_table_edu: 
         df_edu_results = funcs.run_friedman_multigroups(
@@ -404,11 +481,11 @@ with tab_edu:
 
 
 
-    dynamic_title = funcs.get_dynamic_subheader(df_filtered_usage)
+    st.subheader(funcs.get_dynamic_subheader(df_filtered_usage))
 
     funcs.render_demographic_chart(
         df_filtered_usage, 
-        edu_usage, 
+        edu_columns, 
         ['Low Edu', 'Medium Edu', 'High Edu'], 
         usage_labels,
         color_map=COLOR_MAPS["education"]
@@ -428,14 +505,6 @@ with tab_urban:
     """)
 
     col_table_urb, col_insights_urban = st.columns([3,2])
-    urban_metrics = sorted(list(set([
-        c.split('_ind_deg1')[0] for c in df_filtered_usage.columns if '_ind_deg1' in c
-    ])))
-
-    urban_usage = []
-
-    for metric in urban_metrics:
-        urban_usage.extend([f"{metric}_i0_2", f"{metric}_i3_4", f"{metric}_i5_8"])
 
     with col_table_urb:
         df_urban_results = funcs.run_friedman_multigroups(
@@ -498,13 +567,12 @@ with tab_urban:
                 struggles with digital tasks at the same rate.
             """)
 
-
     funcs.render_demographic_chart(
         df_filtered_usage, 
-        urban_usage, 
+        urban_columns, 
         ['City', 'Town/Suburbs', 'Rural Areas'], 
         usage_labels,
-        color_map=COLOR_MAPS["education"]
+        color_map=COLOR_MAPS["urban"]
     )
 
 
