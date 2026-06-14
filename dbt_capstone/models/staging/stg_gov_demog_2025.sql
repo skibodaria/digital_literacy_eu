@@ -54,8 +54,8 @@ latest_available_records as (
         indicator_value
     from filtered_source
     where rn = 1
-)
-
+),
+pivoted_data as(
 select
     country_code
 
@@ -68,3 +68,12 @@ select
 
 from latest_available_records
 group by 1
+)
+
+select
+    c.clean_country_name,         
+    c.plotly_country_code,        
+    p.*
+from pivoted_data p
+left join {{ ref('prep_countries') }} c
+    on p.country_code = c.original_country_code
