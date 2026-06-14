@@ -32,7 +32,12 @@ SELECT
     i_igovbe,
     i_igovrcc,
     i_igovrx,
-    
+    i_ireidna,
+    i_ireidsec,
+    i_ireidtec,
+    i_ireidnn,
+    i_ireiddev,
+
     -- all Eurobarometer but not a country code
     tr_party, tr_authority, tr_nat_gov,
     tr_nat_par, tr_eu, tr_eu_par, tr_press, tr_soc_netw_online,
