@@ -37,6 +37,11 @@ SELECT
     i_ireidtec,
     i_ireidnn,
     i_ireiddev,
+    i_iucpp,
+    i_iupdg,
+    i_iups,
+    i_iuchat1,
+
 
     -- all Eurobarometer but not a country code
     tr_party, tr_authority, tr_nat_gov,
