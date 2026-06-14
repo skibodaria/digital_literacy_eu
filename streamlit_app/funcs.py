@@ -84,7 +84,7 @@ def run_t_test_pair(df, column_list, suffix_to_remove, label_dict=None):
                 'Gap (Points)': round(gap, 1),
                 'Wilcoxon P-Value': round(p_value, 4) if not pd.isna(p_value) else 'N/A',
                 #'Wilcox_Stat': round(wilcox_stat,4),
-                'Significant? (α=0.05)': '✅ Yes' if (not pd.isna(p_value) and p_value < 0.05) else '❌ No'
+                'Significant? (α=0.05)': '🏆 Yes' if (not pd.isna(p_value) and p_value < 0.05) else 'No'
             })
             
     df_results = pd.DataFrame(summary_data)
@@ -108,7 +108,6 @@ def run_t_test_pair(df, column_list, suffix_to_remove, label_dict=None):
     df_results = df_results.drop(columns={'col_code'})
             
     return df_results
-
 
 
 def run_friedman_multigroups(
@@ -193,7 +192,7 @@ def run_friedman_multigroups(
                 # Inject performance gap and engine probability variables
                 row_data['Max Gap (Points)'] = round(max_gap, 2)
                 row_data['P-Value'] = round(p_value, 6) if not pd.isna(p_value) else 'N/A'
-                row_data['Significant? (α=0.05)'] = 'Yes' if (not pd.isna(p_value) and p_value < 0.05) else 'No'
+                row_data['Significant? (α=0.05)'] = '🏆 Yes' if (not pd.isna(p_value) and p_value < 0.05) else 'No'
                 
                 summary_data.append(row_data)
                 
