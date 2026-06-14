@@ -30,19 +30,16 @@ except Exception as e:
 # METRICS CONFIGURATION (Global Tab Mappings)
 # ==============================================================================
 usage_maps = funcs.extract_demographic_metrics(df_usage)
-# --- Gender Tab ---
+
 gen_metrics = usage_maps["gender"]["base_metrics"]
 gen_columns = usage_maps["gender"]["chart_cols"]
 
-# --- Education Tab ---
 edu_metrics = usage_maps["education"]["base_metrics"]
 edu_columns = usage_maps["education"]["chart_cols"]
 
-# --- Urbanization Tab ---
 urban_metrics = usage_maps["urbanization"]["base_metrics"]
 urban_columns = usage_maps["urbanization"]["chart_cols"]
 
-# --- Age Tab ---
 age_metrics  = usage_maps["age"]["base_metrics"]
 age_columns = usage_maps["age"]["chart_cols"]
 
@@ -88,51 +85,45 @@ st.markdown("""
 st.write("---")
 
 # ==============================================================================
-# MAIN TABS ARCHITECTURE
+# COMPACT TWO-TAB ARCHITECTURE
 # ==============================================================================
-tab_overview, tab_gender, tab_age, tab_edu, tab_urban = st.tabs([
-    "Overview", 
-    "Gender", 
-    "Age Groups",
-    "Education Levels",
-    "Urbanization Levels"
+tab_overview, tab_demographics = st.tabs([
+    "Overview & National Baselines", 
+    "Demographic Variance Gaps"
 ])
+
+# Advanced title formatting helper function
+def clean_metric_label(raw_string):
+    return (str(raw_string)
+            .replace('Internet:', '')
+            .replace('Media:', '')
+            .replace('eID Non-Use:', '')
+            .replace('e-Gov:', '')
+            .replace('(% of individuals)', '')
+            .strip())
 
 # ==============================================================================
 # --- TAB 1: OVERVIEW ---
 # ==============================================================================
 with tab_overview:
-    
     st.subheader("Macro Trends & National Baselines")
     
-    # --------------------------------------------------------------------------
-    # 6 KPI METRIC COLUMNS (change with country selection)
-    # --------------------------------------------------------------------------
     kpi1, kpi2, kpi3, kpi4, kpi5, kpi6 = st.columns(6)
-    
     with kpi1:
-        st.metric(label="Daly Usage Internet", value=f"{df_filtered_baseline['i_iday'].mean().round(1)}%")
-        
+        st.metric(label="Daily Internet Usage", value=f"{df_filtered_baseline['i_iday'].mean().round(1)}%")
     with kpi2:
-        st.metric(label="AI Tools", value=f"{df_filtered_baseline['i_iuai'].mean().round(1)}%")
-        
+        st.metric(label="AI Tools Adoption", value=f"{df_filtered_baseline['i_iuai'].mean().round(1)}%")
     with kpi3:
         st.metric(label="Civic Participation", value=f"{((df_filtered_usage['i_iucpp_f_y16_74'].mean().round(1)+df_filtered_usage['i_iucpp_m_y16_74'].mean().round(1))/2).round(1)}%")
-        
-    with kpi5:
-        st.metric(label="Messaging", value=f"{((df_filtered_usage['i_iuchat1_m_y16_74'].mean().round(1)+df_filtered_usage['i_iuchat1_f_y16_74'].mean().round(1))/2).round(1)}%")
-    
     with kpi4:
         st.metric(label="Playing Games", value=f"{((df_filtered_usage['i_iupdg_m_y16_74'].mean().round(1)+df_filtered_usage['i_iupdg_f_y16_74'].mean().round(1))/2).round(1)}%")
-   
+    with kpi5:
+        st.metric(label="Messaging", value=f"{((df_filtered_usage['i_iuchat1_m_y16_74'].mean().round(1)+df_filtered_usage['i_iuchat1_f_y16_74'].mean().round(1))/2).round(1)}%")
     with kpi6:
         st.metric(label="Encountered Difficulties", value=f"{((df_filtered_usage['i_iups_m_y16_74'].mean().round(1)+df_filtered_usage['i_iups_f_y16_74'].mean().round(1))/2).round(1)}%")
         
     st.write("---")
 
-    # --------------------------------------------------------------------------
-    # TWO COLUMN LAYOUT: MAP (LEFT) & TEXT EXPLANATION (RIGHT)
-    # --------------------------------------------------------------------------
     col_skills_map, col_skills_text = st.columns([3, 1])
 
     with col_skills_map:
@@ -145,9 +136,9 @@ with tab_overview:
             "Playing Online Games": "i_iupdg",
             "Expressing Political Opinion on Social Media":"i_iupol2",
             "Facing Doubtful/Untrue Info Online":"i_udi",
-            "Encounering Difficulties While Using Internet":"i_iups",
+            "Encountering Difficulties While Using Internet":"i_iups",
             "Messaging": 'i_iuchat1',
-            "Neve Used Internet": "i_iux"
+            "Never Used Internet": "i_iux"
         }
         
         chosen_label = st.radio(
@@ -175,7 +166,6 @@ with tab_overview:
             showframe=False,              
             showcoastlines=True,          
             coastlinecolor="LightGray",
-            resolution=50,
             bgcolor="rgba(0,0,0,0)"
         )
         
@@ -183,7 +173,6 @@ with tab_overview:
             margin={"r":0, "t":10, "l":0, "b":0},
             coloraxis_colorbar=dict(title="% of Pop")
         )
-        
         st.plotly_chart(fig, use_container_width=True)        
         
     with col_skills_text:
@@ -194,387 +183,130 @@ with tab_overview:
             frontier AI adoption, or friction layers.
         """)
 
-        with st.expander("Click to view Framework Methodology & Definitions"):
+        with st.expander("Framework Methodology"):
             st.markdown("""
                 * **Data Scope:** Uniform country aggregates across selected valid European states.
-                * **Base Variable Evaluation:** Indicators represent percentages of the total population aged 16-74 within each localized region.
+                * **Base Variable Evaluation:** Indicators represent percentages of the population aged 16-74.
             """)
-    
-# ==============================================================================
-# --- TAB 2: GENDER ---
-# ==============================================================================
-with tab_gender:
-    st.header("### Gender Utility Splits & Distribution Signatures")
-    st.write("""
-            This section analyzes structural behavioral splits between male and female cohorts across 
-            the EU. While basic volume access converges, utility pathways diverge significantly.
-        """)
 
-    col_gen_table, col_gender_insights = st.columns([3,2])
+# ==============================================================================
+# --- TAB 2: DEMOGRAPHIC GAPS (CONSOLIDATED) ---
+# ==============================================================================
+with tab_demographics:
+    st.header("Comparative Demographic Variance Analysis")
+    st.markdown("""
+        Analyze structural variations across the European Union across four principal demographic splits.
+        The tables below run static statistical validations (Wilcoxon Signed-Rank and Friedman Chi-Square) 
+        across all 27 member states to isolate genuine structural gaps from random variance.
+    """)
 
-    with col_gen_table:
-        st.subheader("Is Gender Statistically Significant for Digital Skills Levels?")
-        st.caption("Note: This table reflects aggregate EU-wide significance statistics (N=27) and remains fixed to preserve test sample validity.")
+    # ------------------ SIGNIFICANCE MATRICES SECTION ------------------
+    col_tables_left, col_insights_right = st.columns([3, 2])
+
+    with col_tables_left:
         
-        paired_gen_columns = []
-        for metric in gen_metrics:
-            paired_gen_columns.extend([f"{metric}_f_y16_74", f"{metric}_m_y16_74"])
+        # --- 1. Gender Significance Matrix ---
+        with st.expander("Gender Gaps Significance Matrices (Usage)", expanded=True):
+            paired_gen_columns = []
+            for metric in gen_metrics:
+                paired_gen_columns.extend([f"{metric}_f_y16_74", f"{metric}_m_y16_74"])
 
-        df_usage_gen_results = funcs.run_t_test_pair(
-            df=df_usage, 
-            column_list=paired_gen_columns, 
-            suffix_to_remove='_f_y16_74',
-            label_dict=usage_labels
-        )
-        df_usage_gen_results.columns = ['Indicator', 'Valid Countries (N)', 'Female Avg (%)', 'Male Avg (%)', 'Gap (Points)', 'Wilcoxon P-Value', 'Significant? (α=0.05)']
-        df_usage_gen_results['Indicator'] = (
-            df_usage_gen_results['Indicator']
-                .str.replace('Internet:', '', case=False)
-                .str.replace('Media: ', '',case=False)
-                .str.replace(r'(\% of individuals)','', regex=True,case=False)
-                .str.strip()
-            )
-        df_usage_gen_table = df_usage_gen_results.drop(columns=['Female Avg (%)', 'Male Avg (%)'])
-        st.dataframe(
-            df_usage_gen_table,
-            column_config={
-                "Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"),
-                "Wilcoxon P-Value": st.column_config.NumberColumn(format="%.4f")
-            },
-            hide_index=True,
-            use_container_width=True
-        )
+            df_gender_res = funcs.run_t_test_pair(df_usage, paired_gen_columns, '_f_y16_74', usage_labels)
+            df_gender_res.columns = ['Indicator', 'Valid Countries (N)', 'Female Avg (%)', 'Male Avg (%)', 'Gap (Points)', 'Wilcoxon P-Value', 'Significant? (α=0.05)']
+            df_gender_res['Indicator'] = df_gender_res['Indicator'].apply(clean_metric_label)
+            
+            # Drop Averages to keep matrix clean
+            cols_to_drop_g = [c for c in ["Female Avg (%)", "Male Avg (%)"] if c in df_gender_res.columns]
+            df_gender_res = df_gender_res.drop(columns=cols_to_drop_g)
+            
+            st.dataframe(df_gender_res, column_config={"Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"), "Wilcoxon P-Value": st.column_config.NumberColumn(format="%.4f")}, hide_index=True, use_container_width=True)
 
-    with col_gender_insights:
-        st.subheader("Key Insights")
-        with st.expander("**1. The Dynamic Advanced Tech Gap**"):
-            st.write(
-                """
-                - Men show a statistically significant lead in emerging and recreational tech spaces.  
-                - Men outpace women by 3.5 percentage points in generative AI tool adoption and by 6.9 points in playing or downloading games.  
-                - This suggests that early-stage adoption of frontier tech trends and recreational digital interaction 
-                remains heavily skewed toward male demographics across the EU.
-                """
-        )
-        with st.expander("**2. Women Lead on Essential Communication, Men on Public Voice**"):
-            st.write(
-                """
-                - While women significantly dominate the private sphere of communication, men leverage digital channels more for public and political visibility.
-                - Women hold a firm 3.0 percentage point lead in routine internet message exchanges.
-                - Conversely, men lead by 2.3 points in expressing opinions on civic or political issues on social media and by 1.6 points in online political participation.
-                - Digital utility splits along structural lines: women utilize the internet more for social cohesion and connectivity, while men are more likely to use it as a platform for public-facing discourse.
-                """
-        )
-        with st.expander("**3. Equal Vulnerability to Misinformation & Access Obstacles**"):
-            st.write(
-                """ 
-                - Negative internet experiences show no significant gender division.
-                - Men are slightly more likely to report encountering untrue or doubtful information online.
-                - Encountering technical difficulties and complete internet exclusion show high p-values, making them statistically identical across genders.
-                """
-        )
+        # --- 2. Age Cohorts Matrix ---
+        with st.expander("Age Cohorts Variance Matrix (Usage)", expanded=True):
+            df_age_res = funcs.run_friedman_multigroups(df_usage, age_metrics, ['_y16_19', '_y20_24', '_y25_34', '_y35_44', '_y45_54', '_y55_64', '_y65_74'], ['16-19', '20-24', '25-34', '35-44', '45-54', '55-64', '65-74'], usage_labels)
+            if not df_age_res.empty:
+                df_age_res['Indicator'] = df_age_res['Indicator'].apply(clean_metric_label)
+                cols_to_drop_a = [f"{lbl} Avg (%)" for lbl in ['16-19', '20-24', '25-34', '35-44', '45-54', '55-64', '65-74']]
+                df_age_res = df_age_res.drop(columns=cols_to_drop_a, errors='ignore')
+                st.dataframe(df_age_res, column_config={"Max Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"), "P-Value": st.column_config.NumberColumn(format="%.4f")}, hide_index=True, use_container_width=True)
+
+        # --- 3. Education Levels Matrix ---
+        with st.expander("Education Level Variance Matrix (Usage)", expanded=True):
+            df_edu_res = funcs.run_friedman_multigroups(df_usage, edu_metrics, ['_i0_2', '_i3_4', '_i5_8'], ['Low Edu', 'Medium Edu', 'High Edu'], usage_labels)
+            if not df_edu_res.empty:
+                df_edu_res['Indicator'] = df_edu_res['Indicator'].apply(clean_metric_label)
+                cols_to_drop_e = [f"{lbl} Avg (%)" for lbl in ['Low Edu', 'Medium Edu', 'High Edu']]
+                df_edu_res = df_edu_res.drop(columns=cols_to_drop_e, errors='ignore')
+                st.dataframe(df_edu_res, column_config={"Max Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"), "P-Value": st.column_config.NumberColumn(format="%.6f")}, hide_index=True, use_container_width=True)
+
+        # --- 4. Urbanization Density Matrix ---
+        with st.expander("Urbanization Split Variance Matrix (Usage)", expanded=True):
+            df_urban_res = funcs.run_friedman_multigroups(df_usage, urban_metrics, ['_ind_deg1', '_ind_deg2', '_ind_deg3'], ['Cities', 'Suburbs', 'Rural'], usage_labels)
+            if not df_urban_res.empty:
+                df_urban_res['Indicator'] = df_urban_res['Indicator'].apply(clean_metric_label)
+                cols_to_drop_u = [f"{lbl} Avg (%)" for lbl in ['Cities', 'Suburbs', 'Rural']]
+                df_urban_res = df_urban_res.drop(columns=cols_to_drop_u, errors='ignore')
+                st.dataframe(df_urban_res, column_config={"Max Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"), "P-Value": st.column_config.NumberColumn(format="%.4f")}, hide_index=True, use_container_width=True)
+
+    with col_insights_right:
+        st.subheader("Cross-Dimension Structural Insights")
+        with st.expander("**1. Frontier Tech Skews Men and Urban Hubs**"):
+            st.write("""
+                Advanced digital tasks show compounding advantages. Men outpace women in emerging AI adoption by 3.5 points, 
+                while metropolitan hubs hold a massive 15.4 point acceleration curve over rural sectors on identical metrics.
+            """)
+        with st.expander("**2. Public Voices vs Private Channels**"):
+            st.write("""
+                Women maintain a stable lead in routine private communication layers (+3.0 points in messaging). 
+                However, digital public-facing actions (civic commentary, political tracking) showcase statistically significant skews toward male and highly educated brackets.
+            """)
+        with st.expander("**3. The Egalitarian Distribution of Friction**"):
+            st.write("""
+                Interestingly, encountering technical difficulties features high p-values across all tests. 
+                This denotes that digital complexity acts as a uniform friction layer, impacting populations evenly regardless of gender or geography.
+            """)
+
     st.write("---")
-
-    st.subheader(funcs.get_dynamic_subheader(df_filtered_usage))
     
-    gender_filter = st.selectbox(
-        "Select Demographic View:",
-        options=["Both", "Female", "Male"],
-        index=0
-    )
+    # ------------------ INTERACTIVE COMPONENT VISUALIZATION STUDIO ------------------
+    st.subheader("Demographic Component Studio")
+    st.caption(funcs.get_dynamic_subheader(df_filtered_usage))
 
-    chart_summary_rows = []
+    # Single selector layout to drive any dimension selection on demand
+    col_sel_dim, col_sel_filter = st.columns([2, 2])
+    
+    with col_sel_dim:
+        selected_dimension = st.selectbox(
+            "Select Demographic Dimension to Chart:",
+            options=["Gender", "Age Cohorts", "Education Levels", "Urbanization Levels"]
+        )
 
-    if not df_filtered_usage.empty:
-        
-        for i in range(0, len(gen_columns), 2):
-            fem_col = gen_columns[i]
-            male_col = gen_columns[i+1]
-            
-            if fem_col in df_filtered_usage.columns and male_col in df_filtered_usage.columns:
-                mean_fem = df_filtered_usage[fem_col].mean()
-                mean_male = df_filtered_usage[male_col].mean()
-                
-                raw_title = usage_labels.get(fem_col, fem_col)
-                
-                display_label = (
-                    str(raw_title)
-                    .replace('Internet:', '')
-                    .replace('Media:', '')
-                    .replace('(% of individuals)', '')
-                    .strip()
-                )
-                
-                chart_summary_rows.append({
-                    'Indicator': display_label,
-                    'Female': round(mean_fem, 1) if not pd.isna(mean_fem) else 0,
-                    'Male': round(mean_male, 1) if not pd.isna(mean_male) else 0
-                })
-
-        if chart_summary_rows:
-            df_chart = pd.DataFrame(chart_summary_rows)
-            
-            df_melted = df_chart.melt(
-                id_vars=['Indicator'], 
-                value_vars=['Female', 'Male'], 
-                var_name='Gender', 
-                value_name='Percentage (%)'
-            )
-            df_melted = df_melted.sort_values('Percentage (%)')
-
-            if gender_filter != 'Both':
-                df_with_selection = df_melted[df_melted['Gender'] == gender_filter]
-            else:
-                df_with_selection = df_melted
-
-
-            fig = px.bar(
-                df_with_selection, 
-                x='Percentage (%)', 
-                y='Indicator', 
-                color='Gender', 
-                barmode='group',
-                color_discrete_map={'Female': '#498cdb', 'Male': '#001f63'},
-                height=450,
-                labels={'Percentage (%)': 'Share', 'Gender': 'Group'},
-                hover_data={'Indicator': True, 'Gender':True, 'Percentage (%)': ':.1f%'}
-            )
-
-            fig.update_layout(
-                xaxis_title="Average Percentage (%)",
-                yaxis_title=None,
-                plot_bgcolor='rgba(0,0,0,0)',
-                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, title=None),
-                margin=dict(l=20, r=20, t=20, b=20)
-            )
-
-            fig.update_xaxes(showgrid=True, gridcolor='rgba(226, 232, 240, 0.5)')
-            st.plotly_chart(fig, use_container_width=True)
-        else:
-            st.warning("No tracking indicators matched your data criteria for this country choice.")
+    # Contextually update variables based on chosen selection
+    if selected_dimension == "Gender":
+        active_cols = gen_columns
+        active_labels = ['Female', 'Male']
+        active_color = COLOR_MAPS["gender"]
+    elif selected_dimension == "Age Cohorts":
+        active_cols = age_columns
+        active_labels = ['16-19', '20-24', '25-34', '35-44', '45-54', '55-64', '65-74']
+        active_color = None
+    elif selected_dimension == "Education Levels":
+        active_cols = edu_columns
+        active_labels = ['Low Edu', 'Medium Edu', 'High Edu']
+        active_color = COLOR_MAPS["education"]
     else:
-        st.warning("Please select at least one country from the sidebar to populate the chart visualization.")
+        active_cols = urban_columns
+        active_labels = ['City', 'Town/Suburbs', 'Rural Areas']
+        active_color = COLOR_MAPS["urban"]
 
-# ==============================================================================
-# --- TAB 3: AGE GROUPS ---
-# ==============================================================================
-with tab_age:
-    st.markdown("### Digital Utility Splits Across Generational Cohorts")
-    st.write("""
-        This module visualizes the correlation between age groups (spanning from youth cohorts to seniors 74 years old) 
-        and digital behavioral patterns. It combines a rigorous statistical test (Friedman Chi-Square) to determine 
-        if generational gaps are mathematically significant across the EU, paired with an interactive component breakdown.
-    """)
-
-    col_table_age, col_insights_age = st.columns([3, 2])
-
-    with col_table_age:
-        # 📊 Run the statistical significance test on the aggregate data
-        df_age_results = funcs.run_friedman_multigroups(
-            df=df_usage,
-            metrics_list=age_metrics,
-            group_suffixes=['_y16_19', '_y20_24', '_y25_34', '_y35_44', '_y45_54', '_y55_64', '_y65_74'],
-            group_labels=['16-19', '20-24', '25-34', '35-44', '45-54', '55-64', '65-74'],
-            metadata_dict=usage_labels
-        )
-
-        if not df_age_results.empty:
-            st.subheader("Is Generational Cohort Statistically Significant for Digital Access?")
-            st.caption("Note: This table reflects aggregate EU-wide significance statistics (N=27) and remains fixed to preserve test sample validity.")
-            
-            # Drop the raw average percentage columns to keep the significance grid lean
-            cols_to_drop_age = [f"{label} Avg (%)" for label in ['16-19', '20-24', '25-34', '35-44', '45-54', '55-64', '65-74']]
-            df_display_age = df_age_results.drop(columns=cols_to_drop_age, errors='ignore')
-
-            st.dataframe(
-                df_display_age,
-                column_config={
-                    "Max Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"),
-                    "P-Value": st.column_config.NumberColumn(format="%.4f")
-                },
-                hide_index=True,
-                use_container_width=True
-            )
-        else:
-            st.warning("No tracking indicators matched your data criteria for the age group metrics.")
-
-    with col_insights_age:
-        st.subheader("Key Insights")
-        with st.expander("**1. The Classic Generational Gradient**"):
-            st.write(
-                """
-                - Advanced services and communication frequency scale inversely with age. 
-                - Younger cohorts (16-34) present peak usage densities, which taper off gradually through middle-aged groups and fall sharply among cohorts aged 65-74.
-                """
-            )
-        with st.expander("**2. Entertainment & Gaming Skews Heavily to Youth**"):
-            st.write(
-                """
-                - Online gaming and multimedia consumption exhibit the largest generational divides across the dataset.
-                - The point spread between the youngest cohort (16-19) and oldest cohort (65-74) marks a massive structural gap in recreational internet use.
-                """
-            )
-        with st.expander("**3. Structural Friction Affects All Ages**"):
-            st.write(
-                """
-                - Much like urbanization levels and gender, encountering technical usage difficulties presents high stability (low variance) across working age cohorts.
-                - Digital friction is experienced across the board, though the oldest brackets face compounded exclusion patterns.
-                """
-            )
-
-    st.write("---")
-    st.subheader(funcs.get_dynamic_subheader(df_filtered_usage))
-
-    # 📈 Render the interactive bar chart using the flat global columns variable
+    # Render unified chart dynamically
     funcs.render_demographic_chart(
         df_filtered_usage, 
-        age_columns, 
-        ['16-19', '20-24', '25-34', '35-44', '45-54', '55-64', '65-74'], 
+        active_cols, 
+        active_labels, 
         usage_labels,
-        color_map=None  # Plotly will dynamically handle the sequential palette cleanly for 7 items
+        color_map=active_color
     )
-
-
-
-
-
-
-
-
-# ==============================================================================
-# --- TAB 4: EDUCATION LEVELS ---
-# ==============================================================================
-
-
-with tab_edu:
-    st.subheader("Granular Component Evaluation")
-    st.write("Placeholder: In-depth breakdowns of specific subsets.")
-
-    col_table_edu, col_insights_edu = st.columns([3,2])
-
-    with col_table_edu: 
-        df_edu_results = funcs.run_friedman_multigroups(
-            df=df_usage,  # Static pipeline on full data for test validity
-            metrics_list=edu_metrics,
-            group_suffixes=['_i0_2', '_i3_4', '_i5_8'],
-            group_labels=['Low Edu', 'Medium Edu', 'High Edu'],
-            metadata_dict=usage_labels
-        )
-
-        cols_to_drop = [f"{label} Avg (%)" for label in ['Low Edu', 'Medium Edu', 'High Edu']]
-        df_display_edu = df_edu_results.drop(columns=cols_to_drop, errors='ignore')
-
-        st.dataframe(
-            df_display_edu,
-            column_config={
-            "Max Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"),
-            "P-Value": st.column_config.NumberColumn(format="%.6f") # 🎯 Force 6 decimal places
-            },
-            hide_index=True,
-            use_container_width=True
-        )
-    with col_insights_edu:
-        st.subheader("Key Insights")
-        st.expander("**1.**")
-        st.expander("**2.**")
-        st.expander("**3.**")
-
-
-
-    st.subheader(funcs.get_dynamic_subheader(df_filtered_usage))
-
-    funcs.render_demographic_chart(
-        df_filtered_usage, 
-        edu_columns, 
-        ['Low Edu', 'Medium Edu', 'High Edu'], 
-        usage_labels,
-        color_map=COLOR_MAPS["education"]
-    )
-
-
-# ==============================================================================
-# --- TAB 4: URBANIZATION LEVELS ---
-# ==============================================================================
-with tab_urban:
-    st.markdown("### Digital Utility vs. Degree of Urbanization")
-    st.write("""
-        This module visualizes the correlation between degree of urbanization (Cities vs. Suburbs vs. Rural Areas) 
-        and digital utility. It combines a rigorous statistical test (Friedman Chi-Square) to determine 
-        if urban-rural gaps are mathematically significant, paired with an interactive chart to illustrate 
-        the intensity of those gaps across specific digital activities..
-    """)
-
-    col_table_urb, col_insights_urban = st.columns([3,2])
-
-    with col_table_urb:
-        df_urban_results = funcs.run_friedman_multigroups(
-            df=df_usage,
-            metrics_list=urban_metrics,
-            group_suffixes=['_ind_deg1', '_ind_deg2', '_ind_deg3'],
-            group_labels=['Cities', 'Suburbs', 'Rural',],
-            metadata_dict=usage_labels
-        )
-
-        if not df_urban_results.empty:
-            st.subheader("Is Settlement Density Statistically Significant for Digital Access?")
-            st.caption("Note: This table reflects aggregate EU-wide significance statistics (N=27) and remains fixed to preserve test sample validity.")
-            
-            cols_to_drop = [f"{label} Avg (%)" for label in ['Cities', 'Suburbs', 'Rural']]
-            df_display = df_urban_results.drop(columns=cols_to_drop, errors='ignore')
-
-            st.dataframe(
-                df_display,
-                column_config={
-                    "Max Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"),
-                    "P-Value": st.column_config.NumberColumn(format="%.4f")
-                },
-                hide_index=True,
-                use_container_width=True
-            )
-        else:
-            st.warning("No tracking indicators matched your data criteria for the urbanization metrics.")
-
-    with col_insights_urban:
-        st.subheader("Key Insights")
-        with st.expander("**1. The Urban Advantage is Pervasive**"):
-            st.write(
-                """
-                - For almost every metric -- especially Use of Generative AI Tools, Messages Exchange, and Daily Access -- there is a clear, 
-                     downward trend as we move from Cities to Rural areas. 
-                - High-density urban environments act as accelerators for digital adoption.
-            """)
-        with st.expander('**2. Generative AI as the "Gap Leader"**'):
-            st.write(
-                """
-                - With a massive 15.4-point gap between cities and rural areas, Generative AI tools represent 
-                the single largest point of inequality. 
-                - Advanced or emerging tech is currently much more concentrated in metropolitan hubs compared to simpler tasks.
-            """)
-        
-        with st.expander('**3. Rural "Penalty" in Online Political Participation**'):
-            st.write(
-                """
-                - People, who live in cities, are significantly more likely to express opinions on civic/political issues and 
-                participate in political activities online compared to those in rural areas. 
-                - **Potential "civic digital divide" detected!**
-            """)
-        
-        with st.expander("**4. Digital Difficulties Are Very Egalitatian**"):
-            st.write(
-                """
-                - The analysis shows no statistically significant difference across three groups.
-                - Digital friction is "democratically" distributed: everyone, regardless of where they live,
-                struggles with digital tasks at the same rate.
-            """)
-
-    funcs.render_demographic_chart(
-        df_filtered_usage, 
-        urban_columns, 
-        ['City', 'Town/Suburbs', 'Rural Areas'], 
-        usage_labels,
-        color_map=COLOR_MAPS["urban"]
-    )
-
 
 # ==============================================================================
 # FOOTER SECTION
@@ -582,5 +314,5 @@ with tab_urban:
 st.write("---")
 st.caption("""
     **Data Source Reference:** Eurostat Digital Economy and Society Statistics (2025). Data on Digital Skills 
-           and ICT Usage collected in the framework od [ESS ICT Survey](https://ec.europa.eu/eurostat/web/microdata/collections-research/survey-ict-use-households-individuals)
-    """)
+    and ICT Usage collected in the framework of the ESS ICT Survey.
+""")

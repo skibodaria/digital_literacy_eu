@@ -297,23 +297,44 @@ with tab_barriers:
     col_map_tab2, col_key_insights_tab2 = st.columns([2,3])
     
     with col_map_tab2:
-        # --- MAP INSERTION (BARRIERS) ---
-        # Create dictionary to map your specific 7 barrier metrics to their descriptive titles
-        tab2_display_options = {
-            baseline_labels.get(code, code).replace("eID Non-Use: ", ""): code 
-            for code in map_tab2_no_eid_metrics 
-            if code in df_tab2_map.columns
-        }
-        tab2_display_options = dict(sorted(tab2_display_options.items()))
+        with col_map_tab2:
+    # --- MAP INSERTION (BARRIERS) ---
+            barrier_options_map = {}
+            for metric_code in map_tab2_no_eid_metrics:
+                # Check if the code (or its lowercase version) exists in your map dataframe columns
+                # This prevents an empty dropdown if column cases shifted under the hood
+                matched_col = next((c for c in df_tab2_map.columns if c.lower() == metric_code.lower()), None)
+                
+                if matched_col:
+                    raw_label = baseline_labels.get(metric_code, metric_code)
+                    
+                    # Strip away all variations of system prefixes to keep the dropdown UI clean
+                    clean_label = (raw_label
+                                .replace("eID Non-Use: ", "")
+                                .replace("eID Barriers: ", "")
+                                .replace("e-Gov: ", "")
+                                .replace("eID: ", "")
+                                .strip())
+                    
+                    # Store the cleaned title as the key and the actual dataframe column name as the value
+                    barrier_options_map[clean_label] = matched_col
 
-        selected_title_b = st.selectbox(
-            "Select Barrier for Map Visualization:",
-            options=list(tab2_display_options.keys()),
-            key="map_barrier_selector"
-        )
-        chosen_indicator_code_b = tab2_display_options[selected_title_b]
+            # Sort the options alphabetically by their clean titles for a better user experience
+            barrier_options_map = dict(sorted(barrier_options_map.items()))
+
+            if barrier_options_map:
+                # 2. Render the Selectbox using the sorted clean titles
+                selected_title_b = st.selectbox(
+                    "Select Barrier for Map Visualization:",
+                    options=list(barrier_options_map.keys()),
+                    key="map_barrier_selector_dynamic" 
+                )
+        
+                chosen_indicator_code_b = barrier_options_map[selected_title_b]
             
-        st.markdown(f"### Distribution Map: {selected_title_b}")
+                st.markdown(f"### Distribution Map: {selected_title_b}")
+            else:
+                st.warning("No matching barrier metrics found in the map dataframe columns.")
 
         if chosen_indicator_code_b:
             fig_barr = px.choropleth(
