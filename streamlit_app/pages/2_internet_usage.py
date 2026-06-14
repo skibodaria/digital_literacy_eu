@@ -166,7 +166,8 @@ with tab_overview:
             showframe=False,              
             showcoastlines=True,          
             coastlinecolor="LightGray",
-            bgcolor="rgba(0,0,0,0)"
+            resolution=50,
+            bgcolor="rgba(0,0,0,0)" # transperency                 
         )
         
         fig.update_layout(
@@ -219,7 +220,11 @@ with tab_demographics:
             cols_to_drop_g = [c for c in ["Female Avg (%)", "Male Avg (%)"] if c in df_gender_res.columns]
             df_gender_res = df_gender_res.drop(columns=cols_to_drop_g)
             
-            st.dataframe(df_gender_res, column_config={"Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"), "Wilcoxon P-Value": st.column_config.NumberColumn(format="%.4f")}, hide_index=True, use_container_width=True)
+            st.dataframe(
+                df_gender_res, 
+                column_config={"Max Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"), 
+                               "Wilcoxon P-Value": st.column_config.NumberColumn(format="%.4f")}, hide_index=True, use_container_width=True
+            )
 
         # --- 2. Age Cohorts Matrix ---
         with st.expander("Age Cohorts Variance Matrix (Usage)", expanded=True):
@@ -237,7 +242,7 @@ with tab_demographics:
                 df_edu_res['Indicator'] = df_edu_res['Indicator'].apply(clean_metric_label)
                 cols_to_drop_e = [f"{lbl} Avg (%)" for lbl in ['Low Edu', 'Medium Edu', 'High Edu']]
                 df_edu_res = df_edu_res.drop(columns=cols_to_drop_e, errors='ignore')
-                st.dataframe(df_edu_res, column_config={"Max Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"), "P-Value": st.column_config.NumberColumn(format="%.6f")}, hide_index=True, use_container_width=True)
+                st.dataframe(df_edu_res, column_config={"Max Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"), "P-Value": st.column_config.NumberColumn(format="%.4f")}, hide_index=True, use_container_width=True)
 
         # --- 4. Urbanization Density Matrix ---
         with st.expander("Urbanization Split Variance Matrix (Usage)", expanded=True):
@@ -307,7 +312,7 @@ with tab_demographics:
         usage_labels,
         color_map=active_color
     )
-
+  
 # ==============================================================================
 # FOOTER SECTION
 # ==============================================================================

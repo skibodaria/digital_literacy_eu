@@ -249,7 +249,15 @@ with tab_usage:
 
             cols_to_drop = [c for c in ["Female Avg (%)", "Male Avg (%)"] if c in df_gender.columns]
             df_gender = df_gender.drop(columns=cols_to_drop)
-            st.dataframe(df_gender, use_container_width=True, hide_index=True)
+            st.dataframe(
+                df_gender,
+                column_config={
+                    "Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"),
+                    "Wilcoxon P-Value": st.column_config.NumberColumn(format="%.4f") 
+                },
+                hide_index=True,
+                use_container_width=True
+            )
         else:
             st.caption("No matching gender usage columns located.")
 
@@ -261,7 +269,13 @@ with tab_usage:
                 df_results["Indicator"] = df_results["Indicator"].apply(lambda x: get_clean_table_label(x, "e-Gov: "))
             cols_to_drop = [c for c in ["Low Edu Avg (%)", "Med Edu Avg (%)", "High Edu Avg (%)"] if c in df_results.columns]
             df_results = df_results.drop(columns=cols_to_drop)
-            st.dataframe(df_results, use_container_width=True, hide_index=True)
+            st.dataframe(
+                df_results, 
+                column_config={
+                    "Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"),
+                    "P-Value": st.column_config.NumberColumn(format="%.4f") 
+                },
+                use_container_width=True, hide_index=True)
         else:
             st.caption("No matching education usage variables mapped.")
 
@@ -274,7 +288,13 @@ with tab_usage:
             
             cols_to_drop = [c for c in ["Cities Avg (%)", "Suburbs Avg (%)", "Rural Avg (%)"] if c in df_results.columns]
             df_results = df_results.drop(columns=cols_to_drop)
-            st.dataframe(df_results, use_container_width=True, hide_index=True)
+            st.dataframe(
+                df_results, 
+                column_config={
+                    "Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"),
+                    "P-Value": st.column_config.NumberColumn(format="%.4f") 
+                },
+                use_container_width=True, hide_index=True)
         else:
             st.caption("No matching urbanization usage variables mapped.")
 
@@ -286,8 +306,14 @@ with tab_usage:
                 df_results["Indicator"] = df_results["Indicator"].apply(lambda x: get_clean_table_label(x, "e-Gov: "))
             cols_to_drop = [c for c in ["16-19 Avg (%)", "20-24 Avg (%)", "25-34 Avg (%)", "35-44 Avg (%)", "45-54 Avg (%)", "55-64 Avg (%)", "65-74 Avg (%)"] if c in df_results.columns]
             df_results = df_results.drop(columns=cols_to_drop)
-            st.dataframe(df_results, use_container_width=True, hide_index=True)
-        else:
+            st.dataframe(
+                df_results, 
+                column_config={
+                    "Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"),
+                    "P-Value": st.column_config.NumberColumn(format="%.4f") 
+                },
+                use_container_width=True, hide_index=True)
+        else: 
             st.caption("No matching age cohort usage variables mapped.")
 
 # ==============================================================================
@@ -427,13 +453,9 @@ with tab_barriers:
     # ------------------ SIGNIFICANCE MATRICES ------------------
     st.subheader("Analyzing Barriers to E-ID Adoption")
     
-    # Helper to clean up any messy token and return pristine baseline label for Barriers
-    # Advanced helper that ignores formatting spaces injected by statistical modules
     def get_clean_barrier_label(raw_string, prefix_to_strip):
         raw_str_clean = str(raw_string).strip()
         
-        # Scenario A: If the string is already a descriptive title containing a system prefix,
-        # skip the complex matching entirely and just strip the headers!
         if any(p in raw_str_clean for p in ["eID Non-Use:", "eID Barriers:", "e-Gov:", "eID:"]):
             return (raw_str_clean
                     .replace("eID Non-Use: ", "")
@@ -443,7 +465,6 @@ with tab_barriers:
                     .replace("e-Gov : ", "")
                     .strip())
             
-        # Scenario B: It's a mangled key token from a t-test (e.g., "I Ireidna F")
         normalized_target = raw_str_clean.replace(" ", "").lower()
         if normalized_target.endswith('f'):
             normalized_target = normalized_target[:-1]
@@ -483,7 +504,14 @@ with tab_barriers:
             cols_to_drop = [c for c in ["Low Edu Avg (%)", "Med Edu Avg (%)", "High Edu Avg (%)"] if c in df_results.columns]
             df_results = df_results.drop(columns=cols_to_drop)
 
-            st.dataframe(df_results, use_container_width=True, hide_index=True)
+            st.dataframe(
+                df_results, 
+                column_config={
+                    "Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"),
+                    "P-Value": st.column_config.NumberColumn(format="%.4f") 
+                },
+                use_container_width=True, hide_index=True
+            )
         else:
             st.caption("No matching education barrier variables mapped.")
 
@@ -497,7 +525,13 @@ with tab_barriers:
             cols_to_drop = [c for c in ["Cities Avg (%)", "Suburbs Avg (%)", "Rural Avg (%)"] if c in df_results.columns]
             df_results = df_results.drop(columns=cols_to_drop)
 
-            st.dataframe(df_results, use_container_width=True, hide_index=True)
+            st.dataframe(
+                df_results, 
+                column_config={
+                    "Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"),
+                    "P-Value": st.column_config.NumberColumn(format="%.4f") 
+                },
+                use_container_width=True, hide_index=True)
         else:
             st.caption("No matching urbanization barrier variables mapped.")
 
@@ -510,7 +544,13 @@ with tab_barriers:
             cols_to_drop = [c for c in ["16-19 Avg (%)", "20-24 Avg (%)", "25-34 Avg (%)", "35-44 Avg (%)", "45-54 Avg (%)", "55-64 Avg (%)", "65-74 Avg (%)"] if c in df_results.columns]
             df_results = df_results.drop(columns=cols_to_drop)
 
-            st.dataframe(df_results, use_container_width=True, hide_index=True)
+            st.dataframe(
+                df_results, 
+                column_config={
+                    "Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"),
+                    "P-Value": st.column_config.NumberColumn(format="%.4f") 
+                },
+                use_container_width=True, hide_index=True)
         else: 
             st.caption("No matching age cohort barrier variables mapped.")
 
