@@ -29,6 +29,9 @@ SELECT
     i_udi,
     i_ireidno,
     i_dsk2_bab,
+    i_igovbe,
+    i_igovrcc,
+    i_igovrx,
     
     -- all Eurobarometer but not a country code
     tr_party, tr_authority, tr_nat_gov,
