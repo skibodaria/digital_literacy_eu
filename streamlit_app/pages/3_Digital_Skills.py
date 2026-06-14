@@ -68,12 +68,9 @@ st.write("---") # Visual divider line
 # ==============================================================================
 # MAIN TABS ARCHITECTURE
 # ==============================================================================
-tab_overview, tab_gender, tab_age, tab_edu, tab_urban, tab_deep_dive = st.tabs([
+tab_overview, tab_demog, tab_deep_dive = st.tabs([
     "Overview", 
-    "Gender", 
-    "Age Groups",
-    "Education Levels",
-    "Urbanization Levels",
+    "Demographical Dimensions",
     "Skill Metric Deep Dive"
 ])
 
@@ -323,153 +320,335 @@ with tab_overview:
             """
         )
 # ==============================================================================
-# --- GENDER ---
+# --- TAB 2: DEMOGRAPHIC DIMENSIONS ---
 # ==============================================================================
-with tab_gender:
-    st.header("Digital Skills vs. Gender")
-    st.write("Placeholder: Cross-tabulations and distributions segmented by Education, Gender, Urbanization, and Age groups.")
-
-    # extract columns by demographic characteristics (gender, education, urbanization, age)
-    columns = df_skills.columns
-    gen_dig_skills = []
-    urb_dig_skills = []
-    edu_dig_skills = []
-    age_dig_skills = []
-
-    age_substrings = ['y16_19', 'y20_24', 'y25_34', 'y35_44', 'y45_54', 'y55_64', 'y65_74']
-
-    for col in columns:
-
-        # check gender:
-        if ('_f_' in col) or ('_m_' in col):
-            gen_dig_skills.append(col)
-            
-        # check settlement/urban:
-        if ('ind_deg1' in col) or ('ind_deg2' in col) or ('ind_deg3' in col):
-            urb_dig_skills.append(col)
-            
-        # check education:
-        if ('i0_2' in col) or ('i3_4' in col) or ('i5_8' in col):
-            edu_dig_skills.append(col)
-            
-        # check age (and not having gender!)
-        has_age = any(age_tag in col for age_tag in age_substrings)
-        has_gender = ('_f_' in col) or ('_m_' in col)
-        
-        if has_age and not has_gender:
-            age_dig_skills.append(col)
-
-    col_table, col_gender_insights = st.columns([2,3])
-    with col_table:
-        st.subheader("Is Gender Statistically Significant for Digital Skills Levels?")
-        df_gender_results = funcs.run_t_test_pair(df_skills, gen_dig_skills, '_y16_74', skills_labels)
-        df_gender_results_table=df_gender_results.drop(columns=['Female Avg (%)', 'Male Avg (%)'])
-        st.dataframe(
-            df_gender_results_table,
-            column_config={
-                #"Female Avg (%)": st.column_config.NumberColumn(format="%.1f%%"),
-                #"Male Avg (%)": st.column_config.NumberColumn(format="%.1f%%"),
-                "Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"),
-                "P-Value": st.column_config.NumberColumn(format="%.4f")
-            },
-            hide_index=True,
-            use_container_width=True
-        )
-
-    with col_gender_insights:
-        st.subheader("Key Insights")
-        st.markdown("**1. The 'High-Skill' Premium Favors Men**")
-        st.markdown(
-            "The gender gap is narrowing globally, but men across the EU are still "
-            "significantly more likely to cross the threshold into advanced digital competencies "
-            "This has direct "
-            "implications filling high-paying tech and engineering roles."
-        )
-        st.markdown("**2. Women Dominate the Solid 'Baseline' Competencies**")
-        st.markdown(
-            "Women are significantly better represented in the 'middle tier' of digital literacy. "
-            "They hold a solid base of everyday digital skills. The data suggests that the "
-            "core issue is a bottleneck "
-            "preventing women with basic/low skills from transitioning into the 'Above Basic' tier."
-        )
-        st.markdown("**3. Statistically Identical Floors**")
-        st.markdown(
-            "At the bottom end of the digital skills scale, gender is an irrelevant factor. "
-            "The portion of the population that is completely digitally excluded or highly restricted "
-            "is identical regardless of gender. Exclusion here is likely driven by other structural vectors."
-        )
-
-    df_chart = df_gender_results[['Indicator', 'Female Avg (%)', 'Male Avg (%)']].copy()
-    df_chart.columns = ['Indicator', 'Female', 'Male']
-    df_chart['Indicator'] = (
-        df_chart['Indicator']
-        .str.replace('Digital Skills:', '', case=False)
-        .str.strip()
-    )
-
-    df_melted = df_chart.melt(
-        id_vars=['Indicator'], 
-        value_vars=['Female', 'Male'], 
-        var_name='Gender', 
-        value_name='Percentage (%)'
-    )
-
-    # 3. Create a beautiful, interactive grouped bar chart
-    fig = px.bar(
-        df_melted, 
-        x='Indicator', 
-        y='Percentage (%)', 
-        color='Gender', 
-        barmode='group', # 💡 This explicitly forces them side-by-side!
-        color_discrete_map={'Female': '#498cdb', 'Male': '#001f63'},
-        height=400
-    )
-
-    # 4. Clean up the layout aesthetics to match your clean UI standard
-    fig.update_layout(
-        xaxis_title=None,
-        yaxis_title="Average Percentage (%)",
-        plot_bgcolor='rgba(0,0,0,0)',
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, title=None),
-        margin=dict(l=20, r=20, t=20, b=20)
-    )
-
-    # Fix grid lines to be subtle
-    fig.update_yaxes(showgrid=True, gridcolor='rgba(226, 232, 240, 0.5)')
-
-    # 5. Render it in Streamlit
-    st.subheader("Digital Skills Competency Comparison")
-    st.plotly_chart(fig, use_container_width=True)
-
-
-
-
-
-
-
+with tab_demog:
+    st.header("Socio-Demographic Literacy Layers")
+    st.write("Explore how digital skills thresholds distribute across specific sub-populations.")
     
+    # --- STEP 1: Interactive Segment Map Components (Dependent on Country Filter) ---
+    st.subheader(funcs.get_dynamic_subheader(df_filtered_skills))
+    
+    demo_metric_choice = st.selectbox(
+        "Select Demographic Slice to Plot:",
+        options=["Gender", "Age Cohorts", "Education Levels", "Urbanization Levels"]
+    )
+    
+    # Dynamically extract and resolve clean suffix tracking arrays from column names
+    if demo_metric_choice == "Gender":
+        target_cols = [c for c in df_skills.columns if ('_f_' in c or '_m_' in c) and '_y16_74' in c]
+        labels_list = ['Female', 'Male']
+        color_blueprint = {'Female': '#498cdb', 'Male': '#001f63'}
+    elif demo_metric_choice == "Age Cohorts":
+        target_cols = [c for c in df_skills.columns if any(sfx in c for sfx in ['y16_19', 'y20_24', 'y25_34', 'y35_44', 'y45_54', 'y55_64', 'y65_74']) and not ('_f_' in c or '_m_' in c)]
+        labels_list = ['16-19', '20-24', '25-34', '35-44', '45-54', '55-64', '65-74']
+        color_blueprint = None
+    elif demo_metric_choice == "Education Levels":
+        target_cols = [c for c in df_skills.columns if any(sfx in c for sfx in ['i0_2', 'i3_4', 'i5_8'])]
+        labels_list = ['Low Edu', 'Medium Edu', 'High Edu']
+        color_blueprint = {'Low Edu': '#cbd5e1', 'Medium Edu': '#64748b', 'High Edu': '#0f172a'}
+    else:  # Urbanization
+        target_cols = [c for c in df_skills.columns if any(sfx in c for sfx in ['ind_deg1', 'ind_deg2', 'ind_deg3'])]
+        labels_list = ['Cities', 'Suburbs', 'Rural']
+        color_blueprint = {'Cities': '#3b82f6', 'Suburbs': '#60a5fa', 'Rural': '#93c5fd'}
 
+    funcs.render_demographic_chart(
+        df_filtered_skills, target_cols, labels_list, skills_labels, color_map=color_blueprint
+    )
+    
+    st.write("---")
+    st.subheader("Global EU Significance Tests (Fixed Sample Baselines)")
+    
+    # --- STEP 2: Strict Fixed Global Statistical Inference Tables (Expandable, NO Country Filters) ---
+    
+    # 1. Gender Table Module
+    with st.expander("Gender Gaps Significance (Wilcoxon Signed-Rank)", expanded=False):
+        col_tbl, col_ins = st.columns([3, 2])
+        with col_tbl:
+            # 🎯 FIX: Explicitly target only total population slices to prevent NaN evaluations
+            gen_clean_cols = [c for c in df_skills.columns if ('_f_' in c or '_m_' in c) and c.endswith('_y16_74')]
+            if gen_clean_cols:
+                df_gender = funcs.run_t_test_pair(df_skills, gen_clean_cols, '_y16_74', skills_labels)
+                df_gender = df_gender.drop(columns=[c for c in ["Female Avg (%)", "Male Avg (%)"] if c in df_gender.columns])
+                st.dataframe(
+                    df_gender, 
+                    column_config={
+                        "Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"),
+                        "P-Value": st.column_config.NumberColumn(format="%.6f") # 🎯 Force 6 decimals
+                    }, hide_index=True, use_container_width=True
+                )
+        with col_ins:
+            st.markdown("**Key Insights:**\n* Men maintain a significant lead at the 'Above Basic' threshold, while entry-level exclusion rates remain identical.")
 
+    # 2. Age Cohorts Table Module
+    with st.expander("Age Cohorts Variance Significance (Friedman Multi-Group)", expanded=False):
+        col_tbl, col_ins = st.columns([3, 2])
+        with col_tbl:
+            age_metrics_clean = sorted(list(set([c.split('_y16')[0].split('_y20')[0].split('_y25')[0].split('_y35')[0].split('_y45')[0].split('_y55')[0].split('_y65')[0].lower() for c in df_skills.columns if any(sfx in c.lower() for sfx in ['_y16_19', '_y20_24', '_y25_34', '_y35_44', '_y45_54', '_y55_64', '_y65_74']) and not ('_f_' in c or '_m_' in c)])))
+            if age_metrics_clean:
+                df_age = funcs.run_friedman_multigroups(df_skills, age_metrics_clean, ['_y16_19', '_y20_24', '_y25_34', '_y35_44', '_y45_54', '_y55_64', '_y65_74'], ['16-19', '20-24', '25-34', '35-44', '45-54', '55-64', '65-74'], skills_labels)
+                df_age = df_age.drop(columns=[f"{l} Avg (%)" for l in ['16-19', '20-24', '25-34', '35-44', '45-54', '55-64', '65-74']], errors='ignore')
+                st.dataframe(
+                    df_age,
+                    column_config={
+                        "Max Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"),
+                        "P-Value": st.column_config.NumberColumn(format="%.6f") # 🎯 Force 6 decimals
+                    }, hide_index=True, use_container_width=True
+                )
+        with col_ins:
+            st.markdown("**Key Insights:**\n* Strong generational downward step patterns emerge as cohorts age.")
 
-with tab_edu:
-    st.subheader("Granular Component Evaluation")
-    st.write("Placeholder: In-depth breakdowns of specific subsets.")
+    # 3. Education Table Module
+    with st.expander("Education Levels Variance Significance (Friedman Multi-Group)", expanded=False):
+        col_tbl, col_ins = st.columns([3, 2])
+        with col_tbl:
+            edu_metrics_clean = sorted(list(set([c.split('_i0_2')[0].split('_i3_4')[0].split('_i5_8')[0].lower() for c in df_skills.columns if any(sfx in c.lower() for sfx in ['_i0_2', '_i3_4', '_i5_8'])])))
+            if edu_metrics_clean:
+                df_edu = funcs.run_friedman_multigroups(df_skills, edu_metrics_clean, ['_i0_2', '_i3_4', '_i5_8'], ['Low Edu', 'Medium Edu', 'High Edu'], skills_labels)
+                df_edu = df_edu.drop(columns=[f"{l} Avg (%)" for l in ['Low Edu', 'Medium Edu', 'High Edu']], errors='ignore')
+                st.dataframe(
+                    df_edu,
+                    column_config={
+                        "Max Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"),
+                        "P-Value": st.column_config.NumberColumn(format="%.6f") # 🎯 Force 6 decimals
+                    }, hide_index=True, use_container_width=True
+                )
+        with col_ins:
+            st.markdown("**Key Insights:**\n* Formal educational attainment is the strongest institutional predictor of advanced skills across the dataset.")
 
+    # 4. Settlement Density / Urbanization Table Module
+    with st.expander("Settlement Density Variance Significance (Friedman Multi-Group)", expanded=False):
+        col_tbl, col_ins = st.columns([3, 2])
+        with col_tbl:
+            urb_metrics_clean = sorted(list(set([c.split('_ind_deg1')[0].split('_ind_deg2')[0].split('_ind_deg3')[0].lower() for c in df_skills.columns if any(sfx in c.lower() for sfx in ['_ind_deg1', '_ind_deg2', '_ind_deg3'])])))
+            if urb_metrics_clean:
+                df_urb = funcs.run_friedman_multigroups(df_skills, urb_metrics_clean, ['_ind_deg1', '_ind_deg2', '_ind_deg3'], ['Cities', 'Suburbs', 'Rural'], skills_labels)
+                df_urb = df_urb.drop(columns=[f"{l} Avg (%)" for l in ['Cities', 'Suburbs', 'Rural']], errors='ignore')
+                st.dataframe(
+                    df_urb,
+                    column_config={
+                        "Max Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"),
+                        "P-Value": st.column_config.NumberColumn(format="%.6f") # 🎯 Force 6 decimals
+                    }, hide_index=True, use_container_width=True
+                )
+        with col_ins:
+            st.markdown("**Key Insights:**\n* Metropolitan hubs show a clear adoption lead over rural communities.")
 
 # ==============================================================================
-# --- REGULAR TAB LAYOUTS ---
-# ==============================================================================
-with tab_urban:
-    st.subheader("Digital Skills vs. Sociodemographic Factors")
-    st.write("Placeholder: Cross-tabulations and distributions segmented by Education, Gender, Urbanization, and Age groups.")
-
-
-# ==============================================================================
-# --- REGULAR TAB LAYOUTS ---
+# --- TAB 6: SKILL METRIC DEEP DIVE ---
 # ==============================================================================
 with tab_deep_dive:
-    st.subheader("Digital Skills vs. Sociodemographic Factors")
-    st.write("Placeholder: Cross-tabulations and distributions segmented by Education, Gender, Urbanization, and Age groups.")
+    st.header("Strategic Competence Dimension Deep Dive")
+    st.markdown("""
+        This module decomposes the overall Digital Skills Indicator into its **five structural foundational vectors** defined by the European Commission's DigComp Framework. Rather than focusing on a single metric, 
+        this workspace visualizes comparative structural footprints and pinpoints exactly where socio-demographic disparities live.
+    """)
+
+    # --------------------------------------------------------------------------
+    # 0. DATABASE DATA EXTRACTION & CONFIGURATION
+    # --------------------------------------------------------------------------
+    try:
+        # Load the newly created dbt mart table and its metadata indicators
+        df_deep, deep_labels = funcs.load_tab_data("stg_skills_deep_dive", "mart_indicators")
+    except Exception as e:
+        st.error(f"Failed to extract deep dive dimension data: {e}")
+        df_deep = pd.DataFrame()
+
+    if df_deep.empty:
+        st.warning("Deep Dive data asset pipeline empty. Verify your 'stg_skills_deep_dive' table status.")
+    else:
+        # Filter deep dive frame down to the user's active sidebar geographic choices
+        df_filtered_deep = df_deep[df_deep['clean_country_name'].isin(selected_countries)]
+
+        # Human-readable mapping dictionary for our 5 Core Framework Dimension prefixes
+        DIMENSION_MAP = {
+            'i_dsk2_il_bab': 'Information & Data Literacy',
+            'i_dsk2_cc_bab': 'Communication & Collaboration',
+            'i_dsk2_dcc_bab': 'Digital Content Creation',
+            'i_dsk2_sf_bab': 'Safety & Privacy Competence',
+            'i_dsk2_ps_bab': 'Technical Problem Solving'
+        }
+
+        st.write("---")
+
+        # ==============================================================================
+        # COMPONENT 1: COUNTRY GEOGRAPHIC SIGNATURE FINGERPRINT (Radar Map Matrix)
+        # ==============================================================================
+        st.subheader("📊 Cross-Dimension Competence Fingerprint")
+        st.markdown("_Compare a country's baseline performance across all five capability pillars simultaneously._")
+
+        # Single country filter dedicated strictly to the fingerprint vector
+        fingerprint_country = st.selectbox(
+            "Select Target Country for Fingerprint Analysis:",
+            options=sorted(df_filtered_deep['clean_country_name'].unique()),
+            index=0
+        )
+
+        df_country_fingerprint = df_filtered_deep[df_filtered_deep['clean_country_name'] == fingerprint_country]
+        df_eu_fingerprint = df_deep.copy() # Use full unfiltered frame for a robust EU benchmark reference
+
+        fingerprint_rows = []
+        for prefix, label in DIMENSION_MAP.items():
+            # Target the national total baseline suffix columns for the macro view
+            f_col = f"{prefix}_f_y16_74"
+            m_col = f"{prefix}_m_y16_74"
+            
+            if f_col in df_country_fingerprint.columns and m_col in df_country_fingerprint.columns:
+                # Calculate National Average for total baseline
+                country_avg = (df_country_fingerprint[f_col].mean() + df_country_fingerprint[m_col].mean()) / 2
+                eu_avg = (df_eu_fingerprint[f_col].mean() + df_eu_fingerprint[m_col].mean()) / 2
+                
+                fingerprint_rows.append({
+                    "Dimension": label,
+                    f"{fingerprint_country} (%)": round(country_avg, 1) if not pd.isna(country_avg) else 0,
+                    "EU Average (%)": round(eu_avg, 1) if not pd.isna(eu_avg) else 0
+                })
+
+        if fingerprint_rows:
+            df_radar = pd.DataFrame(fingerprint_rows)
+            
+            # Construct a clean Radar diagram using Plotly Graph Objects
+            fig_radar = go.Figure()
+            
+            # Trace 1: Target Country
+            fig_radar.add_trace(go.Scatterpolar(
+                r=df_radar[f"{fingerprint_country} (%)"],
+                theta=df_radar['Dimension'],
+                fill='toself',
+                name=fingerprint_country,
+                line_color='#001f63',
+                fillcolor='rgba(0, 31, 99, 0.2)'
+            ))
+            
+            # Trace 2: EU Average Benchmark
+            fig_radar.add_trace(go.Scatterpolar(
+                r=df_radar['EU Average (%)'],
+                theta=df_radar['Dimension'],
+                fill='toself',
+                name='EU Average Baseline',
+                line_color='#64748b',
+                fillcolor='rgba(100, 116, 139, 0.15)',
+                line=dict(dash='dash')
+            ))
+
+            fig_radar.update_layout(
+                polar=dict(
+                    radialaxis=dict(visible=True, range=[0, 100], ticksuffix="%"),
+                    bgcolor='rgba(0,0,0,0)'
+                ),
+                showlegend=True,
+                height=450,
+                legend=dict(orientation="h", yanchor="bottom", y=1.1, xanchor="center", x=0.5),
+                margin=dict(t=30, b=20, l=40, r=40)
+            )
+            
+            col_radar, col_radar_desc = st.columns([3, 2])
+            with col_radar:
+                st.plotly_chart(fig_radar, use_container_width=True)
+            with col_radar_desc:
+                st.markdown(f"### {fingerprint_country} Structural Balance Sheet")
+                st.markdown("""
+                    **How to read this chart:**
+                    * A perfectly symmetrical web indicate well-rounded national educational strategies.
+                    * Sharp peaks point out targeted national specializations, while inward indents signal strategic bottlenecks.
+                """)
+                
+                # Dynamically calculate and display performance callouts
+                df_radar['Diff'] = df_radar[f"{fingerprint_country} (%)"] - df_radar['EU Average (%)']
+                strongest_dim = df_radar.loc[df_radar['Diff'].idxmax()]
+                weakest_dim = df_radar.loc[df_radar['Diff'].idxmin()]
+                
+                st.info(f"**🚀 Relative Strength:** *{strongest_dim['Dimension']}* is leading the EU average trend by **+{strongest_dim['Diff']:.1f} percentage points**.")
+                st.warning(f"**⚠️ Relative Bottleneck:** *{weakest_dim['Dimension']}* shows the widest lag behind the EU block (**{weakest_dim['Diff']:.1f} percentage points**).")
+        else:
+            st.warning("Dimension baseline signature tracks could not be isolated from database schema rows.")
+
+        st.write("---")
+
+        # ==============================================================================
+        # COMPONENT 2: INTERACTIVE DISPARITY GRID MATRIX (Heatmap View)
+        # ==============================================================================
+        st.subheader("🔥 Macro Socio-Demographic Disparity Matrix")
+        st.markdown("_Select an intersection layer to map variance density across all 5 framework dimensions at once._")
+
+        deep_demo_choice = st.selectbox(
+            "Select Demographic Stratification Layer:",
+            options=["Age Cohorts", "Education Levels", "Urbanization Levels"],
+            key="deep_demo_selectbox"
+        )
+
+        # Set up dictionary maps targeting the exact demographic key endings configured in your dbt cross join
+        if deep_demo_choice == "Age Cohorts":
+            slice_mapping = {'y16_19': '16-19', 'y20_24': '20-24', 'y25_34': '25-34', 'y35_44': '35-44', 'y45_54': '45-54', 'y55_64': '55-64', 'y65_74': '65-74'}
+        elif deep_demo_choice == "Education Levels":
+            slice_mapping = {'i0_2': 'Low Edu', 'i3_4': 'Medium Edu', 'i5_8': 'High Edu'}
+        else:  # Urbanization
+            slice_mapping = {'ind_deg1': 'Cities', 'ind_deg2': 'Suburbs', 'ind_deg3': 'Rural'}
+
+        heatmap_data = []
+
+        # Aggregate and calculate cross table matrices across all filtered countries
+        for prefix, dim_label in DIMENSION_MAP.items():
+            for suffix, label in slice_mapping.items():
+                target_col = f"{prefix}_{suffix}"
+                if target_col in df_filtered_deep.columns:
+                    mean_val = df_filtered_deep[target_col].mean()
+                    heatmap_data.append({
+                        "Core Dimension": dim_label,
+                        "Socio-Demographic Group": label,
+                        "Mean Proficiency (%)": round(mean_val, 1) if not pd.isna(mean_val) else 0
+                    })
+
+        if heatmap_data:
+            df_heat = pd.DataFrame(heatmap_data)
+            
+            # Pivot the flat array into a 2D grid matrix suitable for structural graphing
+            df_heat_pivot = df_heat.pivot(
+                index="Core Dimension", 
+                columns="Socio-Demographic Group", 
+                values="Mean Proficiency (%)"
+            )
+            
+            # Retain structural order sorting across demographic series variables
+            df_heat_pivot = df_heat_pivot[list(slice_mapping.values())]
+
+            # Generate the visualization utilizing Plotly Express's Heatmap module
+            fig_heat = px.imshow(
+                df_heat_pivot,
+                labels=dict(x="Demographic Group Segment", y="Competence Dimension", color="Avg %"),
+                x=df_heat_pivot.columns,
+                y=df_heat_pivot.index,
+                color_continuous_scale=styles.EU_CORNFLOWER,
+                text_auto='.1f',
+                height=450
+            )
+
+            fig_heat.update_layout(
+                xaxis_title=None,
+                yaxis_title=None,
+                margin=dict(t=10, b=20, l=10, r=10)
+            )
+
+            st.plotly_chart(fig_heat, use_container_width=True)
+            
+            # Strategic Data-Driven Summary Insights Generator Box
+            st.markdown("##### 📝 Matrix Structural Observations")
+            
+            # Calculate metrics to output dynamic commentary
+            max_val = df_heat["Mean Proficiency (%)"].max()
+            min_val = df_heat["Mean Proficiency (%)"].min()
+            top_seg = df_heat.loc[df_heat["Mean Proficiency (%)"].idxmax()]
+            bot_seg = df_heat.loc[df_heat["Mean Proficiency (%)"].idxmin()]
+            
+            st.markdown(f"""
+                * **Peak Adoption Concentration:** Maximum proficiency is reached inside the **{top_seg['Socio-Demographic Group']}** subgroup evaluating **{top_seg['Core Dimension']}** at **{max_val}%**.
+                * **Core Exclusion Point:** Structural friction is concentrated heaviest in the **{bot_seg['Socio-Demographic Group']}** cohort assessing **{bot_seg['Core Dimension']}**, dropping to **{min_val}%**.
+                * **Vertical Line Check:** Scan the heatmap vertically. If colors transition rapidly from dark to light, it proves that **{deep_demo_choice}** exerts a dominant leverage force on digital integration regardless of the specific skill domain.
+            """)
+        else:
+            st.warning("Matching metric matrix blocks could not be constructed for this segment setup.")
+
+
 
 # ==============================================================================
 # FOOTER SECTION

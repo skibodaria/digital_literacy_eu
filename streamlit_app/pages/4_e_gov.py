@@ -4,6 +4,7 @@ import numpy as np
 import plotly.express as px
 import funcs
 import styles
+from scipy import stats
 
 # ==============================================================================
 # 1. PAGE CONFIGURATION
@@ -76,9 +77,10 @@ st.write("---")
 # ==============================================================================
 # 5. MAIN HIGH-LEVEL TABS ARCHITECTURE
 # ==============================================================================
-tab_usage, tab_barriers = st.tabs([
+tab_usage, tab_barriers, tab_trust_correlations = st.tabs([
     "E-Governance Usage & Engagement", 
-    "Barriers & Reasons for Non-Usage"
+    "Barriers & Reasons for Non-Usage",
+    "Institutional Trust & E-Governance"
 ])
 
 DIMENSIONS = {
@@ -553,6 +555,174 @@ with tab_barriers:
                 use_container_width=True, hide_index=True)
         else: 
             st.caption("No matching age cohort barrier variables mapped.")
+
+
+
+# ==============================================================================
+# --- TAB: TRUST & E-GOVERNANCE USAGE CORRELATIONS ---
+# ==============================================================================
+# ==============================================================================
+# --- TAB: TRUST & E-GOVERNANCE USAGE CORRELATIONS ---
+# ==============================================================================
+with tab_trust_correlations:
+    st.header("Sociopolitical Drivers of Digital Statecraft")
+    st.markdown("""
+        This module evaluates the structural macro-level relationships between **Institutional Trust Vectors** and **e-Governance Adoption Rates** across EU member states.
+    """)
+
+    # --------------------------------------------------------------------------
+    # 1. READ IN THE CLEAN MACRO BASELINE DATASET
+    # --------------------------------------------------------------------------
+    try:
+        # Load the macro country-level baseline matrix directly
+        df_trust, trust_labels = funcs.load_tab_data("mart_eu_baseline", "mart_indicators")
+    except Exception as e:
+        st.error(f"Failed to extract macro baseline analysis layers: {e}")
+        df_trust = pd.DataFrame()
+
+    if df_trust.empty:
+        st.warning("Baseline data table assets are currently unavailable.")
+    else:
+        # Filter down rows to the user's active sidebar country selections
+        df_filtered_trust = df_trust[df_trust['clean_country_name'].isin(selected_countries)]
+
+        # Group 1: Define your exact Eurobarometer trust and perception indicators (Y-Axis)
+        TRUST_METRICS = {
+            'tr_party': 'Trust: Political Parties',
+            'tr_authority': 'Trust: Public Authorities',
+            'tr_nat_gov': 'Trust: National Government',
+            'tr_nat_par': 'Trust: National Parliament',
+            'tr_eu': 'Trust: European Union',
+            'tr_eu_par': 'Trust: European Parliament',
+            'tr_press': 'Trust: Written Press',
+            'tr_soc_netw_online': 'Trust: Social Networks Online',
+            'nat_media_tr_info': 'Media: Trustworthy Info',
+            'nat_media_free_pressure': 'Media: Free from Pressure',
+            'tr_info_polit_on_soc_net': 'Trust: Political Info on Social Media',
+            'eff_acc_to_tech': 'Perception: Effective Tech Access',
+            'eff_improve_democr_life': 'Perception: Improves Democratic Life',
+            'eff_improve_acc_pub_services': 'Perception: Improves Public Service Access',
+            'eff_work_remote': 'Perception: Effectively Facilitates Remote Work'
+        }
+        
+        # Group 2: Explicitly map your e-Gov digital metrics (X-Axis)
+        EGOV_METRICS = {
+            'i_iugov1': 'Interacting with Public Authorities',
+            'i_igovapr': 'Online Scheduling Appointments',
+            'i_igovtax2': 'Online Tax Declaration Submission',
+            'i_iupdg': 'Submitting Official Forms Online',
+            'i_iucpp': 'Accessing Personal Documents',
+            'i_igovbe': 'Accessing Public Electronic Health Records',
+            'i_igovrcc': 'Accessing Public Database/Registers',
+            'i_igovrx': 'Using Request-Based Certificates',
+            'i_ieid': 'Possessing/Using eID systems',
+            'i_ireidno': 'Barriers: Lack of eID Possession',
+            'i_iuai': 'Generative AI Tool Usage',
+            'i_udi': 'Digital Exclusion Index'
+        }
+
+        # Filter dictionaries based on what columns actually exist in your database table
+        available_trust = [c for c in TRUST_METRICS.keys() if c in df_filtered_trust.columns]
+        available_egov = [c for c in EGOV_METRICS.keys() if c in df_filtered_trust.columns]
+
+        if available_trust and available_egov:
+            # ==============================================================================
+            # COMPONENT 1: THE SPLIT GRID HEATMAP
+            # ==============================================================================
+            st.subheader("🔥 Macro Trust vs. Digital Interaction Split Grid")
+            st.markdown("_Pearson Correlation Coefficients ($R$) comparing macro institutional sentiment variables with core e-Gov adoption actions._")
+
+            # Calculate correlation matrix using only the relevant columns
+            all_target_cols = available_trust + available_egov
+            df_corr_matrix = df_filtered_trust[all_target_cols].corr(method='pearson')
+            
+            # Extract the cross-section slice: Trust on the Y-axis, e-Gov on the X-axis
+            df_heatmap_slice = df_corr_matrix.loc[available_trust, available_egov]
+            
+            # Convert raw database handles to clean readable titles
+            df_heatmap_slice.index = [TRUST_METRICS[c] for c in df_heatmap_slice.index]
+            df_heatmap_slice.columns = [EGOV_METRICS[c] for c in df_heatmap_slice.columns]
+
+            fig_corr = px.imshow(
+                df_heatmap_slice,
+                labels=dict(x="e-Governance / Digital Metric", y="Trust & Perception Vector", color="Pearson R"),
+                x=df_heatmap_slice.columns,
+                y=df_heatmap_slice.index,
+                color_continuous_scale=styles.EU_CORNFLOWER,
+                zmin=-1.0, zmax=1.0,
+                text_auto='.2f',
+                height=550
+            )
+            fig_corr.update_layout(
+                margin=dict(t=10, b=25, l=10, r=10),
+                xaxis_tickangle=-45
+            )
+            st.plotly_chart(fig_corr, use_container_width=True)
+            
+            st.write("---")
+
+            # ==============================================================================
+            # COMPONENT 2: INTERACTIVE OLS REGRESSION SCATTER MODEL
+            # ==============================================================================
+            st.subheader("📈 Macro Bivariate Scatter & Ordinary Least Squares (OLS) Model")
+            st.markdown("_Pick any two indicators from your matrix above to fit a linear regression line across selected EU states._")
+
+            col_input_x, col_input_y = st.columns(2)
+            with col_input_x:
+                chosen_x_col = st.selectbox(
+                    "Select Sociopolitical Predictor (X Axis):",
+                    options=available_trust,
+                    format_func=lambda x: TRUST_METRICS[x]
+                )
+            with col_input_y:
+                chosen_y_col = st.selectbox(
+                    "Select Digital/e-Gov Outcome (Y Axis):",
+                    options=available_egov,
+                    format_func=lambda x: EGOV_METRICS[x]
+                )
+
+            # Drop missing rows to ensure clean pairwise calculations
+            df_model_clean = df_filtered_trust[[chosen_x_col, chosen_y_col, 'clean_country_name']].dropna()
+
+            if len(df_model_clean) >= 4:
+                # Calculate OLS elements
+                slope, intercept, r_value, p_value, std_err = stats.linregress(
+                    df_model_clean[chosen_x_col], df_model_clean[chosen_y_col]
+                )
+                r_squared = r_value ** 2
+
+                fig_reg = px.scatter(
+                    df_model_clean, x=chosen_x_col, y=chosen_y_col,
+                    hover_name='clean_country_name',
+                    labels={chosen_x_col: TRUST_METRICS[chosen_x_col], chosen_y_col: EGOV_METRICS[chosen_y_col]},
+                    trendline="ols",
+                    trendline_color_override="#001f63"
+                )
+                fig_reg.update_traces(marker=dict(size=10, color="#498cdb", line=dict(width=1, color="White")))
+                fig_reg.update_layout(
+                    height=450,
+                    margin=dict(t=15, b=15, l=15, r=15)
+                )
+                
+                col_chart, col_stats = st.columns([3, 1])
+                with col_chart:
+                    st.plotly_chart(fig_reg, use_container_width=True)
+                with col_stats:
+                    st.markdown("### Model Diagnostics")
+                    st.metric(label="R² (Explained Variance)", value=f"{r_squared:.3f}")
+                    st.metric(label="β Coefficient (Slope)", value=f"{slope:.2f}")
+                    st.metric(label="p-value (Significance)", value=f"{p_value:.4f}")
+                    
+                    if p_value < 0.05:
+                        st.success("🟢 Statistically Significant")
+                        st.caption("The observed linear relationship is unlikely to have occurred by chance.")
+                    else:
+                        st.info("⚪ Not Significant")
+                        st.caption("No strong statistical support for a linear effect at this country-sample size.")
+            else:
+                st.warning("Insufficient valid pairwise country records available for the active geography filters.")
+        else:
+            st.error("Vector structural error: Mapped metric codes not found within your database baseline columns.")
 
 # ==============================================================================
 # FOOTER SECTION
