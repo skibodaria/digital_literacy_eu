@@ -1,16 +1,29 @@
 WITH raw_seed_source AS (
     SELECT
-        -- 💡 Switch all raw seed source columns to lowercase
         LOWER(geo) AS raw_country_code,
-        CAST(year AS INT) AS reporting_year,  -- ✨ Changed from TIME_PERIOD to time_period
-        CAST(value AS NUMERIC) AS indicator_value, -- ✨ Changed from OBS_VALUE to obs_value
+        CAST(year AS INT) AS reporting_year,  -- from TIME_PERIOD to time_period
+        CAST(value AS NUMERIC) AS indicator_value, --  from OBS_VALUE to obs_value
         
         ind_type AS demographic_segment_code,
-        "Individual type" AS demographic_segment_label, -- Keep quotes if there's a space, but make the first word lowercase if needed
+        "Individual type" AS demographic_segment_label,
         indic_is AS indicator_code,
         "Information society indicator" AS indicator_label
         
     FROM {{ ref('dig_skills_bab_time_series') }} 
+    WHERE value IS NOT NULL
+),
+raw_seed_old AS (
+    ELECT
+        LOWER(geo) AS raw_country_code,
+        CAST(year AS INT) AS reporting_year,  -- from TIME_PERIOD to time_period
+        CAST(value AS NUMERIC) AS indicator_value, --  from OBS_VALUE to obs_value
+        
+        ind_type AS demographic_segment_code,
+        "Individual type" AS demographic_segment_label,
+        indic_is AS indicator_code,
+        "Information society indicator" AS indicator_label
+        
+    FROM {{ ref('dig_skills_bab_old') }} 
     WHERE value IS NOT NULL
 ),
 country_reference AS (

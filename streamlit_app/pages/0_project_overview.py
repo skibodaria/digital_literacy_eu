@@ -118,13 +118,73 @@ with tab_overview:
         st.write('---')
 
         st.subheader("Goals of the Project")
-        st.markdown(
-            """
-            1. Mapping the "Digital Divide" Across the EU Counties
-            2. Connecting E-Governance and eID Usage with Institutional Trust
-            3. Investigating Correlations between Digital Skills and Key Demographic Characteristics"""
-        )
-    
+        with st.expander('**1. Mapping the "Digital Divide" Across the EU Counties:**'):
+            st.write("""This goal focuses on identifying geographical disparities in digital infrastructure and 
+            adoption across different Member States. By benchmarking regional progress, 
+            the project highlights which countries are leading the transition and which regions risk falling behind 
+            the EU’s 2030 uniformity targets.""")
+
+        with st.expander('**2. Connecting E-Governance and eID Usage with Institutional Trust:**'):
+            st.write("""This analysis investigates whether the digitization of essential public services actively improves 
+            the relationship between citizens and the state. Specifically, it tests the hypothesis that seamless 
+            interactions with tools like national eIDs and online public portals can statistically correlate with higher 
+            levels of trust in national and EU institutions.""")
+
+        with st.expander('**3. Investigating Correlations between Digital Skills and Key Demographic Characteristics:**'):
+            st.write("""Instead of treating the population as a monolith, this objective digs into how structural factors 
+            like gender, age, education, and urbanization level shape digital competence. 
+            The goal is to isolate exactly which demographic groups face the highest barriers to entry, 
+            revealing the socio-economic drivers behind digital exclusion.""")
+
+        st.subheader("Limitations")
+        with st.expander("Correlation vs. Causality"):
+            st.write("""This analysis establishes **correlations, not causation**. Finding a statistical link between high 
+                     eID usage and high institutional trust does not mean that using an eID causes someone to trust their government. 
+                     It is highly likely that confounding variables—such as overall satisfaction with the economy, 
+                     political stability, or pre-existing civic engagement—drive both tech adoption and trust simultaneously.""")
+        
+        with st.expander("Self-Reported Survey Bias"):
+            st.write("""Because the Eurobarometer and Eurostat datasets rely on self-reported survey responses, the data is subject 
+                     to inherent human biases. Respondents might overstate their "digital skills" due to social desirability bias, 
+                     or their reported "trust" levels might reflect a temporary emotional reaction to current political events 
+                     at the exact moment they took the survey, rather than a stable, long-term sentiment.""")
+        
+        with st.expander("Data Aggregation & Missing Granularity"):
+            st.write("""Working with massive, pan-European datasets means some local nuances are inevitably lost in transposition. 
+                     To maintain a clean data pipeline and handle missing values, certain row-level variables or niche demographic 
+                     categories had to be aggregated. This macro-level view can sometimes mask sharp sub-regional and other inequalities 
+                     within individual countries.""")
+            
+        with st.expander("Timeline"):
+            st.write("""Surveys represent a specific snapshot in time. Because digital infrastructure and public sentiment shift rapidly, 
+                     analyzing static historical datasets (even relatively "fresh" ones) makes it difficult to capture real-time trends 
+                     or the immediate impact of very recent digital policy rollouts across the EU.""")
+
+        st.subheader("**Future Research Vectors**")
+        with st.expander("Intersectionality: Investigating Overlapping Inequalities"):
+            st.write("""Future iterations of this project could move beyond analyzing demographic variables in isolation and 
+                     instead adopt an intersectional approach. By examining how categories like age, gender, and education level overlap 
+                     (e.g., analyzing the digital literacy rates of older women with lower educational attainment versus younger men with 
+                     the same educational background), the research can uncover hidden barriers and identify the specific subgroups 
+                     facing the most severe digital exclusion.""")
+        with st.expander("Labor Market Dynamics: Employment Status and Occupation"):
+            st.write("""Expanding the data pipeline to include labor market variables would allow for a deeper look into the economic 
+                     drivers of digital literacy. Future research could analyze how digital skills and trust in digital governance 
+                     vary across different employment statuses (unemployed, retired, self-employed) and occupational sectors 
+                     (e.g., manual labor vs. knowledge-based industries), evaluating whether the workplace is 
+                     the primary engine of tech fluency or a source of systemic disparity.""")
+        with st.expander("Migration Experience and Civic Inclusion"):
+            st.write("""Integrating data on migration backgrounds and citizenship status would provide critical insights 
+                     into how digital public services affect marginalized or transitioning populations. This path would investigate 
+                     whether platforms like eIDs and online immigration/residency portals serve as accessible tools for civic integration, 
+                     or if linguistic, bureaucratic, and technical barriers increase the isolation of 
+                     migrant communities from institutional support.""")
+        with st.expander("Longitudinal Analysis: Tracking Trust Dynamics Over Time"):
+            st.write("""While the current project offers a cross-sectional snapshot, a future longitudinal study could track the development of digital skills
+                     and E-Governance tools adoption across multiple years.""")
+        st.write('---')
+
+        st.markdown("#### Hey! Nice to meet you!")
         with st.expander("**From Author**"):
             with open("./.streamlit/author_pic.jpeg", "rb") as img_file:
                 img_base64 = base64.b64encode(img_file.read()).decode()
@@ -158,7 +218,134 @@ with tab_overview:
 # TAB 2: DATA & SOURCES
 # ==========================================
 with tab_data:
-    st.subheader("Information about Data")
+    st.header("Data Sources & Indicators Blueprint")
+    st.markdown("""The analytical process of this project relies on official, well-established, and publicly available macro-statistics provided
+    by the European Commission."""
+)
+    # ----- EUROSTAT DATA -----
+    st.subheader("Eurostat Data")
+    st.markdown(
+        """
+        **Eurostat** (European Statistical Office) is a Directorate-General of the European Commission. 
+        Its [primary mission](https://ec.europa.eu/eurostat/web/main/about-us/mission-values) is to provide high-quality, 
+        standardized statistics across Europe, conducted under the unified framework of [the European Statistical System](https://ec.europa.eu/eurostat/web/european-statistical-system/overview).
+        """
+    )
+
+    st.markdown("#### Main Tables Integrated into the Pipeline")
+    eurostat_tables = [
+        {"Table Code": "isoc_ci_ifp_iu", "Table Name": "Individuals - internet use", "Link": "[⛓️](https://ec.europa.eu/eurostat/databrowser/view/ISOC_CI_IFP_IU/default/table?lang=en)"},
+        {"Table Code": "isoc_ci_ifp_fu", "Table Name": "Individuals - frequency of internet use", "Link": "[⛓️](https://ec.europa.eu/eurostat/databrowser/view/isoc_ci_ifp_fu/default/table?lang=en)"},
+        {"Table Code": "isoc_ciegi_ac", "Table Name": "E-government - activities of individuals via websites", "Link": "[⛓️](https://ec.europa.eu/eurostat/databrowser/view/isoc_ciegi_ac/default/table?lang=en&category=isoc.isoc_i.isoc_ci_egi)"},
+        {"Table Code": "isoc_ci_ac_i", "Table Name": "Individuals - internet activities", "Link":"[⛓️](https://ec.europa.eu/eurostat/databrowser/view/isoc_ci_ac_i/default/table?lang=en&category=isoc.isoc_i.isoc_iiu)"},
+        {"Table Code": "isoc_eid_ieid", "Table Name": "Use of electronic identification (eID)", "Link": "[⛓️](https://ec.europa.eu/eurostat/databrowser/view/isoc_eid_ieid/default/table?lang=en&category=isoc.isoc_i.isoc_ci_egi)"},
+        {"Table Code": "isoc_ai_iaiu", "Table Name": "Individuals - use of generative AI tools", "Link": "[⛓️](https://ec.europa.eu/eurostat/databrowser/view/isoc_ai_iaiu/default/table?lang=en&category=isoc.isoc_i.isoc_ai)"},
+        {"Table Code": "isoc_sk_dskl_i21", "Table Name": "Individuals' level of digital skills (from 2021 onwards)", "Link": "[⛓️](https://ec.europa.eu/eurostat/databrowser/view/isoc_sk_dskl_i21/default/table?lang=en&category=isoc.isoc_sk.isoc_sku)"}
+    ]
+    st.table(eurostat_tables)
+    st.caption("*Note: Table registry is dynamically updated via the data pipeline.*")
+
+    st.markdown("#### Data Pipeline Trade-offs (Eurostat)")
+    col1, col2 = st.columns(2)
+    with col1:
+        st.success("**The Pros**")
+        st.markdown(
+            """
+            * **Harmonized Methodology:** Strict legal and statistical frameworks ensure that a metric like *"internet usage in the last 3 months"* is measured identically in Germany and France.
+            * **Massive Sample Sizes:** Because these metrics feed into direct EU policy and funding, they capture robust behavioral data across major national sample sizes.
+            * **Programmatic Access:** Excellent open-data infrastructure allows the pipeline to bypass manual file handling completely via the Python `eurostat` API package.
+            """)
+    with col2:
+        st.error("**The Cons**")
+        st.markdown(
+            """
+            * **Publication Lags:** Consolidating data across 27 Member States creates an inherent lag of 12 to 24 months, making real-time tech tracking difficult.
+            * **The 'Break in Time Series' Trap:** Classification updates introduce database markers (`:b`) that can disrupt longitudinal analyses.
+            * **Regional Compliance Variance:** Capacity variations mean some Member States submit provisional data late, creating localized missing values.
+            """)
+
+    # ----- EUROBAROMETER DATA -----
+    st.subheader("Eurobarometer Public Opinion Surveys")
+    st.markdown(
+        """
+        The **Eurobarometer** is a unique cross-national public opinion survey conducted on behalf of the European Commission since the 1970s. 
+        This project merges individual microdata from two distinct Eurobarometer branches:
+        """)
+    st.markdown("##### Standard Eurobarometer")
+    st.markdown(
+        """
+        Regular tracking surveys focusing on EU citizens' perceptions of institutional trust and public life.
+        * **STD104 (Autumn 2025):** $n = 26,445$ respondents  
+            [Documentation](https://europa.eu/eurobarometer/surveys/detail/3378) | [Data Repository](https://data.europa.eu/data/datasets/s3378_104_1_std104_eng?locale=en)
+        """)
+    st.markdown("##### Special Eurobarometer")
+    st.markdown(
+        """
+        Targeted thematic surveys designed around specific economic and technological shifts.
+        * **SP566: The Digital Decade 2025:** $n = 26,319$ respondents  
+        Deep-dive metrics covering internet usage, digital identity awareness, and AI perception.  
+        [Documentation](https://europa.eu/eurobarometer/surveys/detail/3362) | [Data Repository](https://data.europa.eu/data/datasets/s3362_103_2_sp566_eng?locale=en)
+        """
+    )
+    st.markdown("#### Data Pipeline Trade-offs (Eurobarometer)")
+    col3, col4 = st.columns(2)
+    with col3:
+        st.success("**The Pros**")
+        st.markdown(
+            """
+            * **Rich Behavioral Insights:** Captures qualitative variables regarding digital trust and citizen sentiments that hard metrics miss.
+            * **Faster Release Cycles:** Published significantly faster than traditional academic panel surveys, allowing access to fresher data.
+            * **Unified Framework:** Fully synchronized and standardized across all EU countries from day one.
+            """
+        )
+    with col4:
+        st.error("**The Cons**")
+        st.markdown(
+            """
+            * **Human-Centric Formats:** Raw data is heavily distributed via formatted `.xlsx` sheets, requiring extensive programmatic parsing and reshaping.
+            * **Cultural Translation Shifts:** Nuances in wordings across dozens of languages can lead to subtle variations in how "trust" is interpreted.
+            * **Broad Demographic Grouping:** Key variables (age, income) are pre-aggregated into rigid intervals, restricting hyper-specific micro-modeling.
+            """
+        )
+    
+    # ----- INDICATORS -----
+    st.subheader("The Project Indicator Map")
+    st.markdown(
+        "To execute the statistical and correlation analysis, variables across both repositories were extracted, filtered, and mapped into three core groups:"
+    )
+    
+    expander_iv = st.expand_or_collapse = st.expander("Independent Variables (The Drivers)", expanded=True)
+    with expander_iv:
+        st.markdown(
+            """
+            * **E-Governance & eID Adoption:** Frequency of website interaction with public authorities (`isoc_ciegi_ac`) and utilization of electronic IDs (`isoc_eid_ieid`).
+            * **Digital Literacy & Fluency:** Baseline digital skills scores (`isoc_sk_dskl_i21`) and everyday internet consumption habits (`i_day`).
+            """
+        )
+        
+    expander_dv = st.expander("Dependent Variables (The System Outcomes)", expanded=True)
+    with expander_dv:
+        st.markdown(
+            """
+            * **Institutional Trust:** Scaled metrics for citizens' expressed level of confidence in National Parliaments, National Governments, and the European Union (`Eurobarometer 104`).
+            * **Digital Rights Sentiments:** Public agreement levels regarding digital environment protections and digital principles safety nets (`Eurobarometer 104`).
+            """
+        )
+        
+    expander_cov = st.expander("Socio-Demographic Dimensions", expanded=True)
+    with expander_cov:
+        st.markdown(
+            """
+            * Age groups: `16-19`, `20-24`, `25-34`, `35-44`, `45-54`, `55-64`, `65-74`,
+            * Education levels: `Low`, `Medium`, `High`, 
+            * Urbanization levels: `Cities`, `Towns/Suburbs`, `Rural`,
+            * Gender: `Female` and `Male` of age 16-74.
+            """
+        )
+        
+    st.info(
+        "**Data Cleaning Highlight:** In order to avoid presenting data mismatched by year, '**latest available year**' technique was implemented."
+    )
 
 
 
