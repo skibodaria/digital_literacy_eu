@@ -14,26 +14,21 @@ st.set_page_config(layout="wide")
 # DATA LOADING (Executed once and cached)
 # ==========================================
 try:
-    # Tab 1 & 2: Baseline Mart & Metadata
+    # get the data + metadata
     df_baseline, baseline_labels = funcs.load_tab_data("mart_eu_baseline", "mart_indicators")
-    
-    # Tab 4: E-Governance Data & Metadata
-    df_egov, egov_labels = funcs.load_tab_data("stg_gov_demog_2025", "mart_indicators")
-    
-    # add more dataframes/tables here
 except Exception as e:
     st.error(f"Database connection or query failed: {e}")
     st.stop()
 
 # --- HEADER & PRESENTATION CONTEXT ---
-st.title("🇪🇺 Digital Skills, Internet Usage, E-Governance, and Civic Trust")
+st.title("🇪🇺 Overview: Digital Skills, Internet Usage, & E-Governance")
 st.markdown("""
     **Graduation Capstone Project** | An analysis of 27 EU Member States utilizing Eurostat & Eurobarometer data.\n
     This application investigates how structural digital baselines condition human trust and behavioral outcomes across Europe.
 """)
 
 # --- SIDEBAR GLOBAL FILTERS ---
-st.sidebar.header("Country")
+st.sidebar.header("Geo Filter")
 available_countries = sorted(df_baseline['clean_country_name'].unique())
 selected_countries = st.sidebar.multiselect(
     "Select Countries to Filter",

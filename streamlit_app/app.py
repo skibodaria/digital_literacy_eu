@@ -32,9 +32,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ==========================================
-# NATIVE ROUTING MANAGEMENT
+# NAVIGATION 
 # ==========================================
-# ⚡ CRITICAL FIX: The home page needs to point to a page file, NOT your main controller app.py!
 overview_page = st.Page("pages/0_project_overview.py", title="Project Overview", icon="🇪🇺", default=True)
 baseline = st.Page("pages/1_eu_baseline.py", title="EU Baseline & Clustering")
 usage = st.Page("pages/2_internet_usage.py", title="Internet Usage")
@@ -42,5 +41,5 @@ digital_skills = st.Page("pages/3_digital_skills.py", title="Digital Skills")
 e_gov = st.Page("pages/4_e_gov.py", title="E-Governance and eID")
 
 # Declare and run the routing engine
-pg = st.navigation([overview_page, digital_skills, usage, e_gov, baseline])
-pg.run() # <--- Tells Streamlit to stop here and strictly run the selected page!
+pg = st.navigation([overview_page, baseline, digital_skills, e_gov, usage])
+pg.run() # runs particular page
