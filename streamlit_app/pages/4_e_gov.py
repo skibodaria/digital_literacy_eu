@@ -554,9 +554,22 @@ with tab_barriers:
             st.caption("No matching age cohort barrier variables mapped.")
 
 
+    st.warning("""
+        **Sample Size**: The reduction of the statistical sample size from 27 to 15 or 16 needed further investigation.
+            """)
+    st.info("""
+        **Low Reliablity**: Additional check with the data source [Eurostat | Use of electronic identification (eID) `isoc_eid_ieid` Table](https://ec.europa.eu/eurostat/databrowser/view/isoc_eid_ieid/default/table?lang=en&category=isoc.isoc_i.isoc_ci_egi)
+        confirmed that several countries (**Denmark**, **Estonia**, **Greece**, **Finland**, **Sweden**, and **Norway**)
+        missing data on multiple metrics (e.g., "Indiciduals not using their eID in the last 12 months because they were not aware of its existance", `i_ireidna`)
+        for several age cohorts. For some other countries (e.g., **Belgium**, **Ireland**, **France**, **Netherlands**, **Latvia**, and **Lithuania**)
+        the existing data marked with the flag `:u`, signaling "low reliability".
+        \nLow reliability in the context of the Eurostat data means that the values are based on small samples or do not meet standard Eurostat criteria
+        for statistical analysis.""")
+
+
 
 # ==============================================================================
-# --- TAB: TRUST & E-GOVERNANCE USAGE CORRELATIONS ---
+# --- TAB 3: TRUST & E-GOVERNANCE USAGE CORRELATIONS ---
 # ==============================================================================
 with tab_trust_correlations:
     st.header("Sociopolitical Drivers of Digital Statecraft")
@@ -564,9 +577,7 @@ with tab_trust_correlations:
         This module evaluates the structural macro-level relationships between **Institutional Trust Vectors** and **e-Governance Adoption Rates** across EU member states.
     """)
 
-    # --------------------------------------------------------------------------
-    # 1. READ IN THE CLEAN MACRO BASELINE DATASET
-    # --------------------------------------------------------------------------
+    # get the data:
     try:
         df_trust, trust_labels = funcs.load_tab_data("mart_eu_baseline", "mart_indicators")
     except Exception as e:
@@ -576,7 +587,6 @@ with tab_trust_correlations:
     if df_trust.empty:
         st.warning("Baseline data table assets are currently unavailable.")
     else:
-        # Filter down rows to the user's active sidebar country selections
         df_filtered_trust = df_trust[df_trust['clean_country_name'].isin(selected_countries)]
 
         TRUST_METRICS = {
@@ -593,7 +603,6 @@ with tab_trust_correlations:
             'tr_info_polit_on_soc_net': 'Trust: Political Info on Social Media'
         }
         
-        # Group 2: Explicitly map your e-Gov digital metrics (X-Axis)
         EGOV_METRICS = {
             'i_iugov1': 'General Interaction with Authorities',
             'i_igovapr': 'Making Appointments Online',
@@ -644,7 +653,7 @@ with tab_trust_correlations:
             # ==============================================================================
             # COMPONENT 2: INTERACTIVE OLS REGRESSION SCATTER MODEL
             # ==============================================================================
-            st.subheader("📈 Macro Bivariate Scatter & Ordinary Least Squares (OLS) Model")
+            st.subheader("Macro Bivariate Scatter & Ordinary Least Squares (OLS) Model")
             st.markdown("_Pick any two indicators from your matrix above to fit a linear regression line across selected EU states._")
 
             col_input_x, col_input_y = st.columns(2)
@@ -706,7 +715,7 @@ with tab_trust_correlations:
 # --- TAB: DIGITAL SKILLS VS. E-GOVERNANCE ADOPTION ---
 # ==============================================================================
 with tab_skills_vs_egov:
-    st.header("Digital Literacy as an Adoption Pipeline")
+    st.header("Digital Literacy as an eID/E-Governance Tools Boost")
     st.markdown("""
         This module tests the structural relationship between **National Digital Literacy Brackets** (Skills) 
         and the actual **Operational Realization** of public digital platforms (eID and e-Gov tools). 
@@ -785,8 +794,8 @@ with tab_skills_vs_egov:
             # ==============================================================================
             # COMPONENT 2: INTERACTIVE BIVARIATE OLS SCATTER MODEL
             # ==============================================================================
-            st.subheader("The Gateway Linear Regression Model")
-            st.markdown("_Isolate specific capability parameters to visualize country-by-country slopes ($\beta$) and model significance ($p$)._")
+            st.subheader("The Linear Regression Model")
+            st.markdown("_Isolate specific capability parameters to visualize country-by-country slopes ($β$) and model significance ($p$)._")
 
             col_sel_x, col_sel_y = st.columns(2)
             with col_sel_x:
@@ -833,20 +842,16 @@ with tab_skills_vs_egov:
                     st.metric(label="p-value", value=f"{p_value:.4f}")
                     
                     if p_value < 0.05:
-                        st.success("🟢 Significant Linear Link")
+                        st.success("🟢 Statistically Significant")
                         st.caption("Changes in national digital literacy tiers act as a strong statistical predictor for this e-governance metric.")
                     else:
-                        st.info("⚪ No Significant Link")
+                        st.info("⚪ Not Significant")
                         st.caption("The variations are likely distributed across non-linear paths or infrastructural friction points independent of basic user skills.")
             else:
                 st.warning("Insufficient valid paired country profiles are active for the filtered region.")
         else:
             st.error("Schema lookup breakdown: Required indicators missing inside your database baseline table columns.")
 
-
-st.warning("""
-    The reduction of the statistical sample size from 27 to 15 or 16 needs further investigation. The data is missing.
-           """)
 
 # ==============================================================================
 # FOOTER SECTION
