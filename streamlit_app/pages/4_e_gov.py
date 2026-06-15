@@ -77,10 +77,11 @@ st.write("---")
 # ==============================================================================
 # 5. MAIN HIGH-LEVEL TABS ARCHITECTURE
 # ==============================================================================
-tab_usage, tab_barriers, tab_trust_correlations = st.tabs([
+tab_usage, tab_barriers, tab_trust_correlations, tab_skills_vs_egov = st.tabs([
     "E-Governance Usage & Engagement", 
     "Barriers & Reasons for Non-Usage",
-    "Institutional Trust & E-Governance"
+    "Institutional Trust & E-Governance",
+    "Digital Skills vs E-Governance Tools Usage"
 ])
 
 DIMENSIONS = {
@@ -101,7 +102,7 @@ with tab_usage:
         # Create dictionary to map your specific 7 usage metrics to their descriptive titles
 
         tab1_display_options = {
-            baseline_labels.get(code, code).replace("e-Gov: ", "").replace("eID", ""): code 
+            baseline_labels.get(code, code).replace("e-Gov: ", "").replace("eID", "").replace(": ",""): code 
             for code in map_tab1_gov_use_metrics 
             if code in df_tab1_map.columns
         }
@@ -598,27 +599,19 @@ with tab_trust_correlations:
             'tr_soc_netw_online': 'Trust: Social Networks Online',
             'nat_media_tr_info': 'Media: Trustworthy Info',
             'nat_media_free_pressure': 'Media: Free from Pressure',
-            'tr_info_polit_on_soc_net': 'Trust: Political Info on Social Media',
-            'eff_acc_to_tech': 'Perception: Effective Tech Access',
-            'eff_improve_democr_life': 'Perception: Improves Democratic Life',
-            'eff_improve_acc_pub_services': 'Perception: Improves Public Service Access',
-            'eff_work_remote': 'Perception: Effectively Facilitates Remote Work'
+            'tr_info_polit_on_soc_net': 'Trust: Political Info on Social Media'
         }
         
         # Group 2: Explicitly map your e-Gov digital metrics (X-Axis)
         EGOV_METRICS = {
-            'i_iugov1': 'Interacting with Public Authorities',
-            'i_igovapr': 'Online Scheduling Appointments',
-            'i_igovtax2': 'Online Tax Declaration Submission',
-            'i_iupdg': 'Submitting Official Forms Online',
-            'i_iucpp': 'Accessing Personal Documents',
-            'i_igovbe': 'Accessing Public Electronic Health Records',
-            'i_igovrcc': 'Accessing Public Database/Registers',
-            'i_igovrx': 'Using Request-Based Certificates',
-            'i_ieid': 'Possessing/Using eID systems',
-            'i_ireidno': 'Barriers: Lack of eID Possession',
-            'i_iuai': 'Generative AI Tool Usage',
-            'i_udi': 'Digital Exclusion Index'
+            'i_iugov1': 'General Interaction with Authorities',
+            'i_igovapr': 'Making Appointments Online',
+            'i_igovtax2': 'Submitting Tax Declaration Online',
+            'i_igovbe': 'Requesting Benefits Online',
+            'i_igovrcc': 'Other Requests and Complaints Online',
+            'i_igovrx': 'No Requests Online',
+            'i_ieid': 'Have eID',
+            'i_ireidno': "Don't Have eID"
         }
 
         # Filter dictionaries based on what columns actually exist in your database table
@@ -627,21 +620,21 @@ with tab_trust_correlations:
 
         if available_trust and available_egov:
             # ==============================================================================
-            # COMPONENT 1: THE SPLIT GRID HEATMAP
+            # COMPONENT 1: THE SPLIT GRID HEATMAP (Trust on Y, e-Gov on X)
             # ==============================================================================
-            st.subheader("🔥 Macro Trust vs. Digital Interaction Split Grid")
-            st.markdown("_Pearson Correlation Coefficients ($R$) comparing macro institutional sentiment variables with core e-Gov adoption actions._")
+            st.subheader("Macro Trust vs. Digital Interaction Split Grid")
+            st.markdown("_Pearson Correlation Coefficients ($R$) comparing macro institutional sentiment variables with core E-Governance adoption actions._")
 
-            # Calculate correlation matrix using only the relevant columns
+            # 1. Calculate correlation matrix using only the relevant columns
             all_target_cols = available_trust + available_egov
             df_corr_matrix = df_filtered_trust[all_target_cols].corr(method='pearson')
             
-            # Extract the cross-section slice: Trust on the Y-axis, e-Gov on the X-axis
+            # 2. Extract the cross-section slice: Trust on rows (Y-axis), e-Gov on columns (X-axis)
             df_heatmap_slice = df_corr_matrix.loc[available_trust, available_egov]
             
-            # Convert raw database handles to clean readable titles
-            df_heatmap_slice.index = [TRUST_METRICS[c] for c in df_heatmap_slice.index]
-            df_heatmap_slice.columns = [EGOV_METRICS[c] for c in df_heatmap_slice.columns]
+            # 3. Convert raw database keys to clean readable titles matching the data shape
+            df_heatmap_slice.index = [TRUST_METRICS[c] for c in df_heatmap_slice.index]       # Rows = Trust
+            df_heatmap_slice.columns = [EGOV_METRICS[c] for c in df_heatmap_slice.columns]   # Columns = e-Gov
 
             fig_corr = px.imshow(
                 df_heatmap_slice,
@@ -669,16 +662,18 @@ with tab_trust_correlations:
 
             col_input_x, col_input_y = st.columns(2)
             with col_input_x:
+                # To match your layout, X-Axis selectbox should display and handle e-Gov metrics
                 chosen_x_col = st.selectbox(
-                    "Select Sociopolitical Predictor (X Axis):",
-                    options=available_trust,
-                    format_func=lambda x: TRUST_METRICS[x]
+                    "Select Digital/e-Gov Predictor (X Axis):",
+                    options=available_egov,                         # Fixed: use available_egov keys
+                    format_func=lambda x: EGOV_METRICS[x]           # Fixed: use EGOV_METRICS labels
                 )
             with col_input_y:
+                # Y-Axis selectbox should display and handle Trust metrics
                 chosen_y_col = st.selectbox(
-                    "Select Digital/e-Gov Outcome (Y Axis):",
-                    options=available_egov,
-                    format_func=lambda x: EGOV_METRICS[x]
+                    "Select Institutional Trust Outcome (Y Axis):",
+                    options=available_trust,                        # Fixed: use available_trust keys
+                    format_func=lambda x: TRUST_METRICS[x]          # Fixed: use TRUST_METRICS labels
                 )
 
             # Drop missing rows to ensure clean pairwise calculations
@@ -694,7 +689,7 @@ with tab_trust_correlations:
                 fig_reg = px.scatter(
                     df_model_clean, x=chosen_x_col, y=chosen_y_col,
                     hover_name='clean_country_name',
-                    labels={chosen_x_col: TRUST_METRICS[chosen_x_col], chosen_y_col: EGOV_METRICS[chosen_y_col]},
+                    labels={chosen_x_col: EGOV_METRICS[chosen_x_col], chosen_y_col: TRUST_METRICS[chosen_y_col]},
                     trendline="ols",
                     trendline_color_override="#001f63"
                 )
@@ -715,14 +710,166 @@ with tab_trust_correlations:
                     
                     if p_value < 0.05:
                         st.success("🟢 Statistically Significant")
-                        st.caption("The observed linear relationship is unlikely to have occurred by chance.")
                     else:
                         st.info("⚪ Not Significant")
-                        st.caption("No strong statistical support for a linear effect at this country-sample size.")
             else:
                 st.warning("Insufficient valid pairwise country records available for the active geography filters.")
+
+
+
+# ==============================================================================
+# --- TAB: DIGITAL SKILLS VS. E-GOVERNANCE ADOPTION ---
+# ==============================================================================
+with tab_skills_vs_egov:
+    st.header("Digital Literacy as an Adoption Pipeline")
+    st.markdown("""
+        This module tests the structural relationship between **National Digital Literacy Brackets** (Skills) 
+        and the actual **Operational Realization** of public digital platforms (eID and e-Gov tools). 
+        It evaluates whether digital exclusion or low adoption is primarily driven by an infrastructure deficit or restricted by a literacy ceiling.
+    """)
+
+    # --------------------------------------------------------------------------
+    # 1. READ IN THE DATASET
+    # --------------------------------------------------------------------------
+    try:
+        # Load the clean macro country-level baseline matrix directly
+        df_pipeline, pipeline_labels = funcs.load_tab_data("mart_eu_baseline", "mart_indicators")
+    except Exception as e:
+        st.error(f"Failed to extract macro baseline for capability modeling: {e}")
+        df_pipeline = pd.DataFrame()
+
+    if df_pipeline.empty:
+        st.warning("Baseline data table assets are currently unavailable.")
+    else:
+        # Filter down rows to the active sidebar country selections
+        df_filtered_pipe = df_pipeline[df_pipeline['clean_country_name'].isin(selected_countries)]
+
+        # Group 1: The Core Digital Competence Brackets (X-Axis)
+        SKILL_BRACKETS = {
+            'i_dsk2_ab': 'Above Basic Digital Skills',
+            'i_dsk2_b': 'Basic Digital Skills',
+            'i_dsk2_lw': 'Low Digital Skills',
+            'i_dsk2_lm': 'Limited Digital Skills',
+            'i_dsk2_n': 'Narrow Digital Skills',
+            'i_dsk2_x': 'No Digital Skills (Exclusion Baseline)'
+        }
+        
+        # Group 2: The Infrastructure & Transactional Actions (Y-Axis)
+        ADOPTION_ACTIONS = {
+            'i_ieid': 'Possessing/Using eID Systems',
+            'i_ireidno': 'Barrier: Lack of eID Possession',
+            'i_iugov1': 'Interacting Online with Public Authorities',
+            'i_iucpp': 'Civic and Political Participation Online',
+            'i_igovtax2': 'Online Tax Declaration Submission',
+            'i_igovbe': 'Requesting Benefits Online',
+            'i_igovrcc': 'Other Complains and Requests Online'
+        }
+
+        # Filter dictionaries based on what columns actually exist in your database table
+        available_skills = [c for c in SKILL_BRACKETS.keys() if c in df_filtered_pipe.columns]
+        available_actions = [c for c in ADOPTION_ACTIONS.keys() if c in df_filtered_pipe.columns]
+
+        if available_skills and available_actions:
+            # ==============================================================================
+            # COMPONENT 1: THE SPLIT GRID HEATMAP
+            # ==============================================================================
+            st.subheader("Capability-to-Action Correlation Matrix")
+            st.markdown("_Pearson Correlation Coefficients ($R$) evaluating how specific national literacy tiers predict civic tool deployment._")
+
+            # Calculate correlation matrix using only the relevant cross-section columns
+            all_target_cols = available_skills + available_actions
+            df_pipe_corr = df_filtered_pipe[all_target_cols].corr(method='pearson')
+            
+            # Slice the cross-section: Skills on the X-axis, Adoption Actions on the Y-axis
+            df_pipe_heatmap = df_pipe_corr.loc[available_actions, available_skills]
+            
+            # Map raw keys to descriptive clean display labels
+            df_pipe_heatmap.index = [ADOPTION_ACTIONS[c] for c in df_pipe_heatmap.index]
+            df_pipe_heatmap.columns = [SKILL_BRACKETS[c] for c in df_pipe_heatmap.columns]
+
+            fig_pipe_corr = px.imshow(
+                df_pipe_heatmap,
+                labels=dict(x="Digital Literacy Threshold", y="e-Gov / eID Action", color="Pearson R"),
+                x=fig_pipe_corr.data[0].x if 'fig_pipe_corr' in locals() else df_pipe_heatmap.columns,
+                y=df_pipe_heatmap.index,
+                color_continuous_scale=styles.EU_CORNFLOWER,
+                zmin=-1.0, zmax=1.0,
+                text_auto='.2f',
+                height=450
+            )
+            fig_pipe_corr.update_layout(
+                margin=dict(t=10, b=25, l=10, r=10),
+                xaxis_tickangle=-30
+            )
+            st.plotly_chart(fig_pipe_corr, use_container_width=True)
+            
+            st.write("---")
+
+            # ==============================================================================
+            # COMPONENT 2: INTERACTIVE BIVARIATE OLS SCATTER MODEL
+            # ==============================================================================
+            st.subheader("The Gateway Linear Regression Model")
+            st.markdown("_Isolate specific capability parameters to visualize country-by-country slopes ($\beta$) and model significance ($p$)._")
+
+            col_sel_x, col_sel_y = st.columns(2)
+            with col_sel_x:
+                chosen_skill_x = st.selectbox(
+                    "Select Literacy Predictor (X Axis):",
+                    options=available_skills,
+                    format_func=lambda x: SKILL_BRACKETS[x]
+                )
+            with col_sel_y:
+                chosen_action_y = st.selectbox(
+                    "Select Platform Outcome (Y Axis):",
+                    options=available_actions,
+                    format_func=lambda x: ADOPTION_ACTIONS[x]
+                )
+
+            # Drop missing values to guarantee clean paired operations
+            df_reg_clean = df_filtered_pipe[[chosen_skill_x, chosen_action_y, 'clean_country_name']].dropna()
+
+            if len(df_reg_clean) >= 4:
+                # Calculate OLS parameters using scipy
+                slope, intercept, r_value, p_value, std_err = stats.linregress(
+                    df_reg_clean[chosen_skill_x], df_reg_clean[chosen_action_y]
+                )
+                r_squared = r_value ** 2
+
+                fig_pipe_reg = px.scatter(
+                    df_reg_clean, x=chosen_skill_x, y=chosen_action_y,
+                    hover_name='clean_country_name',
+                    labels={chosen_skill_x: SKILL_BRACKETS[chosen_skill_x], chosen_action_y: ADOPTION_ACTIONS[chosen_action_y]},
+                    trendline="ols",
+                    trendline_color_override="#001f63"
+                )
+                fig_pipe_reg.update_traces(marker=dict(size=10, color="#498cdb", line=dict(width=1, color="White")))
+                fig_pipe_reg.update_layout(
+                    height=450,
+                    margin=dict(t=15, b=15, l=15, r=15)
+                )
+                
+                col_reg_chart, col_reg_stats = st.columns([3, 1])
+                with col_reg_chart:
+                    st.plotly_chart(fig_pipe_reg, use_container_width=True)
+                with col_reg_stats:
+                    st.markdown("### Model Diagnostics")
+                    st.metric(label="R² Value", value=f"{r_squared:.3f}")
+                    st.metric(label="β (Slope)", value=f"{slope:.2f}")
+                    st.metric(label="p-value", value=f"{p_value:.4f}")
+                    
+                    if p_value < 0.05:
+                        st.success("🟢 Significant Linear Link")
+                        st.caption("Changes in national digital literacy tiers act as a strong statistical predictor for this e-governance metric.")
+                    else:
+                        st.info("⚪ No Significant Link")
+                        st.caption("The variations are likely distributed across non-linear paths or infrastructural friction points independent of basic user skills.")
+            else:
+                st.warning("Insufficient valid paired country profiles are active for the filtered region.")
         else:
-            st.error("Vector structural error: Mapped metric codes not found within your database baseline columns.")
+            st.error("Schema lookup breakdown: Required indicators missing inside your database baseline table columns.")
+
+
+
 
 # ==============================================================================
 # FOOTER SECTION
