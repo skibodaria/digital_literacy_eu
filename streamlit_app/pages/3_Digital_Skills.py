@@ -194,40 +194,46 @@ with tab_overview:
     
     col_explain, col_time = st.columns([2,3])
 
-    # ---------------------------------------------
-    # MAP WITH TREND OVER TIME (but just three years)
-    # ---------------------------------------------
-
+    # ------------------------------------------------------------------------------
+    # --- MODULE: 2030 DIGITAL DECADE FORECAST PANELS (HISTORICAL BRIDGE OVERHAUL) ---
+    # ------------------------------------------------------------------------------
     with col_time:
+        st.markdown("#### Digital Literacy Trends | OLS")
         st.markdown("""
-                    \n_Based on current growth rates for individuals with At Least Basic Digital Skills (2021, 2023, 2025)_
-                    """)
+            \n_Based on Ordinary Least Squares (OLS) historical growth rates bridging pre-2021 (`I_DSK_BAB` = Above Basic or Basic Digital Skills) and post-2021 (`I_DSK2_BAB` = also Above Basic or Basic Digital Skills) Eurostat frameworks._
+        """)
 
-        # 1. Extract the current 2025 status and historical slope
-        df_trend = df_time_series[df_time_series['indicator_code'] == 'I_DSK2_BAB']
+        target_codes = ['I_DSK_BAB', 'I_DSK2_BAB']
+        df_trend = df_time_series[df_time_series['indicator_code'].isin(target_codes)]
+        
         df_eu_avg = df_trend.groupby('reporting_year')['indicator_value'].mean().reset_index()
+        
+        df_eu_avg['reporting_year'] = df_eu_avg['reporting_year'].astype(int)
+        df_eu_avg['indicator_value'] = df_eu_avg['indicator_value'].astype(float)
         df_eu_avg = df_eu_avg.sort_values('reporting_year')
         
         if df_eu_avg.empty:
-            st.warning("No data available for indicator 'I_DSK2_BAB'.")
+            st.warning("No time-series history records found for the selected indicator codes.")
         else:
-            # Dynamically grab the earliest and latest available years (2021 and 2025)
-            year_min = df_eu_avg['reporting_year'].min()
-            year_max = df_eu_avg['reporting_year'].max()
+            year_min = int(df_eu_avg['reporting_year'].min())  # Will dynamically become 2015
+            year_max = int(df_eu_avg['reporting_year'].max())  # Will dynamically become 2025
             
             val_min = df_eu_avg[df_eu_avg['reporting_year'] == year_min]['indicator_value'].values[0]
             val_max = df_eu_avg[df_eu_avg['reporting_year'] == year_max]['indicator_value'].values[0]
             
-            # Calculate total time spans
-            years_passed = year_max - year_min  # e.g., 2025 - 2021 = 4 years
-            years_to_target = 2030 - year_max   # e.g., 2030 - 2025 = 5 years
+            from scipy import stats
+            slope, intercept, r_value, p_value, std_err = stats.linregress(
+                df_eu_avg['reporting_year'], df_eu_avg['indicator_value']
+            )
             
-            # Calculate annual growth and run the linear projection out to 2030
-            annual_growth = (val_max - val_min) / years_passed
+            annual_growth = slope
+            years_to_target = 2030 - year_max
             projected_2030 = val_max + (annual_growth * years_to_target)
+            
             target_value = 80.0
+            structural_deficit = target_value - projected_2030
 
-            # 2. Build structured comparison dataframe using the variables correctly!
+            # 2. Build structured comparison dataframe
             data = {
                 'Status': [
                     f'Current Status ({year_max})', 
@@ -238,7 +244,7 @@ with tab_overview:
             }
             df_plot = pd.DataFrame(data)
 
-            # 3. Create the progress bars
+            # 3. Create the horizontal progress bars
             fig = px.bar(
                 df_plot,
                 x='Percentage',
@@ -248,7 +254,6 @@ with tab_overview:
                 range_x=[0, 100]
             )
 
-            # Clean up bar styles and add text strings
             fig.update_traces(
                 marker_color=df_plot['Color'],
                 texttemplate='%{text:.1f}%',
@@ -265,60 +270,284 @@ with tab_overview:
                 line=dict(color="crimson", width=3, dash="dash"),
             )
 
-            # Add a clean text annotation directly over the target line
             fig.add_annotation(
-                x=target_value,
-                y=1.6,
+                x=target_value, y=1.6,
                 text="Target: 80% Baseline",
                 showarrow=False,
                 font=dict(color="crimson", size=12, family="sans-serif"),
                 xanchor="center"
             )
 
-            # 5. Clean up structural borders and text layout
             fig.update_layout(
-                xaxis_title="% of Population",
-                yaxis_title="",
-                showlegend=False,
-                height=300,
-                margin=dict(t=40, b=40, l=220, r=40), # Slightly widened left margin for the longer text labels
-                plot_bgcolor='rgba(0,0,0,0)',
-                paper_bgcolor='rgba(0,0,0,0)'
+                xaxis_title="% of Population", yaxis_title="",
+                showlegend=False, height=300,
+                margin=dict(t=40, b=40, l=180, r=40),
+                plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)'
             )
-            
             fig.update_xaxes(showgrid=True, gridcolor='rgba(220, 220, 220, 0.5)')
-
             st.plotly_chart(fig, use_container_width=True)
-            
-    with col_explain:
-        st.subheader(
-            """
-            Is EU Going to Meet the 2030 Goal?
-            """
-        )
 
-        with st.expander("Merhodology & Limitations Notice"):
-            st.markdown(
-                """
-                Historical Eurostat data for the updated Digital Competence Framework 
-                is currently limited, with assessments occurring biennially in **2021**, **2023**, and **2025**. 
-                Because three data points are statistically insufficient for training complex predictive time-series models, 
-                this dashboard uses a linear trend projection. By calculating the average annual growth rate across the full 4-year historical baseline, 
-                we extend a straight-line trajectory to estimate the 2030 outlook against official policy benchmarks. 
-            """
+        # ------------------------------------------------------------------------------
+        # --- VISUALIZATION: DIGITAL SKILLS HISTORICAL TRAJECTORY (2015-2025) ---
+        # ------------------------------------------------------------------------------
+        st.markdown("#### Historical Progression of At Least Basic Digital Skills")
+
+        if not df_eu_avg.empty:
+            
+            full_years = np.append(df_eu_avg['reporting_year'].values, [2030])
+            
+            df_proj = pd.DataFrame({
+                'reporting_year': full_years,
+                # Calculate the theoretical regression value for every point: y = mx + c
+                'regression_value': slope * full_years + intercept
+            })
+
+            fig_line = px.line(
+                df_eu_avg,
+                x='reporting_year',
+                y='indicator_value',
+                markers=True,
+                text=df_eu_avg['indicator_value'].map(lambda x: f"{x:.1f}%"),
+                labels={
+                    'reporting_year': 'Reporting Year',
+                    'indicator_value': 'EU Average (% of Population)'
+                }
             )
+
+            fig_line.update_traces(
+                line=dict(color='#41748d', width=4),
+                marker=dict(size=9, color='#005f73'),
+                textposition='top center',
+                name='Historical Reality'
+            )
+
+            val_2030 = df_proj[df_proj['reporting_year'] == 2030]['regression_value'].values[0]
+            
+            fig_line.add_scatter(
+                x=df_proj['reporting_year'],
+                y=df_proj['regression_value'],
+                mode='lines+markers',
+                line=dict(color='crimson', width=2, dash='dash'),
+                marker=dict(
+                    size=np.where(df_proj['reporting_year'] == 2030, 10, 0).tolist(), # Highlight ONLY the 2030 node
+                    color='crimson'
+                ),
+                text=np.where(df_proj['reporting_year'] == 2030, f"2030 Forecast: {val_2030:.1f}%", "").tolist(),
+                textposition="bottom right",
+                name='OLS Linear Trendline'
+            )
+
+            fig_line.add_shape(
+                type="line",
+                x0=2015, y0=80,
+                x1=2030, y1=80,
+                line=dict(color="#2a9d8f", width=2, dash="dot")
+            )
+            fig_line.add_annotation(
+                x=2017, y=82,
+                text="Official EU 2030 Goal: 80%",
+                showarrow=False,
+                font=dict(color="#2a9d8f", size=11, weight="bold")
+            )
+
+            fig_line.add_shape(
+                type="line",
+                x0=2021, y0=35,
+                x1=2021, y1=85,
+                line=dict(color="orange", width=1.5, dash="dot")
+            )
+            fig_line.add_annotation(
+                x=2021, y=38,
+                text="Methodology Shift",
+                showarrow=False,
+                font=dict(color="orange", size=9),
+                xanchor="center"
+            )
+
+            fig_line.update_layout(
+                height=400,
+                showlegend=False,
+                xaxis=dict(
+                    tickmode='array',
+                    tickvals=[2015, 2016, 2017, 2019, 2021, 2023, 2025, 2030], 
+                    showgrid=False,
+                    range=[2014, 2032] 
+                ),
+                yaxis=dict(
+                    range=[35, 90],
+                    showgrid=True,
+                    gridcolor='rgba(220, 220, 220, 0.4)'
+                ),
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                margin=dict(t=30, b=20, l=20, r=20)
+            )
+
+            st.plotly_chart(fig_line, use_container_width=True)
+        else:
+            st.warning("Unable to render historical trajectory line plot due to missing data layers.")
+
+
         
-        st.markdown(
-            f"""
-            **Key Insights**
-            - Between 2021 and 2025, the percent of EU citizes with at least basic digital skills grew from {val_min.round(2)}% to 61%. 
-            Annual expansion is about **1.5 percentage points**.
-            - At the current speed, the EU is on track to reach **66.9%** digital proficiency by 2030. This creates a structural deficit of **13.1** percentage points, meaning that the EU
-            will officially fail to meet its Digital Decade milestone unless member states drastically accelerate digital literacy programs.
-            - Linear model we used here assumes constant progress, but systemic shifts (e.g., AI adoption or national funding injections) could create non-linear growth.
-            At the same time, this experimet illustrates, that **incremental progress is no longer enough**.
-            """
-        )
+        
+with col_explain:
+    st.subheader("Is the EU Going to Meet the 2030 Goal?")
+
+    with st.expander("Methodology & Limitations Notice"):
+        st.markdown(f"""
+            **Framework Bridge Activated:** In 2021, Eurostat updated its official Digital Competence operational framework. 
+            To construct a robust 10-year analytics runway, this model constructs a structural indicator bridge, joining legacy indicators (`I_DSK_BAB` from {year_min}–2019) 
+            with modern metrics (`I_DSK2_BAB` from 2021–{year_max}). 
+            
+            By running an **Ordinary Least Squares (OLS) Linear Regression** across this composite 10-year horizon, we establish a mathematically grounded annual growth vector ($\beta$) that dampens single-year variance anomalies.
+        """)
+    
+    # The insights will now fully update to display the genuine, long-term 10-year trajectory values!
+    st.markdown(
+        f"""
+        **Key Insights**
+        - Over the full data runway from **{year_min}** to **{year_max}**, the percentage of EU citizens with at least basic digital skills expanded from **{val_min:.1f}%** to **{val_max:.1f}%**.
+        - Based on our OLS regression across all data cohorts, the long-term historical baseline reveals a steady expansion of **{annual_growth:.2f} percentage points** per year.
+        - At this specific velocity, the EU is on track to reach a projected proficiency level of **{projected_2030:.1f}%** by 2030. 
+        - This leaves an official policy **structural deficit of {structural_deficit:.1f} percentage points**.""")
+    st.warning(" **Strategic Takeaway:** Even when factoring in a decade of long-term development history, the empirical modeling confirms that **incremental progress is not enough**. Unless member states implement aggressive, non-linear structural interventions, the 80% milestone will be missed.")
+       
+
+
+
+
+
+
+    # # OLD VERSION
+    # # ---------------------------------------------
+    # # MAP WITH TREND OVER TIME (but just three years)
+    # # ---------------------------------------------
+
+    # with col_time:
+    #     st.markdown("""
+    #                 \n_Based on current growth rates for individuals with At Least Basic Digital Skills (2021, 2023, 2025)_
+    #                 """)
+
+    #     # 1. Extract the current 2025 status and historical slope
+    #     df_trend = df_time_series[df_time_series['indicator_code'] == 'I_DSK2_BAB']
+    #     df_eu_avg = df_trend.groupby('reporting_year')['indicator_value'].mean().reset_index()
+    #     df_eu_avg = df_eu_avg.sort_values('reporting_year')
+        
+    #     if df_eu_avg.empty:
+    #         st.warning("No data available for indicator 'I_DSK2_BAB'.")
+    #     else:
+    #         # Dynamically grab the earliest and latest available years (2021 and 2025)
+    #         year_min = df_eu_avg['reporting_year'].min()
+    #         year_max = df_eu_avg['reporting_year'].max()
+            
+    #         val_min = df_eu_avg[df_eu_avg['reporting_year'] == year_min]['indicator_value'].values[0]
+    #         val_max = df_eu_avg[df_eu_avg['reporting_year'] == year_max]['indicator_value'].values[0]
+            
+    #         # Calculate total time spans
+    #         years_passed = year_max - year_min  # e.g., 2025 - 2021 = 4 years
+    #         years_to_target = 2030 - year_max   # e.g., 2030 - 2025 = 5 years
+            
+    #         # Calculate annual growth and run the linear projection out to 2030
+    #         annual_growth = (val_max - val_min) / years_passed
+    #         projected_2030 = val_max + (annual_growth * years_to_target)
+    #         target_value = 80.0
+
+    #         # 2. Build structured comparison dataframe using the variables correctly!
+    #         data = {
+    #             'Status': [
+    #                 f'Current Status ({year_max})', 
+    #                 f'Projected 2030 Status'
+    #             ],
+    #             'Percentage': [val_max, projected_2030],
+    #             'Color': ['#1f77b4', '#aec7e8']
+    #         }
+    #         df_plot = pd.DataFrame(data)
+
+    #         # 3. Create the progress bars
+    #         fig = px.bar(
+    #             df_plot,
+    #             x='Percentage',
+    #             y='Status',
+    #             orientation='h',
+    #             text='Percentage',
+    #             range_x=[0, 100]
+    #         )
+
+    #         # Clean up bar styles and add text strings
+    #         fig.update_traces(
+    #             marker_color=df_plot['Color'],
+    #             texttemplate='%{text:.1f}%',
+    #             textposition='inside',
+    #             insidetextanchor='end',
+    #             hovertemplate='%{y}: %{x:.1f}%<extra></extra>'
+    #         )
+
+    #         # 4. Add the definitive 2030 Target Line
+    #         fig.add_shape(
+    #             type="line",
+    #             x0=target_value, y0=-0.5,
+    #             x1=target_value, y1=1.5,
+    #             line=dict(color="crimson", width=3, dash="dash"),
+    #         )
+
+    #         # Add a clean text annotation directly over the target line
+    #         fig.add_annotation(
+    #             x=target_value,
+    #             y=1.6,
+    #             text="Target: 80% Baseline",
+    #             showarrow=False,
+    #             font=dict(color="crimson", size=12, family="sans-serif"),
+    #             xanchor="center"
+    #         )
+
+    #         # 5. Clean up structural borders and text layout
+    #         fig.update_layout(
+    #             xaxis_title="% of Population",
+    #             yaxis_title="",
+    #             showlegend=False,
+    #             height=300,
+    #             margin=dict(t=40, b=40, l=220, r=40), # Slightly widened left margin for the longer text labels
+    #             plot_bgcolor='rgba(0,0,0,0)',
+    #             paper_bgcolor='rgba(0,0,0,0)'
+    #         )
+            
+    #         fig.update_xaxes(showgrid=True, gridcolor='rgba(220, 220, 220, 0.5)')
+
+    #         st.plotly_chart(fig, use_container_width=True)
+            
+    # with col_explain:
+    #     st.subheader(
+    #         """
+    #         Is EU Going to Meet the 2030 Goal?
+    #         """
+    #     )
+
+    #     with st.expander("Merhodology & Limitations Notice"):
+    #         st.markdown(
+    #             """
+    #             Historical Eurostat data for the updated Digital Competence Framework 
+    #             is currently limited, with assessments occurring biennially in **2021**, **2023**, and **2025**. 
+    #             Because three data points are statistically insufficient for training complex predictive time-series models, 
+    #             this dashboard uses a linear trend projection. By calculating the average annual growth rate across the full 4-year historical baseline, 
+    #             we extend a straight-line trajectory to estimate the 2030 outlook against official policy benchmarks. 
+    #         """
+    #         )
+        
+    #     st.markdown(
+    #         f"""
+    #         **Key Insights**
+    #         - Between 2021 and 2025, the percent of EU citizes with at least basic digital skills grew from {val_min.round(2)}% to 61%. 
+    #         Annual expansion is about **1.5 percentage points**.
+    #         - At the current speed, the EU is on track to reach **66.9%** digital proficiency by 2030. This creates a structural deficit of **13.1** percentage points, meaning that the EU
+    #         will officially fail to meet its Digital Decade milestone unless member states drastically accelerate digital literacy programs.
+    #         - Linear model we used here assumes constant progress, but systemic shifts (e.g., AI adoption or national funding injections) could create non-linear growth.
+    #         At the same time, this experimet illustrates, that **incremental progress is no longer enough**.
+    #         """
+    #     )
+
+
+
+
 # ==============================================================================
 # --- TAB 2: DEMOGRAPHIC DIMENSIONS ---
 # ==============================================================================
