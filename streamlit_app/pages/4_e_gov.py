@@ -69,7 +69,7 @@ df_tab2_map = df_filtered_baseline[[c for c in all_tab_2_map_cols if c in df_fil
 # ==============================================================================
 st.title("Modern E-Governance Demographics Workspace")
 st.markdown("""
-    ### Examining the Socio-Demographic Layers of European E-ID & E-Gov Services
+    ### Examining the Socio-Demographic Layers of European eID & E-Gov Services
     This workspace uses structured significance metrics to isolate digital governance variance across your selected countries.
 """)
 st.write("---")
@@ -208,7 +208,6 @@ with tab_usage:
     st.write("---")
     
     # ------ Significance of Demographic Dimensions --------
-    # ------ Significance of Demographic Dimensions --------
     st.subheader("Comparative Demographic Significance Matrices")
     
     # Advanced helper that handles both raw code strings and pre-labeled strings safely
@@ -323,21 +322,19 @@ with tab_usage:
 # TAB 2: BARRIERS & REASONS FOR NON-USAGE
 # ==============================================================================
 with tab_barriers:
-    col_map_tab2, col_key_insights_tab2 = st.columns([2,3])
+    col_map_tab2, col_key_insights_tab2 = st.columns([3,2])
     
     with col_map_tab2:
         with col_map_tab2:
-    # --- MAP INSERTION (BARRIERS) ---
+    # --- MAP (BARRIERS) ---
             barrier_options_map = {}
             for metric_code in map_tab2_no_eid_metrics:
-                # Check if the code (or its lowercase version) exists in your map dataframe columns
-                # This prevents an empty dropdown if column cases shifted under the hood
+
                 matched_col = next((c for c in df_tab2_map.columns if c.lower() == metric_code.lower()), None)
                 
                 if matched_col:
                     raw_label = baseline_labels.get(metric_code, metric_code)
                     
-                    # Strip away all variations of system prefixes to keep the dropdown UI clean
                     clean_label = (raw_label
                                 .replace("eID Non-Use: ", "")
                                 .replace("eID Barriers: ", "")
@@ -345,14 +342,14 @@ with tab_barriers:
                                 .replace("eID: ", "")
                                 .strip())
                     
-                    # Store the cleaned title as the key and the actual dataframe column name as the value
                     barrier_options_map[clean_label] = matched_col
 
-            # Sort the options alphabetically by their clean titles for a better user experience
+            # alphabetical order:
             barrier_options_map = dict(sorted(barrier_options_map.items()))
 
             if barrier_options_map:
-                # 2. Render the Selectbox using the sorted clean titles
+
+                # selection of a metric:
                 selected_title_b = st.selectbox(
                     "Select Barrier for Map Visualization:",
                     options=list(barrier_options_map.keys()),
@@ -360,8 +357,8 @@ with tab_barriers:
                 )
         
                 chosen_indicator_code_b = barrier_options_map[selected_title_b]
-            
                 st.markdown(f"### Distribution Map: {selected_title_b}")
+
             else:
                 st.warning("No matching barrier metrics found in the map dataframe columns.")
 
@@ -391,10 +388,10 @@ with tab_barriers:
         st.write("---")
     
     with col_key_insights_tab2:
-        st.write("there will be insights here")
+        st.subheader("There will be insights here")
 
     # ------------------ DYNAMIC BOXPLOT STUDIO ------------------
-    st.subheader("Dynamic Distribution Studio")
+    st.subheader("Dynamic Distribution Lab")
     barr_base_metrics = [m for m in gov_maps["education"]["base_metrics"] if m.lower().startswith('i_ireid')]
     
     if barr_base_metrics:
@@ -433,7 +430,6 @@ with tab_barriers:
             suffix_to_label_b = dict(zip([rc.lower() for rc in real_cols_b], dim_cfg_b["labels"]))
             df_melted_b["Demographic Slice"] = df_melted_b["Demographic Slice"].str.lower().map(suffix_to_label_b)
             
-            # Dynamic clean plot header title for barriers
             clean_plot_title_b = baseline_labels.get(selected_metric_b.lower(), selected_metric_b.upper())
             clean_plot_title_b = clean_plot_title_b.replace("eID Non-Use: ", "").replace("eID Barriers: ", "")
 
@@ -454,7 +450,7 @@ with tab_barriers:
     st.write("---")
 
     # ------------------ SIGNIFICANCE MATRICES ------------------
-    st.subheader("Analyzing Barriers to E-ID Adoption")
+    st.subheader("Analyzing Barriers to eID Adoption")
     
     def get_clean_barrier_label(raw_string, prefix_to_strip):
         raw_str_clean = str(raw_string).strip()
@@ -562,9 +558,6 @@ with tab_barriers:
 # ==============================================================================
 # --- TAB: TRUST & E-GOVERNANCE USAGE CORRELATIONS ---
 # ==============================================================================
-# ==============================================================================
-# --- TAB: TRUST & E-GOVERNANCE USAGE CORRELATIONS ---
-# ==============================================================================
 with tab_trust_correlations:
     st.header("Sociopolitical Drivers of Digital Statecraft")
     st.markdown("""
@@ -575,7 +568,6 @@ with tab_trust_correlations:
     # 1. READ IN THE CLEAN MACRO BASELINE DATASET
     # --------------------------------------------------------------------------
     try:
-        # Load the macro country-level baseline matrix directly
         df_trust, trust_labels = funcs.load_tab_data("mart_eu_baseline", "mart_indicators")
     except Exception as e:
         st.error(f"Failed to extract macro baseline analysis layers: {e}")
@@ -587,7 +579,6 @@ with tab_trust_correlations:
         # Filter down rows to the user's active sidebar country selections
         df_filtered_trust = df_trust[df_trust['clean_country_name'].isin(selected_countries)]
 
-        # Group 1: Define your exact Eurobarometer trust and perception indicators (Y-Axis)
         TRUST_METRICS = {
             'tr_party': 'Trust: Political Parties',
             'tr_authority': 'Trust: Public Authorities',
@@ -614,7 +605,6 @@ with tab_trust_correlations:
             'i_ireidno': "Don't Have eID"
         }
 
-        # Filter dictionaries based on what columns actually exist in your database table
         available_trust = [c for c in TRUST_METRICS.keys() if c in df_filtered_trust.columns]
         available_egov = [c for c in EGOV_METRICS.keys() if c in df_filtered_trust.columns]
 
@@ -625,14 +615,11 @@ with tab_trust_correlations:
             st.subheader("Macro Trust vs. Digital Interaction Split Grid")
             st.markdown("_Pearson Correlation Coefficients ($R$) comparing macro institutional sentiment variables with core E-Governance adoption actions._")
 
-            # 1. Calculate correlation matrix using only the relevant columns
             all_target_cols = available_trust + available_egov
             df_corr_matrix = df_filtered_trust[all_target_cols].corr(method='pearson')
             
-            # 2. Extract the cross-section slice: Trust on rows (Y-axis), e-Gov on columns (X-axis)
             df_heatmap_slice = df_corr_matrix.loc[available_trust, available_egov]
             
-            # 3. Convert raw database keys to clean readable titles matching the data shape
             df_heatmap_slice.index = [TRUST_METRICS[c] for c in df_heatmap_slice.index]       # Rows = Trust
             df_heatmap_slice.columns = [EGOV_METRICS[c] for c in df_heatmap_slice.columns]   # Columns = e-Gov
 
@@ -662,25 +649,23 @@ with tab_trust_correlations:
 
             col_input_x, col_input_y = st.columns(2)
             with col_input_x:
-                # To match your layout, X-Axis selectbox should display and handle e-Gov metrics
+
                 chosen_x_col = st.selectbox(
                     "Select Digital/e-Gov Predictor (X Axis):",
-                    options=available_egov,                         # Fixed: use available_egov keys
-                    format_func=lambda x: EGOV_METRICS[x]           # Fixed: use EGOV_METRICS labels
+                    options=available_egov,    
+                    format_func=lambda x: EGOV_METRICS[x]  
                 )
             with col_input_y:
                 # Y-Axis selectbox should display and handle Trust metrics
                 chosen_y_col = st.selectbox(
                     "Select Institutional Trust Outcome (Y Axis):",
-                    options=available_trust,                        # Fixed: use available_trust keys
-                    format_func=lambda x: TRUST_METRICS[x]          # Fixed: use TRUST_METRICS labels
+                    options=available_trust, 
+                    format_func=lambda x: TRUST_METRICS[x] 
                 )
 
-            # Drop missing rows to ensure clean pairwise calculations
             df_model_clean = df_filtered_trust[[chosen_x_col, chosen_y_col, 'clean_country_name']].dropna()
 
             if len(df_model_clean) >= 4:
-                # Calculate OLS elements
                 slope, intercept, r_value, p_value, std_err = stats.linregress(
                     df_model_clean[chosen_x_col], df_model_clean[chosen_y_col]
                 )
@@ -728,11 +713,8 @@ with tab_skills_vs_egov:
         It evaluates whether digital exclusion or low adoption is primarily driven by an infrastructure deficit or restricted by a literacy ceiling.
     """)
 
-    # --------------------------------------------------------------------------
-    # 1. READ IN THE DATASET
-    # --------------------------------------------------------------------------
     try:
-        # Load the clean macro country-level baseline matrix directly
+
         df_pipeline, pipeline_labels = funcs.load_tab_data("mart_eu_baseline", "mart_indicators")
     except Exception as e:
         st.error(f"Failed to extract macro baseline for capability modeling: {e}")
@@ -741,7 +723,6 @@ with tab_skills_vs_egov:
     if df_pipeline.empty:
         st.warning("Baseline data table assets are currently unavailable.")
     else:
-        # Filter down rows to the active sidebar country selections
         df_filtered_pipe = df_pipeline[df_pipeline['clean_country_name'].isin(selected_countries)]
 
         # Group 1: The Core Digital Competence Brackets (X-Axis)
@@ -754,7 +735,6 @@ with tab_skills_vs_egov:
             'i_dsk2_x': 'No Digital Skills (Exclusion Baseline)'
         }
         
-        # Group 2: The Infrastructure & Transactional Actions (Y-Axis)
         ADOPTION_ACTIONS = {
             'i_ieid': 'Possessing/Using eID Systems',
             'i_ireidno': 'Barrier: Lack of eID Possession',
@@ -765,7 +745,6 @@ with tab_skills_vs_egov:
             'i_igovrcc': 'Other Complains and Requests Online'
         }
 
-        # Filter dictionaries based on what columns actually exist in your database table
         available_skills = [c for c in SKILL_BRACKETS.keys() if c in df_filtered_pipe.columns]
         available_actions = [c for c in ADOPTION_ACTIONS.keys() if c in df_filtered_pipe.columns]
 
@@ -776,14 +755,12 @@ with tab_skills_vs_egov:
             st.subheader("Capability-to-Action Correlation Matrix")
             st.markdown("_Pearson Correlation Coefficients ($R$) evaluating how specific national literacy tiers predict civic tool deployment._")
 
-            # Calculate correlation matrix using only the relevant cross-section columns
             all_target_cols = available_skills + available_actions
             df_pipe_corr = df_filtered_pipe[all_target_cols].corr(method='pearson')
             
-            # Slice the cross-section: Skills on the X-axis, Adoption Actions on the Y-axis
             df_pipe_heatmap = df_pipe_corr.loc[available_actions, available_skills]
             
-            # Map raw keys to descriptive clean display labels
+
             df_pipe_heatmap.index = [ADOPTION_ACTIONS[c] for c in df_pipe_heatmap.index]
             df_pipe_heatmap.columns = [SKILL_BRACKETS[c] for c in df_pipe_heatmap.columns]
 
@@ -825,11 +802,9 @@ with tab_skills_vs_egov:
                     format_func=lambda x: ADOPTION_ACTIONS[x]
                 )
 
-            # Drop missing values to guarantee clean paired operations
             df_reg_clean = df_filtered_pipe[[chosen_skill_x, chosen_action_y, 'clean_country_name']].dropna()
 
             if len(df_reg_clean) >= 4:
-                # Calculate OLS parameters using scipy
                 slope, intercept, r_value, p_value, std_err = stats.linregress(
                     df_reg_clean[chosen_skill_x], df_reg_clean[chosen_action_y]
                 )
@@ -869,7 +844,9 @@ with tab_skills_vs_egov:
             st.error("Schema lookup breakdown: Required indicators missing inside your database baseline table columns.")
 
 
-
+st.warning("""
+    The reduction of the statistical sample size from 27 to 15 or 16 needs further investigation. The data is missing.
+           """)
 
 # ==============================================================================
 # FOOTER SECTION
