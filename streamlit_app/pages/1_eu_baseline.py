@@ -292,7 +292,6 @@ with tab_clusters:
                     paper_bgcolor="rgba(0,0,0,0)", # transparent map box
                     plot_bgcolor="rgba(0,0,0,0)"
                 )
-                ### HERE!!! 
                 st.plotly_chart(fig_cluster_map, use_container_width=True)
 
             with col_table:

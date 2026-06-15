@@ -474,7 +474,7 @@ with tab_deep_dive:
         # ==============================================================================
         # COMPONENT 1: COUNTRY GEOGRAPHIC SIGNATURE FINGERPRINT (Radar Map Matrix)
         # ==============================================================================
-        st.subheader("📊 Cross-Dimension Competence Fingerprint")
+        st.subheader("Cross-Dimension Competence Fingerprint")
         st.markdown("_Compare a country's baseline performance across all five capability pillars simultaneously._")
 
         # Single country filter dedicated strictly to the fingerprint vector
@@ -558,8 +558,8 @@ with tab_deep_dive:
                 strongest_dim = df_radar.loc[df_radar['Diff'].idxmax()]
                 weakest_dim = df_radar.loc[df_radar['Diff'].idxmin()]
                 
-                st.info(f"**🚀 Relative Strength:** *{strongest_dim['Dimension']}* is leading the EU average trend by **+{strongest_dim['Diff']:.1f} percentage points**.")
-                st.warning(f"**⚠️ Relative Bottleneck:** *{weakest_dim['Dimension']}* shows the widest lag behind the EU block (**{weakest_dim['Diff']:.1f} percentage points**).")
+                st.info(f"**Relative Strength:** *{strongest_dim['Dimension']}* is leading the EU average trend by **+{strongest_dim['Diff']:.1f} percentage points**.")
+                st.warning(f"**Relative Bottleneck:** *{weakest_dim['Dimension']}* shows the widest lag behind the EU block (**{weakest_dim['Diff']:.1f} percentage points**).")
         else:
             st.warning("Dimension baseline signature tracks could not be isolated from database schema rows.")
 
@@ -568,7 +568,7 @@ with tab_deep_dive:
         # ==============================================================================
         # COMPONENT 2: INTERACTIVE DISPARITY GRID MATRIX (Heatmap View)
         # ==============================================================================
-        st.subheader("🔥 Macro Socio-Demographic Disparity Matrix")
+        st.subheader("Macro Socio-Demographic Disparity Matrix")
         st.markdown("_Select an intersection layer to map variance density across all 5 framework dimensions at once._")
 
         deep_demo_choice = st.selectbox(
@@ -632,7 +632,7 @@ with tab_deep_dive:
             st.plotly_chart(fig_heat, use_container_width=True)
             
             # Strategic Data-Driven Summary Insights Generator Box
-            st.markdown("##### 📝 Matrix Structural Observations")
+            st.markdown("##### Matrix Structural Observations")
             
             # Calculate metrics to output dynamic commentary
             max_val = df_heat["Mean Proficiency (%)"].max()

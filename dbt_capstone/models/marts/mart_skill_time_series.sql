@@ -13,7 +13,7 @@ WITH raw_seed_source AS (
     WHERE value IS NOT NULL
 ),
 raw_seed_old AS (
-    ELECT
+    SELECT
         LOWER(geo) AS raw_country_code,
         CAST(year AS INT) AS reporting_year,  -- from TIME_PERIOD to time_period
         CAST(value AS NUMERIC) AS indicator_value, --  from OBS_VALUE to obs_value
@@ -25,6 +25,11 @@ raw_seed_old AS (
         
     FROM {{ ref('dig_skills_bab_old') }} 
     WHERE value IS NOT NULL
+),
+combined_seeds AS (
+    SELECT * FROM raw_seed_source
+    UNION ALL
+    SELECT * FROM raw_seed_old
 ),
 country_reference AS (
     SELECT 
@@ -43,7 +48,7 @@ SELECT
     s.indicator_code,
     s.indicator_label,
     s.indicator_value
-FROM raw_seed_source s
+FROM combined_seeds s
 INNER JOIN country_reference c 
     ON s.raw_country_code = LOWER(c.original_country_code)
 ORDER BY 
