@@ -4,12 +4,13 @@ import base64
 st.set_page_config(layout="wide")
 
 st.header("Digital Literacy, E-Governance Usage, & Inequality: Mapping the EU Digital Decade")
+st.caption("Trust in the Machine? Mapping the Intersections of E-Governance, Civic Trust, and Digital Stratification in the European Union | " \
+    "Data Analytics Bootcamp at Spiced Academy | Berlin | June 2025")
 st.markdown(
     """
-    Welcome to the EU Digital Baseline Workspace. This core interface establishes an objective, 
+    Welcome to the EU Digital Baseline Workspace. This core interface establishes a 
     macro-level diagnostic of digital literacy, Internet usage, and e-governance adoptions across the European Union.
     """)
-st.write("---")
 
 tab_overview, tab_data, tab_methods, tab_rec = st.tabs([
     "Project Intro",
@@ -185,7 +186,7 @@ with tab_overview:
         st.write('---')
 
         st.markdown("#### Hey! Nice to meet you!")
-        with st.expander("**From Author**"):
+        with st.expander("**Meet the Author**"):
             with open("./.streamlit/author_pic.jpeg", "rb") as img_file:
                 img_base64 = base64.b64encode(img_file.read()).decode()
 
@@ -379,46 +380,115 @@ with tab_methods:
         st.markdown("#### Framework & Objectives")
         st.write(
             """
-            This research project establishes a macro-level empirical diagnostic of digital literacy, Internet usage, 
-            and e-governance adoption across the Member States of the European Union. The primary analytical objective 
-            is to evaluate national operational performance against the European Commission’s official 2030 Digital Decade Strategic Target, 
-            which mandates that at least 80\\% of all EU adults possess basic or above-basic digital skills by 2030.
-            
-            \nRather than treating the European digital landscape as a monolith, this design implements a comparative 
-            framework to isolate systemic regional trends, structural deficits, and cross-national performance clusters.
+            Using macro-level and individual-level survey data in 2025-2026, this study investigates the existence of a 
+            "Second-Level Digital Divide" across the 27 European Union member states. Moving beyond basic internet access, 
+            the project explores how an individual's actual digital capability maps against demographic inequality lines, 
+            affects their vulnerability to fake news/disinformation, and correlates with their overall trust in national and 
+            European governance.
         """)
 
-        st.markdown("##### Core Methodology & Research Design")
+        st.markdown("#### Core Research Questions")
         st.write(
             """ 
-            * **Primary Unit of Analysis**: The core unit of measurement is individuals. Because the source datasets represent 
-            micro-data aggregated at the national level, all indicators are computed and standardized as the total percentage of 
-            individuals matching a specific criterion (represented as the `PC_IND` unit of measure in the underlying database schemas).
-            ??? SOMETHING ELSE? 
+            **1. The Macro Overview**: What is the current state baseline of internet usage frequency and overall digital 
+            skill levels across the EU-27?
+            **2. The Sociodemographic Split**: Does the Digital Divide match traditional socio-demographic inequality lines 
+            (e.g., age, gender, education level, type of settlement)?
+            **3. Institutional Trust**: How does an individual’s digital literacy correlate with their trust in national governments and EU-level institutions?  
         """)
     
     with col_pipeline:
-        st.markdown("##### The Data Pipeline Architecture")
+        st.markdown("#### The Data Pipeline Architecture")
         with st.expander("**Phase A | Data Retrieving and Seeding**"):
             st.write(
-                """ 
-                * *Data Sources*: Multi-source ingestion combining Eurostat database sheets (digital skills timelines) and Eurobarometer datasets 
-                (institutional trust matrices). Eurostat data was downloaded using **bulk download** approach via `eurostat` Python library.
-                Eurobarometer data was obtained manually but multiple scripts and functions were developed to clean the data (e.g., remove French dublications,
-                re-name metrics, keep information about all indicators, remove absolute numbers, etc.)
-                * *dbt Seed Layer*: Raw, `.csv` files were seeded directly into the data warehouse using dbt seed to ensure adding new sets of data."""
-            )
-        with st.expander("**Phase B | Transformation & Modeling**"):
-            st.write("WRITE ABOUT PREP, STG and MART models + all the mapping")
+                """
+                ##### Multi-Source Extraction & Ingestion Architecture
+                
+                Before any data could enter our transformation pipeline, we designed an acquisition strategy to bridge programmatically open public data registries with complex, survey-based institutional datasets.
+                
+                ---
 
-        with st.expander("**Phase C | EDA & First Visualizations**"):
-            st.write("WRITE ABOUT ipynb-s + about finding mistakes abd problems, retruevung new data. fixing different missing things and iterative design;" \
-            "mention that they need to be transformed to proper .py files and refactored")
+                **1. Data Ingestion Pathways**
+                We executed two distinct retrieval methodologies tailored to the infrastructure of our source institutions:
+                * **Programmatic Bulk Extraction (Eurostat):** To capture the comprehensive digital skills timelines and e-governance metrics, we bypassed manual downloads and built an automated extraction script utilizing the `eurostat` Python library. This interacted directly with the Eurostat API to pull raw, high-density bulk database sheets, ensuring programmatic reproducibility and caching optimization.
+                * **Targeted Manual Retrieval (Eurobarometer):** Because Eurobarometer institutional trust matrices are delivered as dense, highly segmented research structures, these files were manually retrieved. This ensured precise cohort isolation before entering our custom ingestion framework.
+
+                **2. Custom Python Pre-Processing & ETL Pipeline**
+                The raw Eurobarometer data contained severe structural irregularities that made it entirely incompatible with database tables. To solve this, we engineered a dedicated Python cleaning script to run complex pre-processing routines:
+                * **Deduplication & Language Pruning:** The raw source files contained parallel French and English string duplications for survey questions. We engineered string filtering logic to completely purge the secondary language copies, standardizing the text layers.
+                * **Normalization of Metrics:** We systematically isolated and removed absolute numbers (raw respondent counts), transforming the metrics exclusively into normalized, cross-nationally comparable percentages.
+                * **Schema & Meta-Label Preservation:** To ensure we did not lose granular structural insights, our script systematically renamed raw, cryptic column headers into clear, legible semantic metrics, while preserving the underlying row-level metadata context for every tracked indicator.
+
+                **3. The `dbt Seed` Layer**
+                Once both datasets were clean and structured into optimized, flat `.csv` data files, we loaded them into our localized environment. Using the **`dbt seed`** command, these static, raw historical frameworks were natively compiled and inserted directly into our local database warehouse as version-controlled relations. This established an immutable, repeatable foundation for all downstream analytical models.
+                """
+            )
+            
+        with st.expander("**Phase B | Transformation & Modeling**"):
+            st.markdown(
+                """
+                ##### The dbt Transformation Architecture
+                To handle our high-volume datasets with absolute pipeline integrity, we structured our **dbt (Data Build Tool)** architecture into a tailored, three-tiered data modeling system. This decoupled our heavy architectural restructuring from our research-specific slicing logic.
+                
+                ---
+
+                **1. The Preparation Layer (`prep_`)**
+                This layer served as our heavy structural engineering gate, handling data from over 35+ disparate Eurostat tables alongside country metadata:
+                * **The 2-Million-Row Melt Operations:** The raw Eurostat inputs were structurally wide and fragmented. We executed comprehensive melting and reshaping operations to transform the data layout. We unpivoted the separate yearly columns into a single longitudinal `time_period` vector and consolidated all disparate metrics into a unified `indicator` column—generating a massive, normalized core table exceeding 2 million rows.
+                * **Geospatial & Reference Harmonization:** We engineered our core country reference model (`prep_countries`). This layer cleaned country-level strings and established a master lookup map to resolve standard administrative geocode inconsistencies.
+
+                **2. The Staging Layer (`stg_`)**
+                Once the data was normalized into a massive, centralized core matrix, our staging layer acted as a specialized filtering gate to isolate our distinct research components:
+                * **Research Vector Extraction:** Instead of passing the entire 2-million-row table downstream, we built dedicated staging models to extract precise subsets of data tailored to our specific research questions (e.g., isolating Digital Skills metrics independently from E-Governance variables).
+                * **Demographic Slicing & Metric Refinement:** In this layer, we performed targeted data cleaning on the metrics and isolated the granular demographic cross-sections (such as isolating male vs. female performance bands) required for our non-parametric statistical testing.
+
+                **3. The Mart Layer (`mart_`)**
+                Our final modeling layer produces highly optimized, lean tables designed specifically to feed our Streamlit app without runtime computational lag:
+                * **Label Enrichment & ISO Mapping:** This layer joins our clean research vectors with definitive country boundary handles (`plotly_country_code`) and appends readable descriptive text labels to our abstract Eurostat indicator handles.
+                * **EU Baseline Aggregations:** The primary output of this tier is our definitive main metrics table (`mart_eu_baseline`), which provides pre-aggregated, sorted, and spatially mapped values ready for instant rendering on our dashboard maps and statistical modules.
+            """)
+
+        with st.expander("**Phase C | EDA, First Visualizations, & Testing Hypotheses**"):
+            st.write("""
+                ##### Exploratory Data Analysis & Statistical Iteration
+                Before building our production application, we utilized Jupyter Notebooks (`.ipynb`) as an agile sandbox environment to perform 
+                Exploratory Data Analysis (EDA), profile our distributions, and validate our initial statistical assumptions. 
+                
+                ---
+
+                **1. Data Profiling & Finding Anomaly Triggers**
+                Our initial EDA uncovered several structural vulnerabilities in the raw ingestion files that required immediate intervention:
+                * **Identifying Missing Vectors:** We mapped out the missing data footprints across countries. This revealed that certain critical historical years were completely absent for specific indicators, which forced us to go back to the pipeline, retrieve entirely new data sheets, and engineer a more resilient data strategy.
+                * **Exposing the Methodology Break:** It was during this exploratory phase that we visualized the sharp drop-off in scores between 2019 and 2021. By digging into the metadata, we caught the Eurostat framework overhaul, allowing us to proactively design the "Framework Bridge" before writing production code.
+
+                **2. The Statistical Evolution**
+                Our statistical architecture underwent an iterative design evolution as we refined our research questions:
+                * **Initial Explorations (Correlations & T-Tests):** We began by mapping basic linear correlations and running standard independent t-tests to compare groups. 
+                * **The Non-Parametric Shift:** Realizing that our survey-based percentage distributions violated the assumption of normality required by parametric tests, we pivoted to more robust methods. We deployed the **Friedman Test** to evaluate multi-year macro trends across the EU blocks, and switched our demographic comparisons to the **Wilcoxon Signed-Rank Test** to accurately handle paired, non-normal cohorts (e.g., female vs. male performance within the same country).
+
+                **3. Notebook Refactoring & Productionization**
+                Moving from an experimental sandbox to an analytics-ready application required strict code refactoring:
+                * **Code Reuse & Adaptation:** We successfully extracted the working SQL queries, data filtering blocks, and statistical routines 
+                (like the Friedman and Wilcoxon calculations) directly from our `.ipynb` exploratory notebooks and integrated them straight into 
+                the Streamlit application framework to make the dashboard instantly operational.
+                """)
 
         with st.expander("**Phase D | App Layer & Final Presentation**"):
-            st.write("Write about the work with Streamlit" \
-            "write about being connected to PostgreSQL" \
-            "about version control")
+            st.write("""
+                ##### App Delivery, Database Integration, & Version Control
+                The final phase of our lifecycle focused on translating our transformed data models into a secure, interactive, and production-ready web application.
+        
+                ---
+
+                * **The Streamlit Frontend:** We engineered an interactive dashboard using **Streamlit**, deploying a multi-panel layout to present our 
+                findings cleanly.
+                * **PostgreSQL Infrastructure:** The application does not rely on static flat files; instead, it creates a live 
+                secure connection to the localized **PostgreSQL data warehouse**. Streamlit interacts directly with our dbt-generated mart layer via 
+                SQL queries, ensuring dynamic data retrieval. The PostgreSQL database tables can be updated at any moment.
+                * **Version Control & Lineage:** To guarantee project reproducibility, the entire repository—including our dbt schemas, 
+                SQL transformations, seed datasets, and frontend scripts—is managed under Git version control. This establishes a history of the changes 
+                and protects the structural integrity of the deployment pipeline.
+                """)
     
     with col_analytics:
         st.markdown("#### Analytical Approaches")

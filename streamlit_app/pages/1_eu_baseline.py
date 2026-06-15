@@ -11,7 +11,7 @@ from sklearn.cluster import KMeans
 
 st.set_page_config(layout="wide")
 # ==========================================
-# DATA LOADING (Executed once and cached)
+# DATA LOADING
 # ==========================================
 try:
     # get the data + metadata
@@ -36,7 +36,6 @@ selected_countries = st.sidebar.multiselect(
     default=available_countries
 )
 
-# Filter the baseline dataframe in memory for speedy rendering
 df_filtered = df_baseline[df_baseline['clean_country_name'].isin(selected_countries)]
 
 # --- TABS CONFIGURATION ---
@@ -98,8 +97,6 @@ with tab_baseline:
         </style>
     """, unsafe_allow_html=True)
 
-
-    # --- 2. THE UPDATED KPI ROW LAYOUT ---
     col1, col2, col3, col4, col5 = st.columns(5)
 
     with col1:
@@ -144,55 +141,146 @@ with tab_baseline:
     
     st.markdown("---")
 
+    col_map, col_key_insights = st.columns([2,1])
 
-    # select indicator for map:
-    selected_title = st.selectbox(
-        "Select Indicator:",
-        options=list(filtered_display_options.keys())
-    )
-    chosen_indicator_code = filtered_display_options[selected_title]
+
+    # ---------------------------------
+    # MAP
+    # ---------------------------------
+
+    with col_map:
+
+        # select indicator for map:
+        selected_title = st.selectbox(
+            "Select Indicator:",
+            options=list(filtered_display_options.keys())
+        )
+        chosen_indicator_code = filtered_display_options[selected_title]
+            
+        st.markdown(f"### {selected_title}") 
         
-    st.markdown(f"### {selected_title}") 
+        # render the map:
+        fig = px.choropleth(
+            df_filtered,                           
+            locations='plotly_country_code',   
+            locationmode='ISO-3',               
+            color=chosen_indicator_code,                    
+            hover_name='clean_country_name',    
+            hover_data=[chosen_indicator_code], 
+            color_continuous_scale=styles.EU_CORNFLOWER,
+            title=None,
+            height=700
+        )
+
+        fig.update_traces(
+            hovertemplate="<b>%{hovertext}</b><br><br>Value: %{z:.2f}%<extra></extra>"
+        )
+        # fix Malta!
+        fig.update_geos(
+            projection_type="mercator",   
+            center=dict(lon=10, lat=52),  
+            projection_scale=4.5,         
+            visible=False,                
+            showframe=False,              
+            showcoastlines=True,          
+            coastlinecolor="LightGray",
+            resolution=50,
+            bgcolor="rgba(0,0,0,0)" # transperency                 
+        )
+
+        # margins and borders
+        fig.update_layout(
+            title="",
+            annotations=[],
+            margin={"r":0, "t":0, "l":0, "b":0},
+            paper_bgcolor="rgba(0,0,0,0)", # transparent map box
+            plot_bgcolor="rgba(0,0,0,0)"
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
     
-    # render the map:
-    fig = px.choropleth(
-        df_filtered,                           
-        locations='plotly_country_code',   
-        locationmode='ISO-3',               
-        color=chosen_indicator_code,                    
-        hover_name='clean_country_name',    
-        hover_data=[chosen_indicator_code], 
-        color_continuous_scale=styles.EU_CORNFLOWER,
-        title=None,
-        height=700
-    )
+    # --------------------
+    # KEY INSIGHTS
+    # --------------------
+    with col_key_insights:
+        st.subheader("Key Insights")
+        with st.expander("**The Skills Ceiling Paradox**"):
+            st.markdown(
+                """
+                While total digital exclusion is nearly extinct in the EU - with the "No Digital Skills" ceiling bottoming out at 
+                a maximum of just **8.9%** - Europe faces a severe structural stagnation. The baseline average for at least basic digital skills 
+                hovers at roughly 61% (combining basic and above-basic levels), leaving a massive 20-percentage-point deficit below 
+                the official 2030 Digital Decade target of 80%. 
+                The empirical reality is that the problem is no longer digital connection and access to the Internet, but a skills quality.
+            """)
+        with st.expander("**Access vs. Execution**"):
+            st.markdown(
+                """
+                Universal connectivity is a solved problem across Europe, evidenced by a daily internet usage average of **90%** that pushes 
+                up to **99.3%** in leading states. Because basic access is flat, stable, and universal, it cannot be a meaningful indicator 
+                of socio-economic development. Instead, the true digital divide has shifted to frontier technology adoption: 
+                AI usage sits at a **36.7%** average but shows a high variance between a minimum of **17.5%** and a maximum of **48.8%**,
+                serving as the active indicator for regional digital development.
+            """)
+        with st.expander("**Institutional Fragmentation**"):
+            st.markdown(
+                """
+                E-governance adoption in the EU is fundamentally bottlenecked by state-level administrative routines, not civic resistance. 
+                While **64.5%** of citizens interact with public authorities online, deep systemic friction appears in many services: 
+                online tax declaration averages **40%** but collapses to a near-zero floor of **0.36%** in some countries. This probably not a digital
+                limitation but an institutional problem: access to online services needs to be provided and invested into. 
+                Up to **56%** of citizens in certain member states completely lack access to a digital identity. 
+                The data highlights that structural institutional barriers - and not cultural preferences — are actively forcing citizens 
+                back onto analog ways.
+            """)
+        
+        with st.expander("**Descriptive Statistics in Detail**"):
+            if not df_filtered.empty:
+        
+                target_metrics = {
+                    'i_dsk2_bab': 'Basic and Above Basic Digital Skills',
+                    'i_dsk2_ab': 'Above Basic Digital Skills',
+                    'i_dsk2_x': 'No Digital Skills',
+                    'i_iday': 'Daily Internet Usage',
+                    'i_iuai': 'Generative AI Tools Usage',
+                    'i_igov': 'Online Authority Interaction',
+                    'i_igovapr': 'Online Appointments',
+                    'i_igovbe': 'Requesting Benegits Online',
+                    'i_igovtax2': 'Tax Declaration Online',
+                    'i_ireidno': 'Not Having eID'
+                }
 
-    fig.update_traces(
-        hovertemplate="<b>%{hovertext}</b><br><br>Value: %{z:.2f}%<extra></extra>"
-    )
-    # fix Malta!
-    fig.update_geos(
-        projection_type="mercator",   
-        center=dict(lon=10, lat=52),  
-        projection_scale=4.5,         
-        visible=False,                
-        showframe=False,              
-        showcoastlines=True,          
-        coastlinecolor="LightGray",
-        resolution=50,
-        bgcolor="rgba(0,0,0,0)" # transperency                 
-    )
+                available_columns = [col for col in target_metrics.keys() if col in df_filtered.columns]
+        
+                if available_columns:
+                    df_stats = df_filtered[available_columns].describe().loc[['mean', 'max', 'min', 'std']]
+                    df_stats = df_stats.T
+                    df_stats.index = df_stats.index.map(target_metrics)
+                    df_stats = df_stats.rename(columns={
+                        'mean': 'EU Average (Mean)',
+                        'max': 'Maximum State Score',
+                        'min': 'Minimum State Score',
+                        'std': 'Standard Deviation (σ)'
+                    })
+                    formatted_stats = df_stats.style.format("{:.1f}%")
 
-    # margins and borders
-    fig.update_layout(
-        title="",
-        annotations=[],
-        margin={"r":0, "t":0, "l":0, "b":0},
-        paper_bgcolor="rgba(0,0,0,0)", # transparent map box
-        plot_bgcolor="rgba(0,0,0,0)"
-    )
+                    st.dataframe(
+                        formatted_stats, 
+                        use_container_width=True,
+                        height=350
+                    )
+                    
+                    # Brief methodological context note
+                    st.caption(
+                        "Note: Standard Deviation (σ) quantifies regional policy fragmentation. "
+                        "Higher deviation scores indicate severe state-level "
+                        "structural disparities across the Union."
+                    )
+                else:
+                    st.warning("Specified metric columns were not discovered in the current data model layer.")
+            else:
+                st.warning("Unable to compute descriptive summary statistics due to an empty source dataframe.")
 
-    st.plotly_chart(fig, use_container_width=True)
 
 
 # ==============================================================================
@@ -420,6 +508,13 @@ with tab_clusters:
                        $$d(p, q) = \\sqrt{\\sum_{i=1}^{n} (q_i - p_i)^2}$$
                 """)
 
+st.warning(
+    """
+    **Strange indicators behavior**: Two indicators`i_imt12` (Individuals who used Internet more than a year ago or never) and `i_iux` (Individuals who 
+    have never used Internet)) behave weirdly for Denmark. For this table, they are taken from the year 2024 instead of 2025. In original tables both
+    marked as `:` for 2025, meaning "not available or missing". The main reason for it is that in Denmark in 2025 **99.7\\%** of population
+    used Internet.
+    """)
 # ==============================================================================
 # FOOTER SECTION
 # ==============================================================================
