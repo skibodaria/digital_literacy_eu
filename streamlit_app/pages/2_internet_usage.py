@@ -77,7 +77,7 @@ df_filtered_baseline = df_baseline[df_baseline[country_col].isin(selected_countr
 st.title("Internet Usage Analysis Workspace")
 st.markdown("""
     This module shifts focus from general literacy levels to real-world behavioral utility. 
-    It tracks how individuals engage with the internet across the EU—ranging from baseline communication 
+    It tracks how individuals engage with the internet across the EU – ranging from baseline communication 
     frequency to advanced interactions like generative AI usage, civic engagement, misinformation exposure, 
     and encountered usage obstacles.
     """)
@@ -194,7 +194,7 @@ with tab_overview:
 # --- TAB 2: DEMOGRAPHIC GAPS (CONSOLIDATED) ---
 # ==============================================================================
 with tab_demographics:
-    st.header("Comparative Demographic Variance Analysis")
+    st.header("Comparative Demographic Analysis")
     st.markdown("""
         Analyze structural variations across the European Union across four principal demographic splits.
         The tables below run static statistical validations (Wilcoxon Signed-Rank and Friedman Chi-Square) 
@@ -207,7 +207,7 @@ with tab_demographics:
     with col_tables_left:
         
         # --- 1. Gender Significance Matrix ---
-        with st.expander("Gender Gaps Significance Matrices (Usage)", expanded=True):
+        with st.expander("Gender Gaps Significance Matrix (Usage)", expanded=True):
             paired_gen_columns = []
             for metric in gen_metrics:
                 paired_gen_columns.extend([f"{metric}_f_y16_74", f"{metric}_m_y16_74"])
@@ -254,7 +254,7 @@ with tab_demographics:
                 st.dataframe(df_urban_res, column_config={"Max Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"), "P-Value": st.column_config.NumberColumn(format="%.4f")}, hide_index=True, use_container_width=True)
 
     with col_insights_right:
-        st.subheader("Cross-Dimension Structural Insights")
+        st.subheader("Keu Insights")
         with st.expander("**1. Frontier Tech Skews Men and Urban Hubs**"):
             st.write("""
                 Advanced digital tasks show compounding advantages. Men outpace women in emerging AI adoption by 3.5 points, 
@@ -274,8 +274,8 @@ with tab_demographics:
     st.write("---")
     
     # ------------------ INTERACTIVE COMPONENT VISUALIZATION STUDIO ------------------
-    st.subheader("Demographic Component Studio")
-    st.caption(funcs.get_dynamic_subheader(df_filtered_usage))
+    st.subheader("Demographic Component Lab")
+    # st.caption(funcs.get_dynamic_subheader(df_filtered_usage))
 
     # Single selector layout to drive any dimension selection on demand
     col_sel_dim, col_sel_filter = st.columns([2, 2])

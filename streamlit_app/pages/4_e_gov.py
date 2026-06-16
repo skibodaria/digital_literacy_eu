@@ -146,7 +146,7 @@ with tab_usage:
         st.write("there gonna be insights here")
 
     # ------------------ DYNAMIC BOXPLOT STUDIO ------------------
-    st.subheader("Dynamic Distribution Studio")
+    st.subheader("Dynamic Distribution Lab")
     usage_base_metrics = [m for m in gov_maps["education"]["base_metrics"] if not m.lower().startswith('i_ireid')]
     
     if usage_base_metrics:
@@ -198,7 +198,7 @@ with tab_usage:
                 color="Demographic Slice",
                 points="all", 
                 hover_data=[country_col],
-                title=f"Distribution Dispersal Matrix: {clean_plot_title}"
+                title=f"Distribution Matrix: {clean_plot_title}"
             )
             fig_box.update_layout(height=400, showlegend=False, margin={"t":40, "b":40})
             st.plotly_chart(fig_box, use_container_width=True)
@@ -208,7 +208,7 @@ with tab_usage:
     st.write("---")
     
     # ------ Significance of Demographic Dimensions --------
-    st.subheader("Comparative Demographic Significance Matrices")
+    st.subheader("Comparative Demographic Analysis")
     
     # Advanced helper that handles both raw code strings and pre-labeled strings safely
     def get_clean_table_label(raw_string, prefix_to_strip):
@@ -572,7 +572,7 @@ with tab_barriers:
 # --- TAB 3: TRUST & E-GOVERNANCE USAGE CORRELATIONS ---
 # ==============================================================================
 with tab_trust_correlations:
-    st.header("Sociopolitical Drivers of Digital Statecraft")
+    st.header("Sociopolitical Drivers of Digital Development")
     st.markdown("""
         This module evaluates the structural macro-level relationships between **Institutional Trust Vectors** and **e-Governance Adoption Rates** across EU member states.
     """)
@@ -621,7 +621,7 @@ with tab_trust_correlations:
             # ==============================================================================
             # COMPONENT 1: THE SPLIT GRID HEATMAP (Trust on Y, e-Gov on X)
             # ==============================================================================
-            st.subheader("Macro Trust vs. Digital Interaction Split Grid")
+            st.subheader("Macro Trust vs. Digital Interaction Matrix")
             st.markdown("_Pearson Correlation Coefficients ($R$) comparing macro institutional sentiment variables with core E-Governance adoption actions._")
 
             all_target_cols = available_trust + available_egov
@@ -761,7 +761,7 @@ with tab_skills_vs_egov:
             # ==============================================================================
             # COMPONENT 1: THE SPLIT GRID HEATMAP
             # ==============================================================================
-            st.subheader("Capability-to-Action Correlation Matrix")
+            st.subheader("Digital Skills vs E-Governance Usage Correlation Matrix")
             st.markdown("_Pearson Correlation Coefficients ($R$) evaluating how specific national literacy tiers predict civic tool deployment._")
 
             all_target_cols = available_skills + available_actions

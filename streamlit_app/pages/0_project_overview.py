@@ -3,7 +3,7 @@ import base64
 
 st.set_page_config(layout="wide")
 
-st.header("Digital Literacy, E-Governance Usage, & Inequality: Mapping the EU Digital Decade")
+st.title("Digital Literacy, E-Governance Usage, & Inequality: Mapping the EU Digital Decade")
 st.caption("Trust in the Machine? Mapping the Intersections of E-Governance, Civic Trust, and Digital Stratification in the European Union | " \
     "Data Analytics Bootcamp at Spiced Academy | Berlin | June 2025")
 st.markdown(
