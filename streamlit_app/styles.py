@@ -21,6 +21,9 @@ EU_DARK_GOLD = ["#ffe676","#d9ba4c","#ae9029","#846910","#5c4505","#392200"]
 # Option 7: EU Cornflower
 EU_CORNFLOWER = ["#a0deff","#74b4f5","#498cdb","#2466b7","#08428e","#001f63"]
 
+# Option 8: Clusters
+EU_CLUSTERS = ["#005f73", "#2a9d8f","#e9c46a", "#e76f51"]
+
 
 # Reusable chart layouts
 MAP_LAYOUT = {

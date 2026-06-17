@@ -319,3 +319,20 @@ def extract_demographic_metrics(df):
         "age": {"base_metrics": age_metrics, "chart_cols": age_usage}
     }
 
+def add_authorship_footer():
+    """
+    Renders a standardized, minimalist authorship sign at the bottom of the page.
+    """
+    st.write("---")
+    st.caption(
+        """
+        **Data Source Reference:** Eurostat Digital Economy and Society Statistics (2025), [Eurobarometer Standard (104)](https://europa.eu/eurobarometer/surveys/detail/3378) 
+        and [Eurobarometer Special (sp566)](https://europa.eu/eurobarometer/surveys/detail/3362).
+        \n
+        <div style="text-align: left; color: #888888; font-size: 0.85rem; padding-top: 10px;">
+            Designed & Engineered by <strong>Daria Skibo</strong> | Capstone Project © 2026
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+

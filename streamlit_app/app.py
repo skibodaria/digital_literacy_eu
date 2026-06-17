@@ -6,11 +6,13 @@ import streamlit as st
 st.set_page_config(layout="wide")
 
 # Set the style for the tabs globally
+
 st.markdown("""
     <style>
+        /* Style individual tab buttons globally */
         button[data-baseweb="tab"] {
             background-color: #41748d !important;
-            color: #83c5be !important;           
+            color: #caf0f8 !important;           
             border-radius: 4px 4px 0px 0px;       
             padding: 10px 20px !important;       
             margin-right: 4px !important;        
@@ -25,11 +27,12 @@ st.markdown("""
             color: #FFFFFF !important;           
             font-weight: bold !important;        
         }
-        div[data-飛躍="stHorizontalBlock"] div[role="tablist"] div {
+        div[role="tablist"] {
             background-color: transparent !important; 
         }
     </style>
 """, unsafe_allow_html=True)
+
 
 # ==========================================
 # NAVIGATION 

@@ -48,11 +48,8 @@ tab_baseline, tab_clusters = st.tabs([
 # TAB 1: PROJECT OVERVIEW
 # ==========================================
 with tab_baseline:
-    st.subheader("Intro to EU Digital Mapping | Main Metrics")
-    st.markdown("""
-        I need to add here more information about the project -- what is it about, what i'm trying to understand, 
-        why ii is valid etc. What are the main concepts i'm looking into and why there is a map here.
-    """)
+    st.header("Intro to EU Digital Mapping | Main Metrics")
+
     display_name_to_code = {v: k for k, v in baseline_labels.items()}
     available_columns = df_filtered.columns.tolist()
     filtered_display_options = {
@@ -64,7 +61,6 @@ with tab_baseline:
     filtered_display_options = dict(sorted(filtered_display_options.items()))
     
     # KPI Row
-    # --- 1. INJECT CUSTOM KPI CARD STYLE OVERRIDES ---
     st.markdown("""
         <style>
         /* Define the structure for your custom metric card */
@@ -234,52 +230,52 @@ with tab_baseline:
                 back onto analog ways.
             """)
         
-        with st.expander("**Descriptive Statistics in Detail**"):
-            if not df_filtered.empty:
-        
-                target_metrics = {
-                    'i_dsk2_bab': 'Basic and Above Basic Digital Skills',
-                    'i_dsk2_ab': 'Above Basic Digital Skills',
-                    'i_dsk2_x': 'No Digital Skills',
-                    'i_iday': 'Daily Internet Usage',
-                    'i_iuai': 'Generative AI Tools Usage',
-                    'i_igov': 'Online Authority Interaction',
-                    'i_igovapr': 'Online Appointments',
-                    'i_igovbe': 'Requesting Benegits Online',
-                    'i_igovtax2': 'Tax Declaration Online',
-                    'i_ireidno': 'Not Having eID'
-                }
+    with st.expander("**Descriptive Statistics in Detail**"):
+        if not df_filtered.empty:
+    
+            target_metrics = {
+                'i_dsk2_bab': 'Basic and Above Basic Digital Skills',
+                'i_dsk2_ab': 'Above Basic Digital Skills',
+                'i_dsk2_x': 'No Digital Skills',
+                'i_iday': 'Daily Internet Usage',
+                'i_iuai': 'Generative AI Tools Usage',
+                'i_igov': 'Online Authority Interaction',
+                'i_igovapr': 'Online Appointments',
+                'i_igovbe': 'Requesting Benefits Online',
+                'i_igovtax2': 'Tax Declaration Online',
+                'i_ireidno': 'Not Having eID'
+            }
 
-                available_columns = [col for col in target_metrics.keys() if col in df_filtered.columns]
-        
-                if available_columns:
-                    df_stats = df_filtered[available_columns].describe().loc[['mean', 'max', 'min', 'std']]
-                    df_stats = df_stats.T
-                    df_stats.index = df_stats.index.map(target_metrics)
-                    df_stats = df_stats.rename(columns={
-                        'mean': 'EU Average (Mean)',
-                        'max': 'Maximum State Score',
-                        'min': 'Minimum State Score',
-                        'std': 'Standard Deviation (σ)'
-                    })
-                    formatted_stats = df_stats.style.format("{:.1f}%")
+            available_columns = [col for col in target_metrics.keys() if col in df_filtered.columns]
+    
+            if available_columns:
+                df_stats = df_filtered[available_columns].describe().loc[['mean', 'max', 'min', 'std']]
+                df_stats = df_stats.T
+                df_stats.index = df_stats.index.map(target_metrics)
+                df_stats = df_stats.rename(columns={
+                    'mean': 'EU Average (Mean)',
+                    'max': 'Maximum State Score',
+                    'min': 'Minimum State Score',
+                    'std': 'Standard Deviation (σ)'
+                })
+                formatted_stats = df_stats.style.format("{:.1f}%")
 
-                    st.dataframe(
-                        formatted_stats, 
-                        use_container_width=True,
-                        height=350
-                    )
-                    
-                    # Brief methodological context note
-                    st.caption(
-                        "Note: Standard Deviation (σ) quantifies regional policy fragmentation. "
-                        "Higher deviation scores indicate severe state-level "
-                        "structural disparities across the Union."
-                    )
-                else:
-                    st.warning("Specified metric columns were not discovered in the current data model layer.")
+                st.dataframe(
+                    formatted_stats, 
+                    use_container_width=True,
+                    height=350
+                )
+                
+                # Brief methodological context note
+                st.caption(
+                    "Note: Standard Deviation (σ) quantifies regional policy fragmentation. "
+                    "Higher deviation scores indicate severe state-level "
+                    "structural disparities across the Union."
+                )
             else:
-                st.warning("Unable to compute descriptive summary statistics due to an empty source dataframe.")
+                st.warning("Specified metric columns were not discovered in the current data model layer.")
+        else:
+            st.warning("Unable to compute descriptive summary statistics due to an empty source dataframe.")
 
 
 
@@ -288,7 +284,7 @@ with tab_baseline:
 # ==============================================================================
 with tab_clusters:
     st.header("European Archetypes: Data-Driven Country Profiles")
-    st.markdown("""
+    st.info("""
         This workspace applies an unsupervised machine learning algorithm (**K-Means Clustering**) to group EU member states 
         not by geographic borders, but by structural intersections of **Digital Literacy, e-Gov Infrastructure Adoption**, and **Systemic Institutional Trust**.
     """)
@@ -350,9 +346,7 @@ with tab_clusters:
 
             with col_map:
                 st.subheader("Geographic Archetype Footprint")
-                
-                # Custom discrete colors matching your interface styles
-                color_palette = ["#498cdb", "#64748b", "#001f63", "#cbd5e1"] # Blue, Slate, Deep Blue, Light Slate
+            
 
                 fig_cluster_map = px.choropleth(
                     df_filtered_cluster,
@@ -361,19 +355,21 @@ with tab_clusters:
                     color='cluster_profile',
                     hover_name='clean_country_name',
                     hover_data={'plotly_country_code': False, 'cluster_profile': True},
-                    color_discrete_sequence=styles.EU_CORNFLOWER
+                    color_discrete_sequence=styles.EU_CLUSTERS,
+                    height=700
                 )
 
                 fig_cluster_map.update_geos(              
                     projection_type="mercator", center=dict(lon=10, lat=52), projection_scale=4.5,         
                     visible=False, showframe=False, showcoastlines=True, coastlinecolor="LightGray", resolution=50,
-                    bgcolor="rgba(0,0,0,0)"
+                    bgcolor="rgba(0,0,0,0)",
+                    
                     #fitbounds="locations"
                 )
 
                 fig_cluster_map.update_layout(
                     margin={"r":0, "t":0, "l":0, "b":0},
-                    height=500,
+                    height=700,
                     legend=dict(
                         title=None, orientation="h", yanchor="bottom", y=-0.15, xanchor="center", x=0.5
                     ),
@@ -382,76 +378,64 @@ with tab_clusters:
                 )
                 st.plotly_chart(fig_cluster_map, use_container_width=True)
 
+
             with col_table:
-                st.subheader("Member State Cluster Allocations")
-                st.markdown("_Active countries categorized under their respective statistical archetypes based on your sidebar filters._")
-                
-                # Render clean, digestible markdown list boxes for each cluster block
-                if not df_filtered_cluster.empty:
-                    for cl_idx in sorted(cluster_names.keys()):
-                        c_list = df_filtered_cluster[df_filtered_cluster['cluster_label'] == cl_idx]['clean_country_name'].tolist()
-                        if c_list:
-                            st.markdown(f"**● {cluster_names[cl_idx]}**")
-                            st.caption(", ".join(c_list))
-                else:
-                    st.caption("No countries match your sidebar selections.")
+                st.subheader("Member State Clusters")
 
-            st.write("---")
-
-            # ==============================================================================
-            # LAYOUT SECTION 2: INTERACTIVE PROFILE EXPLORER (The Core Insights)
-            # ==============================================================================
-            st.subheader("Archetype Strategic Balance Sheets")
-            tab_c2, tab_c0, tab_c1, tab_c3 = st.columns(4)
-
-            st.markdown(
-                """
-                <style>
-                [data-testid="stMetricValue"] {
-                    white-space: normal;
-                    word-break: break-word;
-                    font-size: 1.4rem !important; /* Slightly downsizes font if needed to fit cleanly */
+                cluster_colors = {
+                    0: "#005f73",  # Deep Teal
+                    1: "#2a9d8f",  # Muted Sage
+                    2: "#e9c46a",  # Soft Mustard
+                    3: "#e76f51"   # Terracotta Orange
                 }
-                [data-testid="stMetricLabel"] {
-                    white-space: normal;
-                    word-break: break-word;
-                }
-                </style>
-                """,
-                unsafe_allow_html=True
-            )
-            
-            with tab_c2:
-                st.metric(label="Group Alpha", value="Digital Frontrunners")
-                st.markdown("""
-                    * **The Digital Footprint:** Exceptional baseline performance. Nearly half of the population (**47.4%**) holds advanced digital skills, eID adoption averages **89.7%**, and **83.5%** interact seamlessly with public authorities.
-                    * **The Trust Anchor:** Institutional trust scores lead the EU block across all facets (Parliament trust sits at **55%**, Public Authorities at **70%**). 
-                    * **Strategic Synthesis:** A flawless digital ecosystem backed by high systemic and institutional trust. 
-                """)
 
-            with tab_c0:
-                st.metric(label="Group Beta", value="Digitally Engaged Sceptics")
-                st.markdown("""
+                cluster_profiles = {
+                    0: """
                     * **The Digital Footprint:** Robust, highly functional technical capacity. Over **30%** maintain advanced skills, **78%** use eID systems actively, and **69.6%** deal with state platforms online.
                     * **The Trust Paradox:** Despite high digital interaction, national political trust is low (Government trust rests at **27%**, Parliament at **25%**).
                     * **Strategic Synthesis:** Infrastructure is mature and citizens use it out of necessity, but digital capability has not translated into state institutional trust.
-                """)
-
-            with tab_c1:
-                st.metric(label="Group Gamma", value="Emerging Transition")
-                st.markdown("""
+                    """,
+                    1: """
                     * **The Digital Footprint:** Moderate skill baseline (**28.5%** above basic), but infrastructure friction causes adoption rates to sag. Only **41%** utilize eIDs, and government interactions drop to **59%**.
-                    * **The Technical Barrier:** Up to **23%** of citizens actively face systemic or technical eID structural barriers. 
+                    * **The Technical Barrier:** Up to **23%** of citizens actively face systemic or technical eID structural barriers.
                     * **Strategic Synthesis:** Citizens trust the system (Public Authority trust holds a solid **61.5%**), but they are hitting clear technical infrastructure walls.
-                """)
-
-            with tab_c3:
-                st.metric(label="Group Delta", value="Digitally Excluded / Friction States")
-                st.markdown("""
+                    """,
+                    2: """
+                    * **The Digital Footprint:** Exceptional baseline performance. Nearly half of the population (**47.4%**) holds advanced digital skills, eID adoption averages **89.7%**, and **83.5%** interact seamlessly with public authorities.
+                    * **The Trust Anchor:** Institutional trust scores lead the EU block across all facets (Parliament trust sits at **55%**, Public Authorities at **70%**).
+                    * **Strategic Synthesis:** A flawless digital ecosystem backed by high systemic and institutional trust.
+                    """,
+                    3: """
                     * **The Digital Footprint:** Severe digital divide crisis. Only **11.5%** reach above-basic literacy, entry-level exclusion scales up to almost **8%**, and eID usage craters to **11%**.
-                    * **The Friction Metrics:** Over half (**51.8%**) lack functional eID systems entirely, pulling electronic tax submissions down to a mere **11%**.
+                    * **The Friction Metrics: ** Over half (**51.8%**) lack functional eID systems entirely, pulling electronic tax submissions down to a mere **11%**.
                     * **Strategic Synthesis:** Systemic digital alienation. Technical infrastructure is absent, civic skills are low, and institutional trust is relatively low.
-                """)
+                    """
+                }
+                
+                if not df_filtered_cluster.empty:
+                    # Explicit list of all 4 clusters to ensure every single card renders
+                    for cl_idx in [0, 1, 2, 3]:
+                        c_list = df_filtered_cluster[df_filtered_cluster['cluster_label'] == cl_idx]['clean_country_name'].tolist()
+                        countries_str = ", ".join(c_list) if c_list else "No active countries"
+                        
+                        bg_color = cluster_colors.get(cl_idx, "#005f73")
+                        text_color = "#FFFFFF" if bg_color == "#005f73" else "#000000"
+                        
+                        # Render the beautiful, standalone colorful country card using standard markdown
+                        card_html = f"""
+                        <div style="background-color: {bg_color}; border-radius: 12px; padding: 16px; margin-top: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                            <b style="font-size: 0.95rem; color: {text_color}; text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 8px;">🎯 {cluster_names[cl_idx]}</b>
+                            <span style="font-size: 0.85rem; font-weight: 500; color: {text_color}; line-height: 1.4;">{countries_str}</span>
+                        </div>
+                        """
+                        st.markdown(card_html, unsafe_allow_html=True)
+                        
+                        # Use a clean, native Streamlit expander directly underneath each card
+                        with st.expander("View Profile Characteristics"):
+                            st.markdown(cluster_profiles[cl_idx])
+                                
+                else:
+                    st.caption("No countries match your sidebar selections.")
 
 
             # ==============================================================================
@@ -518,7 +502,4 @@ st.warning(
 # ==============================================================================
 # FOOTER SECTION
 # ==============================================================================
-st.write("---")
-st.caption("""
-    **Data Source Reference:** Eurostat Digital Economy and Society Statistics (2025), [Eurobarometer Standard (104)](https://europa.eu/eurobarometer/surveys/detail/3378) and [Eurobarometer Special (sp566)](https://europa.eu/eurobarometer/surveys/detail/3362).
-""")
+funcs.add_authorship_footer()

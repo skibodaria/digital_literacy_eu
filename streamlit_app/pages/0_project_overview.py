@@ -1,23 +1,251 @@
 import streamlit as st
 import base64
+import funcs
 
 st.set_page_config(layout="wide")
 
-st.title("Digital Literacy, E-Governance Usage, & Inequality: Mapping the EU Digital Decade")
-st.caption("Trust in the Machine? Mapping the Intersections of E-Governance, Civic Trust, and Digital Stratification in the European Union | " \
-    "Data Analytics Bootcamp at Spiced Academy | Berlin | June 2025")
 st.markdown(
     """
-    Welcome to the EU Digital Baseline Workspace. This core interface establishes a 
-    macro-level diagnostic of digital literacy, Internet usage, and e-governance adoptions across the European Union.
+    <style>
+        /* Target the exact inner layout div inside the container block */
+        div[data-testid="stVerticalBlockBorder"] > div:first-child {
+            background-color: #005f73 !important;  /* Pure white background card */
+            border: 1px solid #005f73 !important;  /* Your primary teal accent color */
+            border-radius: 12px !important;        /* Crisply rounded corners */
+            padding: 24px !important;               /* Inner breathing room layout */
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05) !important; /* Lifts it above the blue canvas */
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+st.title("🇪🇺 Digital Literacy, E-Governance Usage, Institutional Trust Inequality: Mapping the EU Digital Decade")
+st.markdown(
+    """
+    Welcome to the EU Digital Baseline Workspace. This interface establishes a 
+    macro-level diagnostic of digital literacy, Internet usage, and E-Governance and eID adoptions across the European Union. It helps to
+    explore and understand the basic trends related to digital literacy in the EU member states and connect usage of E-Governance tools to
+    institutionall trust, barriers, and inequality.
     """)
 
-tab_overview, tab_data, tab_methods, tab_rec = st.tabs([
-    "Project Intro",
+tab_short, tab_overview, tab_data, tab_methods = st.tabs([
+    "Intro",
+    "Project: Details",
     "Data & Sources",
-    "Methods & Pipeline",
-    "Key Insights & Recommendations"
+    "Methods & Pipeline"
 ])
+# ==========================================
+# TAB 0: SHORT INTRO
+# ==========================================
+with tab_short:
+
+    st.markdown("""
+            <style>
+            /* Define the structure for your solid color custom Insight Card */
+            .insight-card {
+                background-color: #007792;          /* Solid dark teal background block */
+                border: 1px solid #007792;          /* Matching border color to make it flat */
+                border-radius: 12px;                /* Modern curved corners */
+                padding: 22px;                      /* Breathing room inside the card */
+                box-shadow: 0 4px 10px rgba(0,0,0,0.08); /* Soft drop shadow layer for subtle lift */
+                margin-bottom: 15px;
+                min-height: 390px;                  /* Keeps cards uniformly sized in the row */
+            }
+            
+            /* High-contrast typography inside your solid dark cards */
+            .insight-card h4 {
+                color: #FFFFFF !important;          /* Crisp white title headers */
+                font-weight: 700 !important;
+                margin-top: 0px !important;
+                font-size: 1.15rem !important;
+            }
+            
+            .insight-card .card-caption {
+                font-size: 0.85rem;
+                color: #caf0f8;                     /* Light blue tint color for high-contrast context text */
+                font-style: italic;
+                margin-bottom: 14px;
+                line-height: 1.4;
+            }
+            
+            .insight-card ul {
+                padding-left: 18px !important;
+                color: #FFFFFF !important;          /* White bullet list items */
+            }
+            
+            .insight-card li {
+                margin-bottom: 10px;
+                font-size: 0.9rem;
+                line-height: 1.4;
+            }
+            </style>
+        """, unsafe_allow_html=True)
+    
+    st.header("Project Intro")
+    st.caption("This pages helps to understand the core concepts of the project, its goals and hypotheses, data sources, pipeline. For more information," \
+    "please explore additional tabs.")
+
+    st.subheader("What I Wanted to Know: Research Questions")
+    col_q1, col_q2, col_q3, col_q4 = st.columns(4)
+    with col_q1:
+        st.markdown("""
+            <div class="insight-card">
+                <h4>What are the levels of digital skills in the EU countries?</h4>
+                <div class="card-caption">
+                    Digital skills are measured in the EU on the following scale: above basic, basic, low, narrow, and limited. 
+                    The methodology to estimate digital skills recently changed (2021).
+                </div>
+                <ul>
+                    <li>What is the average level of digital skills?</li>
+                    <li>What is the prospect for 2030?</li>
+                    <li>Is EU going to reach the target of 80%?</li>
+                </ul>
+            </div>
+        """, unsafe_allow_html=True)
+
+    with col_q2:
+        st.markdown("""
+            <div class="insight-card">
+                <h4>What is the structure of digital skills literacy?</h4>
+                <div class="card-caption">
+                    To estimate digital skills, the EU survey uses several components: Information and Data Literacy, Communication and Collaboration,
+                    Digital Content Creation, Safety and Security, and Problem Solving.
+                </div>
+                <ul>
+                    <li>Which skills are "stronger" and which are "weaker"?</li>
+                    <li>What are the countries digital skills profiles?</li>
+                </ul>
+            </div>
+        """, unsafe_allow_html=True)
+            
+    with col_q3:
+        st.markdown("""
+            <div class="insight-card">
+                <h4>Do digital literacy and E-Governance vary across demographic groups?</h4>
+                <div class="card-caption">Analyzing variance components across population segments.</div>
+                <ul>
+                    <li>How gender, age, education, and urbanization levels correlate with digital skills?</li>
+                    <li>Is there difference between those groups? Is it statistically significant?</li>
+                    <li>How the groups differ in terms of E-Governance tools usage?</li>
+                    <li>Are there any excluded groups?</li>
+                </ul>
+            </div>
+        """, unsafe_allow_html=True)
+    
+    with col_q4:
+        st.markdown("""
+            <div class="insight-card">
+                <h4>Does active E-Governance usage foster higher trust in political institutions?</h4>
+                <div class="card-caption">Empirical correlations between digital statecraft and institutional confidence layers.</div>
+                <ul>
+                    <li>Is there correlation between E-Governance and eID usage and different metrics for institutional trust?</li>
+                    <li>Is this correlation statistically significant?</li>
+                    <li>What does it mean?</li>
+                </ul>
+            </div>
+        """, unsafe_allow_html=True)
+
+
+    st.subheader("How Did I Do It: Project Pipeline")
+    col1, arr1, col2, arr2, col3, arr3, col4, arr4, col5 = st.columns([3, 1, 3, 1, 3, 1, 3, 1, 3])
+    st.markdown("""
+        <style>
+            .pipeline-arrow {
+                font-size: 2rem;
+                color: #005f73;          /* Matches your deep brand accent teal */
+                font-weight: bold;
+                text-align: center;
+                line-height: 120px;       /* Vertically aligns arrow with the center of your cards */
+                opacity: 0.7;
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
+    with col1:
+        st.markdown("**Data Retrieval**")
+        st.image("assets/python.svg", width=40, use_container_width=False) 
+        st.caption("Automated API bulk extraction & raw survey data ETL. Eurobarometer data clean-up and transformation")
+    
+    with arr1:
+        st.markdown('<div class="pipeline-arrow">➔</div>', unsafe_allow_html=True)
+    
+    with col2: 
+        st.markdown("**Modeling & Transformation**")
+        st.image("assets/dbt.svg", width=40)
+        st.caption("Prep, staging, and mart transformation. Merging complex data to clean DataFrames")
+
+    with arr2:
+        st.markdown('<div class="pipeline-arrow">➔</div>', unsafe_allow_html=True)
+
+    with col3:
+        st.markdown("**Storage Engine**")
+        st.image("assets/postgresql.svg", width=40)
+        st.caption("Locally hosted PostgreSQL database for source data and mart tables")
+    
+    with arr3:
+        st.markdown('<div class="pipeline-arrow">➔</div>', unsafe_allow_html=True)
+
+    with col4:
+        st.markdown("**EDA & Statistical Analysis**")
+        m1, m2, m3, m4 = st.columns([1, 1, 1, 1])
+        with m1: st.image("assets/numpy.svg", width=40, use_container_width=False)
+        with m2: st.image("assets/pandas.svg", width=40, use_container_width=False)
+        with m3: st.image("assets/matplotlib.svg", width=40, use_container_width=False)
+        with m4: st.image("assets/seaborn.svg", width=40, use_container_width=False)
+        st.caption("Data exploration, first visualization, and data quality check. Correlations, regression, hypotheses testing")
+    
+    with arr4:
+        st.markdown('<div class="pipeline-arrow">➔</div>', unsafe_allow_html=True)
+
+    with col5:
+        st.markdown("**Presentation & App**")
+        m5, m6 = st.columns([1, 1])
+        with m5: st.image("assets/streamlit.svg", width=40, use_container_width=False)
+        with m6: st.image("assets/plotly.svg", width=40, use_container_width=False)
+        st.caption("Multi-panel application & dynamic SQL fetching.")
+
+    st.subheader("Which Data Did I Use")
+    col_stat, col_bar = st.columns(2)
+    with col_stat:
+        st.markdown("#### Eurostat Data")
+        st.markdown(
+            """
+            **Eurostat** provides standardized, high-quality macro-statistics across Europe, 
+            collected by national statistical agencies and harmonized at the EU level to ensure cross-country comparability.
+            * **Base Tables:** 7 core Eurostat datasets integrated via API
+            * **Key Tracking Vectors:** 15+ localized digital literacy, eID adoption, and internet usage indicators
+            * **Geographic Scope:** 27 EU Member States
+            * **Temporal Horizon:** baseline for **2025**
+                * Digital Skills across Europe: 2015, 2016, 2017, 2019, 2021, 2023, 2025
+            """
+        )
+
+    with col_bar:
+        st.markdown("#### Eurobarometer Public Opinion Surveys")
+        st.markdown(
+            """
+            The **Eurobarometer** is a unique cross-national public opinion survey conducted on behalf of the European Commission since the 1970s. 
+            For this project I merged data from two Eurobarometer branches:
+            """)
+        st.markdown("##### 1. Standard Eurobarometer STD104, Autumn 2025")
+        st.markdown(
+            """
+            * regular tracking surveys focusing on EU citizens' perceptions of institutional trust and public life
+            * $n = 26,445$ respondents
+            """)
+        st.markdown("##### 2. Special Eurobarometer SP566 The Digital Decade 2025")
+        st.markdown(
+            """
+            * targeted thematic surveys designed around specific economic and technological shifts (AI, digital technologies, Internet usage)
+            * $n = 26,319$ respondents  
+            """
+        )
+
+
+
+
+
 
 # ==========================================
 # TAB 1: OVERVIEW
@@ -30,7 +258,7 @@ with tab_overview:
     # COLUMN ON MAIN PROJECT CHARACTERISTICS
     # ==============================================================================
     with col_project: 
-        st.subheader("The Strategic North Star: The 80% Target")
+        st.header("The Strategic North Star: The 80% Target")
         st.markdown(
             """
             The analysis is fundamentally benchmarked against the European Commission’s 2030 Digital Decade Strategic Target, 
@@ -219,10 +447,6 @@ with tab_overview:
 # TAB 2: DATA & SOURCES
 # ==========================================
 with tab_data:
-    st.header("Data Sources & Indicators Blueprint")
-    st.markdown("""The analytical process of this project relies on official, well-established, and publicly available macro-statistics provided
-    by the European Commission."""
-)
     col_stat, col_bar = st.columns([1,1], gap="medium")
     
     # ----- EUROSTAT DATA -----
@@ -274,7 +498,7 @@ with tab_data:
         st.markdown(
             """
             The **Eurobarometer** is a unique cross-national public opinion survey conducted on behalf of the European Commission since the 1970s. 
-            This project merges individual microdata from two distinct Eurobarometer branches:
+            This project merges data from two distinct Eurobarometer branches:
             """)
         st.markdown("##### Standard Eurobarometer")
         st.markdown(
@@ -371,7 +595,6 @@ with tab_data:
 # TAB 3: PIPELINE & METHODS
 # ==========================================
 with tab_methods:
-    st.subheader("Info about methods and process")
 
     col_core, col_pipeline, col_analytics = st.columns ([1,1,1], gap="small")
 
@@ -390,11 +613,15 @@ with tab_methods:
         st.markdown("#### Core Research Questions")
         st.write(
             """ 
+
             **1. The Macro Overview**: What is the current state baseline of internet usage frequency and overall digital 
             skill levels across the EU-27?
+
             **2. The Sociodemographic Split**: Does the Digital Divide match traditional socio-demographic inequality lines 
             (e.g., age, gender, education level, type of settlement)?
+
             **3. Institutional Trust**: How does an individual’s digital literacy correlate with their trust in national governments and EU-level institutions?  
+
         """)
     
     with col_pipeline:
@@ -514,23 +741,9 @@ with tab_methods:
             """)
 
 
-    
-
-
-
-
-# ==========================================
-# TAB 4: FINDINGS & RECOMMENDATIONS
-# ==========================================
-with tab_rec:
-    st.subheader("Main Insights and Recommendations")
 
 
 # ==============================================================================
 # FOOTER SECTION
 # ==============================================================================
-st.write("---")
-st.caption("""
-    **Data Source Reference:** Eurostat Digital Economy and Society Statistics (2025), [Eurobarometer Standard (104)](https://europa.eu/eurobarometer/surveys/detail/3378) 
-    and [Eurobarometer Special (sp566)](https://europa.eu/eurobarometer/surveys/detail/3362).
-""")
+funcs.add_authorship_footer()

@@ -155,7 +155,7 @@ with tab_overview:
             color=chosen_indicator_code,                    
             hover_name='clean_country_name',  
             color_continuous_scale=styles.EU_CORNFLOWER,
-            height=520
+            height=700
         )
         
         fig.update_geos(
@@ -316,8 +316,4 @@ with tab_demographics:
 # ==============================================================================
 # FOOTER SECTION
 # ==============================================================================
-st.write("---")
-st.caption("""
-    **Data Source Reference:** Eurostat Digital Economy and Society Statistics (2025). Data on Digital Skills 
-    and ICT Usage collected in the framework of the ESS ICT Survey.
-""")
+funcs.add_authorship_footer()

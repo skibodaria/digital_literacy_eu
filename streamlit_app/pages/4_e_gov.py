@@ -372,7 +372,7 @@ with tab_barriers:
                 hover_data=[chosen_indicator_code_b], 
                 color_continuous_scale=styles.EU_CORNFLOWER,
                 title=None,
-                height=600
+                height=700
             )
             fig_barr.update_traces(hovertemplate="<b>%{hovertext}</b><br><br>Value: %{z:.2f}%<extra></extra>")
             fig_barr.update_geos(
@@ -856,5 +856,4 @@ with tab_skills_vs_egov:
 # ==============================================================================
 # FOOTER SECTION
 # ==============================================================================
-st.write("---")
-st.caption("Data Source Reference: Eurostat Digital Economy and Society Statistics (2025).")
+funcs.add_authorship_footer()

@@ -52,17 +52,24 @@ df_filtered_skills = df_skills[df_skills[country_col].isin(selected_countries)]
 df_filtered_baseline = df_baseline[df_baseline[country_col].isin(selected_countries)]
 df_filtered_time = df_time_series[df_time_series[country_col].isin(selected_countries)]
 
+DIMENSIONS = {
+    "Gender": {"suffixes": ['_f_y16_74', '_m_y16_74'], "labels": ['Female', 'Male']},
+    "Education Level": {"suffixes": ['_i0_2', '_i3_4', '_i5_8'], "labels": ['Low Edu', 'Med Edu', 'High Edu']},
+    "Urbanization Level": {"suffixes": ['_ind_deg1', '_ind_deg2', '_ind_deg3'], "labels": ['Cities', 'Suburbs', 'Rural']},
+    "Age Cohorts": {"suffixes": ['_y16_19', '_y20_24', '_y25_34', '_y35_44', '_y45_54', '_y55_64', '_y65_74'], "labels": ['16-19', '20-24', '25-34', '35-44', '45-54', '55-64', '65-74']}
+}
+
 # ==============================================================================
 # HEADER SECTION
 # ==============================================================================
-st.title("Digital Skills Analysis Workspace")
-st.markdown("""
-    ### Examining the Socio-Demographic Layers of European Digital Literacy
-    This workspace breaks down the high, basic, and low digital skill distributions 
-    across stratified population segments in the EU.
+st.title("🇪🇺 Digital Skills Analysis")
+st.caption("""
+    **Examining the Socio-Demographic Layers of European Digital Literacy**: This workspace breaks down the digital skill distributions 
+    across stratified population segments in the EU. The main demographic dimensions used here
+    are: gender, age, level of education, and urbanization level. Explore tha tabs to learn more about
+    macro trends and inequality in relation to digital skills, or dive deeper in an individual countries'
+    digital skills profiles.
 """)
-
-st.write("---") # Visual divider line
 
 
 # ==============================================================================
@@ -79,31 +86,64 @@ tab_overview, tab_demog, tab_deep_dive = st.tabs([
 # ==============================================================================
 with tab_overview:
     
-    st.subheader("Macro Trends & National Baselines")
+    st.header("Macro Trends & National Baselines")
     
     # --------------------------------------------------------------------------
     # 6 KPI METRIC COLUMNS (do not change with country selection!)
     # --------------------------------------------------------------------------
-    kpi1, kpi2, kpi3, kpi4, kpi5, kpi6 = st.columns(6)
+    cols = st.columns(6)
+
+    st.markdown("""
+        <style>
+        /* Define the structure for your custom metric card */
+        .kpi-card {
+            background-color: #41748d;       /* Darker teal card background */
+            border: 1px solid #4A857A;       /* Crisp, subtle border */
+            border-radius: 8px;              /* Clean rounded corners */
+            padding: 15px 20px;              /* Padding inside the card */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* Soft drop shadow */
+            text-align: center;              /* Center align text metrics */
+            margin-bottom: 15px;             /* Spacing below the rows */
+        }
+        
+        /* Style the small uppercase metric label text */
+        .kpi-label {
+            font-size: 0.85rem !important;
+            font-weight: 600 !important;
+            color: #E2E8F0 !important;       /* Light gray for high contrast on teal */
+            text-transform: uppercase;       /* Professional dashboard aesthetic */
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        
+        /* Style the massive bold metric value text */
+        .kpi-value {
+            font-size: 2rem !important;
+            font-weight: 700 !important;
+            color: #FFFFFF !important;       /* Pristine white values */
+        }
+        </style>
+    """, unsafe_allow_html=True)
+
+    metrics_data = [
+        ("Above Basic", df_filtered_baseline['i_dsk2_ab'].mean()),
+        ("Basic Skills", df_filtered_baseline['i_dsk2_b'].mean()),
+        ("Low Skills", df_filtered_baseline['i_dsk2_lw'].mean()),
+        ("Limited Skills", df_filtered_baseline['i_dsk2_lm'].mean()),
+        ("Narrow Skills", df_filtered_baseline['i_dsk2_n'].mean()),
+        ("No Skills", df_filtered_baseline['i_dsk2_x'].mean())
+    ]
     
-    with kpi1:
-        st.metric(label="Above Basic Skills", value=f"{df_filtered_baseline['i_dsk2_ab'].mean().round(2)}%")
-        
-    with kpi2:
-        st.metric(label="Basic Skills", value=f"{df_filtered_baseline['i_dsk2_b'].mean().round(2)}%")
-        
-    with kpi3:
-        st.metric(label="Low Skills", value=f"{df_filtered_baseline['i_dsk2_lw'].mean().round(2)}%")
-        
-    with kpi5:
-        st.metric(label="Limited Skills", value=f"{df_filtered_baseline['i_dsk2_lm'].mean().round(2)}%")
-    
-    with kpi4:
-        st.metric(label="Narrow Skills", value=f"{df_filtered_baseline['i_dsk2_n'].mean().round(2)}%")
-   
-    with kpi6:
-        st.metric(label="No Digital Skills", value=f"{df_filtered_baseline['i_dsk2_x'].mean().round(2)}%")
-        
+    for i, col in enumerate(cols):
+        label, val = metrics_data[i]
+        with col:
+            st.markdown(f"""
+                <div class="kpi-card">
+                    <div class="kpi-label">{label}</div>
+                    <div class="kpi-value">{val:.2f}%</div>
+                </div>
+            """, unsafe_allow_html=True)
+
     st.write("---")
 
     # --------------------------------------------------------------------------
@@ -138,7 +178,7 @@ with tab_overview:
             color=chosen_indicator_code,                    
             hover_name='clean_country_name',  
             color_continuous_scale=styles.EU_CORNFLOWER,
-            height=520
+            height=700
         )
         
         fig.update_geos(
@@ -168,11 +208,11 @@ with tab_overview:
             use_container_width=False,
             help="Official EU Digital Skills Assessment Tool"
         )
-        st.markdown(f"""
-            * Country with the highest level of above basic digital skills: 
-            * wow two
-            * wow three
-        """)
+        with st.container():
+            st.markdown("### Key Insights")
+            st.warning("**Skills Polarization:** \nThe gap between high-literacy populations and the 'digital tail' remains stagnant: Basic access is not solving skill disparities.")
+            st.info("**Velocity Threshold:** \nThere is linear growth, not the exponential shift required to hit the 2030 EU targets: Need for accelerated upskilling policies.")
+            st.success("**Infrastructure vs. Literacy:** \nConnectivity is high, but functional literacy is lagging. Digital tools and access are present, but the digital literacy is falling behind.")
 
         with st.expander("**What Is Being Measured?**"):
             st.markdown(
@@ -210,10 +250,12 @@ with tab_overview:
     # --- MODULE: 2030 DIGITAL DECADE FORECAST PANELS (HISTORICAL BRIDGE OVERHAUL) ---
     # ------------------------------------------------------------------------------
     with col_time:
-        st.markdown("#### Digital Literacy Trends | OLS")
+        st.markdown('#### Historical Progression of "At Least Basic Digital Skills"')
+
         st.markdown("""
-            \n_Based on Ordinary Least Squares (OLS) historical growth rates bridging pre-2021 (`I_DSK_BAB` = Above Basic or Basic Digital Skills) and post-2021 (`I_DSK2_BAB` = also Above Basic or Basic Digital Skills) Eurostat frameworks._
-        """)
+                _This predictive model uses an Ordinary Least Squares (OLS) linear regression to project historical Eurostat growth rates 
+                into the next decade, accounting for the structural framework adjustments in 2021_
+            """)
 
         target_codes = ['I_DSK_BAB', 'I_DSK2_BAB']
         df_trend = df_time_series[df_time_series['indicator_code'].isin(target_codes)]
@@ -227,93 +269,23 @@ with tab_overview:
         if df_eu_avg.empty:
             st.warning("No time-series history records found for the selected indicator codes.")
         else:
-            year_min = int(df_eu_avg['reporting_year'].min())  # Will dynamically become 2015
-            year_max = int(df_eu_avg['reporting_year'].max())  # Will dynamically become 2025
-            
-            val_min = df_eu_avg[df_eu_avg['reporting_year'] == year_min]['indicator_value'].values[0]
-            val_max = df_eu_avg[df_eu_avg['reporting_year'] == year_max]['indicator_value'].values[0]
-            
             from scipy import stats
+            import numpy as np
+            
+            # Compute core linear regression attributes across the historic baseline
             slope, intercept, r_value, p_value, std_err = stats.linregress(
                 df_eu_avg['reporting_year'], df_eu_avg['indicator_value']
             )
             
-            annual_growth = slope
-            years_to_target = 2030 - year_max
-            projected_2030 = val_max + (annual_growth * years_to_target)
-            
-            target_value = 80.0
-            structural_deficit = target_value - projected_2030
-
-            # comparison dataframe:
-            data = {
-                'Status': [
-                    f'Current Status ({year_max})', 
-                    f'Projected 2030 Status'
-                ],
-                'Percentage': [val_max, projected_2030],
-                'Color': ['#1f77b4', '#aec7e8']
-            }
-            df_plot = pd.DataFrame(data)
-
-            # horizontal progress bar
-            fig = px.bar(
-                df_plot,
-                x='Percentage',
-                y='Status',
-                orientation='h',
-                text='Percentage',
-                range_x=[0, 100]
-            )
-
-            fig.update_traces(
-                marker_color=df_plot['Color'],
-                texttemplate='%{text:.1f}%',
-                textposition='inside',
-                insidetextanchor='end',
-                hovertemplate='%{y}: %{x:.1f}%<extra></extra>'
-            )
-
-            # 2030 target line
-            fig.add_shape(
-                type="line",
-                x0=target_value, y0=-0.5,
-                x1=target_value, y1=1.5,
-                line=dict(color="crimson", width=3, dash="dash"),
-            )
-
-            fig.add_annotation(
-                x=target_value, y=1.6,
-                text="Target: 80% Baseline",
-                showarrow=False,
-                font=dict(color="crimson", size=12, family="sans-serif"),
-                xanchor="center"
-            )
-
-            fig.update_layout(
-                xaxis_title="% of Population", yaxis_title="",
-                showlegend=False, height=300,
-                margin=dict(t=40, b=40, l=180, r=40),
-                plot_bgcolor='rgba(0,0,0,0)', paper_bgcolor='rgba(0,0,0,0)'
-            )
-            fig.update_xaxes(showgrid=True, gridcolor='rgba(220, 220, 220, 0.5)')
-            st.plotly_chart(fig, use_container_width=True)
-
-        # ------------------------------------------------------------------------------
-        # --- VISUALIZATION: DIGITAL SKILLS HISTORICAL TRAJECTORY (2015-2025) ---
-        # ------------------------------------------------------------------------------
-        st.markdown("#### Historical Progression of At Least Basic Digital Skills")
-
-        if not df_eu_avg.empty:
-            
+            # Append 2030 to our timeline array to plot the extended trendline
             full_years = np.append(df_eu_avg['reporting_year'].values, [2030])
             
             df_proj = pd.DataFrame({
                 'reporting_year': full_years,
-                # Calculate the theoretical regression value for every point: y = mx + c
                 'regression_value': slope * full_years + intercept
             })
 
+            # Base line chart modeling the empirical historical data
             fig_line = px.line(
                 df_eu_avg,
                 x='reporting_year',
@@ -326,6 +298,7 @@ with tab_overview:
                 }
             )
 
+            # Style the historical trajectory
             fig_line.update_traces(
                 line=dict(color='#41748d', width=4),
                 marker=dict(size=9, color='#005f73'),
@@ -333,35 +306,46 @@ with tab_overview:
                 name='Historical Reality'
             )
 
+            # Extract the precise 2030 OLS forecast value
             val_2030 = df_proj[df_proj['reporting_year'] == 2030]['regression_value'].values[0]
-            
+
+            # Overlay the formal linear projection path out to 2030
             fig_line.add_scatter(
                 x=df_proj['reporting_year'],
                 y=df_proj['regression_value'],
                 mode='lines+markers',
                 line=dict(color='crimson', width=2, dash='dash'),
                 marker=dict(
-                    size=np.where(df_proj['reporting_year'] == 2030, 10, 0).tolist(), # highlight ONLY the 2030 node
+                    size=[10 if y == 2030 else 0 for y in df_proj['reporting_year']],
                     color='crimson'
                 ),
-                text=np.where(df_proj['reporting_year'] == 2030, f"2030 Forecast: {val_2030:.1f}%", "").tolist(),
-                textposition="bottom right",
                 name='OLS Linear Trendline'
             )
 
-            fig_line.add_shape(
-                type="line",
-                x0=2015, y0=80,
-                x1=2030, y1=80,
-                line=dict(color="#2a9d8f", width=2, dash="dot")
+            # Context Annotation: Precise 2030 Forecast Node
+            fig_line.add_annotation(
+                x=2030,
+                y=val_2030,
+                text=f"2030 Forecast: {val_2030:.1f}%",
+                showarrow=True,
+                arrowhead=1,
+                ax=-75, 
+                ay=35,  
+                font=dict(color="crimson", size=11, family="sans-serif"),
+                bgcolor="rgba(255, 255, 255, 0.95)",
+                bordercolor="crimson",
+                borderwidth=1
             )
+            
+            # Context Annotation: Official Policy Targets
             fig_line.add_annotation(
                 x=2017, y=82,
                 text="Official EU 2030 Goal: 80%",
                 showarrow=False,
-                font=dict(color="#2a9d8f", size=11, weight="bold")
+                font=dict(color="#2a9d8f", size=11, family="sans-serif")
             )
 
+            # Context Structural Element: 2021 Eurostat Methodology Shift
             fig_line.add_shape(
                 type="line",
                 x0=2021, y0=35,
@@ -376,8 +360,9 @@ with tab_overview:
                 xanchor="center"
             )
 
+            # Layout canvas presentation configuration
             fig_line.update_layout(
-                height=400,
+                height=500,
                 showlegend=False,
                 xaxis=dict(
                     tickmode='array',
@@ -396,40 +381,50 @@ with tab_overview:
             )
 
             st.plotly_chart(fig_line, use_container_width=True)
-        else:
-            st.warning("Unable to render historical trajectory line plot due to missing data layers.")
-        
-        
+
+        # 1. Ensure your data is sorted
+    df_eu_avg = df_eu_avg.sort_values('reporting_year')
+
+    # 2. Get the baseline values
+    year_min = int(df_eu_avg['reporting_year'].min())
+    year_max = int(df_eu_avg['reporting_year'].max())
+    val_min = df_eu_avg[df_eu_avg['reporting_year'] == year_min]['indicator_value'].values[0]
+    val_max = df_eu_avg[df_eu_avg['reporting_year'] == year_max]['indicator_value'].values[0]
+
+    # 3. Perform the OLS Regression
+    slope, intercept, r_value, p_value, std_err = stats.linregress(
+        df_eu_avg['reporting_year'], df_eu_avg['indicator_value']
+    )
+
+    # 4. Define the variables for the explanation
+    annual_growth = slope
+    projected_2030 = (slope * 2030) + intercept
+    structural_deficit = 80.0 - projected_2030
+    
 with col_explain:
     st.subheader("Is the EU Going to Meet the 2030 Goal?")
 
     with st.expander("Methodology & Limitations Notice"):
-        st.markdown(f"""
-            **Framework Bridge Activated:** In 2021, Eurostat updated its official Digital Competence operational framework. 
-            To construct a robust 10-year analytics runway, this model constructs a structural indicator bridge, joining legacy 
-            indicators (`I_DSK_BAB` in {year_min}–2019) 
-            with modern metrics (`I_DSK2_BAB` for 2021, 2023 and 2025). 
-            
-            By running an **Ordinary Least Squares (OLS) Linear Regression** across this composite 10-year horizon, 
-            we establish a mathematically grounded annual growth vector that ignores single-year variance anomalies.
+        st.markdown("""
+            To build a 10-year outlook, we combined older Eurostat data (2015–2019) with updated metrics (2021–2025). 
+            We used **Linear Regression (OLS)** to determine the average annual growth rate. This mathematical approach 
+            focuses on the long-term historical trend rather than specific yearly ups or downs
         """)
     
-    st.info("" \
-        "Clearly, a few data points available in Eurostat tables **do not** make this analysis a robust prediction." \
-        "It's just a possible outcome in case the digital literacy development speed will stay at the current level." \
-        "\nA better forecasting model requires analysis of investment and national-level programs for improving digital climate" \
-        "and moving towards the established EU-level goals.")
-    
-    st.markdown(
-        f"""
-        **Key Insights**
-        - Over the full data runway from **{year_min}** to **{year_max}**, the percentage of EU citizens with at least basic digital skills expanded from **{val_min:.1f}%** to **{val_max:.1f}%**.
-        - Based on our OLS regression across all data cohorts, the long-term historical baseline reveals a steady expansion of **{annual_growth:.2f} percentage points** per year.
-        - At this specific velocity, the EU is on track to reach a projected proficiency level of **{projected_2030:.1f}%** by 2030. 
-        - This leaves an official policy **structural deficit of {structural_deficit:.1f} percentage points**.""")
-    
-    st.warning(" **Strategic Takeaway:** Even when factoring in a decade of long-term development history, the empirical modeling confirms that **incremental progress is not enough**. Unless member states implement aggressive, non-linear structural interventions, the 80% milestone will be missed.")
-       
+    st.info(
+        "Important Note: This is a mathematical projection, not a formal prediction. A true forecast would "
+        "also need to account for future government investment, digital policy changes, and specific "
+        "national training initiatives"
+    )
+
+    # Narrative output using your specific variables
+    st.markdown(f"""
+        **Key Findings**
+        * **Historical Growth:** Between 2015 and 2025, the percentage of the EU population with at least basic digital skills grew from **{val_min:.1f}%** to **{val_max:.1f}%**.
+        * **Annual Pace:** The historical trend indicates a steady improvement of **{annual_growth:.2f}%** per year.
+        * **2030 Outlook:** If this pace continues, the EU will reach an estimated **{projected_2030:.1f}%** digital literacy by 2030.
+    """)
+    st.warning(f"**The Gap:** To hit the official **80% target**, we face a structural deficit of **{structural_deficit:.1f}%**.")
 
     # # OLD VERSION
     # # ---------------------------------------------
@@ -560,50 +555,93 @@ with col_explain:
 
 
 
+# ==============================================================================
+# --- TAB 2: DEMOGRAPHIC DIMENSIONS (BOXPLOT STUDIO) ---
+# ==============================================================================
 
-# ==============================================================================
-# --- TAB 2: DEMOGRAPHIC DIMENSIONS ---
-# ==============================================================================
 with tab_demog:
     st.header("Socio-Demographic Literacy Layers")
-    st.write("Explore how digital skills thresholds distribute across specific sub-populations.")
     
-    # depends on country filter
-    st.subheader(funcs.get_dynamic_subheader(df_filtered_skills))
+    # 1. Ensure skills_map is available
+    # Note: Ensure extract_demographic_metrics is returning keys that exist in your df
+    skills_map = funcs.extract_demographic_metrics(df_skills)
     
-    demo_metric_choice = st.selectbox(
-        "Select Demographic Slice to Plot:",
-        options=["Gender", "Age Cohorts", "Education Levels", "Urbanization Levels"]
-    )
+    # ADJUSTED: Ensure this matches your specific skill metric naming convention
+    # If 'education' isn't the right key for skills, check your funcs.extract output
+    skills_base_metrics = [m for m in skills_map.get("education", {}).get("base_metrics", [])]
     
-    # clean column names
-    if demo_metric_choice == "Gender":
-        target_cols = [c for c in df_skills.columns if ('_f_' in c or '_m_' in c) and '_y16_74' in c]
-        labels_list = ['Female', 'Male']
-        color_blueprint = {'Female': '#498cdb', 'Male': '#001f63'}
-    elif demo_metric_choice == "Age Cohorts":
-        target_cols = [c for c in df_skills.columns if any(sfx in c for sfx in ['y16_19', 'y20_24', 'y25_34', 'y35_44', 'y45_54', 'y55_64', 'y65_74']) and not ('_f_' in c or '_m_' in c)]
-        labels_list = ['16-19', '20-24', '25-34', '35-44', '45-54', '55-64', '65-74']
-        color_blueprint = None
-    elif demo_metric_choice == "Education Levels":
-        target_cols = [c for c in df_skills.columns if any(sfx in c for sfx in ['i0_2', 'i3_4', 'i5_8'])]
-        labels_list = ['Low Edu', 'Medium Edu', 'High Edu']
-        color_blueprint = {'Low Edu': '#cbd5e1', 'Medium Edu': '#64748b', 'High Edu': '#0f172a'}
-    else:  # Urbanization
-        target_cols = [c for c in df_skills.columns if any(sfx in c for sfx in ['ind_deg1', 'ind_deg2', 'ind_deg3'])]
-        labels_list = ['Cities', 'Suburbs', 'Rural']
-        color_blueprint = {'Cities': '#3b82f6', 'Suburbs': '#60a5fa', 'Rural': '#93c5fd'}
+    if skills_base_metrics:
+        b_col1, b_col2 = st.columns(2)
+        with b_col1:
+            def format_tab2_boxplot(x):
+                full_key = next((k for k in skills_labels.keys() if x in k), None)
+    
+                if full_key:
+                    raw_label = skills_labels[full_key]
+                    # 2. Extract only the part before the first '('
+                    # "Digital Skills: Above Basic (% of individuals) - ..." -> "Digital Skills: Above Basic "
+                    clean_label = raw_label.split('(')[0].strip()
+                    return clean_label
+                
+                return x.upper()
 
-    funcs.render_demographic_chart(
-        df_filtered_skills, target_cols, labels_list, skills_labels, color_map=color_blueprint
-    )
-    
+            selected_metric_b = st.selectbox(
+                "Select Metric for Distribution Analysis", 
+                options=skills_base_metrics, 
+                format_func=format_tab2_boxplot,
+                key="t2_boxplot_metric_dropdown"
+            )
+        with b_col2:
+            selected_dim_b = st.selectbox("Select Demographic Dimension Breakout", options=list(DIMENSIONS.keys()), key="barr_dim")
+            
+        dim_cfg_b = DIMENSIONS[selected_dim_b]
+        
+        # 2. Build target columns based on selected_metric_b + suffixes
+        target_cols_b = [f"{selected_metric_b}{sfx}" for sfx in dim_cfg_b["suffixes"]]
+        
+        # 3. Robust lookup: find columns that exist in df_skills (case-insensitive)
+        df_cols_lower = [c.lower() for c in df_skills.columns]
+        real_cols_b = [c for c in df_skills.columns if c.lower() in [tc.lower() for tc in target_cols_b]]
+        
+        # Verify we found all required columns
+        if len(real_cols_b) == len(target_cols_b):
+            # 4. Melt
+            df_melted_b = df_skills.melt(
+                id_vars=[country_col], 
+                value_vars=real_cols_b, 
+                var_name="Demographic Slice", 
+                value_name="Percentage"
+            )
+            
+            # 5. Map column names to clean labels from DIMENSIONS
+            # Ensure the order of real_cols_b corresponds to dim_cfg_b["labels"]
+            suffix_to_label_b = dict(zip([rc.lower() for rc in real_cols_b], dim_cfg_b["labels"]))
+            df_melted_b["Demographic Slice"] = df_melted_b["Demographic Slice"].str.lower().map(suffix_to_label_b)
+            
+            # 6. Plotting
+            clean_plot_title_b = skills_labels.get(selected_metric_b, selected_metric_b.upper())
+
+            fig_box_b = px.box(
+                df_melted_b, 
+                x="Demographic Slice", 
+                y="Percentage", 
+                color="Demographic Slice",
+                points="all", 
+                hover_data=[country_col],
+                title=f"Distribution Dispersal Matrix: {clean_plot_title_b}"
+            )
+            fig_box_b.update_layout(height=400, showlegend=False, margin={"t":40, "b":40})
+            st.plotly_chart(fig_box_b, use_container_width=True)
+        else:
+            st.caption(f"Missing data: Found {len(real_cols_b)}/{len(target_cols_b)} expected columns for this metric.")
+            
     st.write("---")
+
+    # ========================================================
+    # STATISTICAL TESTS
+    # ========================================================
+
     st.subheader("Global EU Significance Tests (Fixed Sample Baselines)")
-    
-    # ------------------------------------------
-    # FIXED GLOBAL STATS: NO FILTER DEPENDENCY
-    # ------------------------------------------
     
     # ---------- GENDER ----------
     with st.expander("Gender Gaps Significance (Wilcoxon Signed-Rank)", expanded=False):
@@ -679,11 +717,11 @@ with tab_demog:
             st.markdown("**Key Insights:**\n* Metropolitan hubs show a clear adoption lead over rural communities.")
 
 # ==============================================================================
-# --- TAB 6: SKILL METRIC DEEP DIVE ---
+# --- TAB 3: SKILL METRIC DEEP DIVE ---
 # ==============================================================================
 with tab_deep_dive:
     st.header("Strategic Competence Dimension Deep Dive")
-    st.markdown("""
+    st.caption("""
         This module decomposes the overall Digital Skills Indicator into its **five structural foundational vectors** defined by the European Commission's DigComp Framework. Rather than focusing on a single metric, 
         this workspace visualizes comparative structural footprints and pinpoints exactly where socio-demographic disparities live.
     """)
@@ -895,8 +933,4 @@ with tab_deep_dive:
 # ==============================================================================
 # FOOTER SECTION
 # ==============================================================================
-st.write("---")
-st.caption("""
-    **Data Source Reference:** Eurostat Digital Economy and Society Statistics (2025). Data on Digital Skills 
-           and ICT Usage collected in the framework od [ESS ICT Survey](https://ec.europa.eu/eurostat/web/microdata/collections-research/survey-ict-use-households-individuals)
-""")
+funcs.add_authorship_footer()
