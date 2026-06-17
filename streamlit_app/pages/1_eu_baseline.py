@@ -218,7 +218,7 @@ with tab_baseline:
         st.warning("""
             The digital world is now a part of our daily lives, from how we work and play to how we manage our affairs.
             Despite this, digital tasks can still be challenging for many people.
-                   In fact, up to 70% of people still report difficulties when using digital tools for these everyday needs.
+            In fact, **up to 70\\%** of people still report difficulties when using digital tools for these everyday needs
             """)
 
         with st.expander("**Access vs. Execution**"):
@@ -233,7 +233,7 @@ with tab_baseline:
         
         st.info("""Interacting with government services online – like filing taxes or requesting
                 benefits – varies widely across countries. While some of these differences are due to laws or local institutions,
-                a person’s digital skills play a huge role.""")
+                a person’s digital skills play a huge role""")
         with st.expander("**Institutional Fragmentation**"):
             st.markdown(
                 """
@@ -300,7 +300,7 @@ with tab_baseline:
 # ==============================================================================
 with tab_clusters:
     st.header("European Archetypes: Data-Driven Country Profiles")
-    st.captions("""
+    st.caption("""
         This workspace applies an unsupervised machine learning algorithm (**K-Means Clustering**) to group EU member states 
         not by geographic borders, but by structural intersections of **Digital Literacy, e-Gov Infrastructure Adoption**, and **Systemic Institutional Trust**
     """)
@@ -417,13 +417,13 @@ with tab_clusters:
                     * **Strategic Synthesis:** Citizens trust the system (Public Authority trust holds a solid **61.5%**), but they are hitting clear technical infrastructure walls.
                     """,
                     2: """
-                    * **The Digital Footprint:** Exceptional baseline performance. Nearly half of the population (**47.4%**) holds advanced digital skills, eID adoption averages **89.7%**, and **83.5%** interact seamlessly with public authorities.
-                    * **The Trust Anchor:** Institutional trust scores lead the EU block across all facets (Parliament trust sits at **55%**, Public Authorities at **70%**).
-                    * **Strategic Synthesis:** A flawless digital ecosystem backed by high systemic and institutional trust.
+                    * **The Digital Footprint:** Exceptional baseline performance. Nearly half of the population (**47.4%**) holds advanced digital skills, eID adoption averages **89.7%**, and **83.5%** interact seamlessly with public authorities.  
+                    * **The Trust Anchor:** Institutional trust scores lead the EU block across all facets (Parliament trust sits at **55%**, Public Authorities at **70%**).  
+                    * **Strategic Synthesis:** A flawless digital ecosystem backed by high systemic and institutional trust.  
                     """,
                     3: """
                     * **The Digital Footprint:** Severe digital divide crisis. Only **11.5%** reach above-basic literacy, entry-level exclusion scales up to almost **8%**, and eID usage craters to **11%**.
-                    * **The Friction Metrics: ** Over half (**51.8%**) lack functional eID systems entirely, pulling electronic tax submissions down to a mere **11%**.
+                    * **The Friction Metrics:** Over half (**51.8%**) lack functional eID systems entirely, pulling electronic tax submissions down to a mere **11%**.
                     * **Strategic Synthesis:** Systemic digital alienation. Technical infrastructure is absent, civic skills are low, and institutional trust is relatively low.
                     """
                 }
@@ -513,7 +513,7 @@ st.warning(
     have never used Internet)) behave weirdly for Denmark. For this table, they are taken from the year 2024 instead of 2025. In original tables both
     marked as `:` for 2025, meaning "not available or missing". The main reason for it is that in Denmark in 2025 **99.7\\%** of population
     used Internet.
-    """)
+    """) 
 # ==============================================================================
 # FOOTER SECTION
 # ==============================================================================

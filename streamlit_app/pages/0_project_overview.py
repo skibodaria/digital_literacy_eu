@@ -94,7 +94,7 @@ with tab_short:
                 <h4>What are the levels of digital skills in the EU countries?</h4>
                 <div class="card-caption">
                     Digital skills are measured in the EU on the following scale: above basic, basic, low, narrow, and limited. 
-                    The methodology to estimate digital skills recently changed (2021).
+                    The methodology to estimate digital skills recently changed (2021)
                 </div>
                 <ul>
                     <li>What is the average level of digital skills?</li>
@@ -110,7 +110,7 @@ with tab_short:
                 <h4>What is the structure of digital skills literacy?</h4>
                 <div class="card-caption">
                     To estimate digital skills, the EU survey uses several components: Information and Data Literacy, Communication and Collaboration,
-                    Digital Content Creation, Safety and Security, and Problem Solving.
+                    Digital Content Creation, Safety and Security, and Problem Solving
                 </div>
                 <ul>
                     <li>Which skills are "stronger" and which are "weaker"?</li>
@@ -123,7 +123,7 @@ with tab_short:
         st.markdown("""
             <div class="insight-card">
                 <h4>Do digital literacy and E-Governance vary across demographic groups?</h4>
-                <div class="card-caption">Analyzing variance components across population segments.</div>
+                <div class="card-caption">Analyzing variance components across population segments</div>
                 <ul>
                     <li>How gender, age, education, and urbanization levels correlate with digital skills?</li>
                     <li>Is there difference between those groups? Is it statistically significant?</li>
@@ -137,7 +137,7 @@ with tab_short:
         st.markdown("""
             <div class="insight-card">
                 <h4>Does active E-Governance usage foster higher trust in political institutions?</h4>
-                <div class="card-caption">Empirical correlations between digital statecraft and institutional confidence layers.</div>
+                <div class="card-caption">Empirical correlations between digital statecraft and institutional confidence layers</div>
                 <ul>
                     <li>Is there correlation between E-Governance and eID usage and different metrics for institutional trust?</li>
                     <li>Is this correlation statistically significant?</li>

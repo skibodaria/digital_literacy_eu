@@ -149,7 +149,19 @@ with tab_usage:
         
         st.write("---")
     with col_key_insights_tab1:
-        st.write("there gonna be insights here")
+        ## FIX IT HERE!!
+        st.write(""" 
+            The Urban Divide: As seen in Screenshot 2026-06-18 at 00.22.16.jpg, living in different types of areas creates a statistically significant gap in digital engagement across every category. This confirms that geography is a persistent barrier to accessing online services and interacting with authorities.
+
+The Age Factor: The data in Screenshot 2026-06-18 at 00.22.16.jpg highlights that age cohorts exhibit massive disparities in usage, with gaps as high as 37.4 points in areas like tax declarations. These results are significant across the board, underscoring that age is a dominant force influencing how different populations navigate the digital landscape.
+                 The Gender Perspective: Gender differences in digital interaction are relatively small and inconsistent, with several key areas showing no statistically significant gap.
+
+The Power of Education: Education is a much stronger driver of digital engagement, with significant gaps appearing across every single category of usage.
+                 
+                 """)
+
+
+
 
     # ------------------ DYNAMIC BOXPLOT STUDIO ------------------
     st.subheader("Dynamic Distribution Lab")

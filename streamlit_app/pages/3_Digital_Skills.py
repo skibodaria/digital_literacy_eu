@@ -13,6 +13,56 @@ import altair as alt
 # -- Page configuration:
 st.set_page_config(layout="wide")
 
+st.markdown("""
+            <style>
+            /* Define the structure for your solid color custom Insight Card */
+            .insight-card {
+                background-color: #007792;          /* Solid dark teal background block */
+                border: 1px solid #007792;          /* Matching border color to make it flat */
+                border-radius: 12px;                /* Modern curved corners */
+                padding: 22px;                      /* Breathing room inside the card */
+                box-shadow: 0 4px 10px rgba(0,0,0,0.08); /* Soft drop shadow layer for subtle lift */
+                margin-bottom: 15px;
+                min-height: 280px;                  /* Keeps cards uniformly sized in the row */
+            }
+            
+            /* High-contrast typography inside your solid dark cards */
+            .insight-card h4 {
+                color: #FFFFFF !important;          /* Crisp white title headers */
+                font-weight: 700 !important;
+                margin-top: 0px !important;
+                font-size: 1.15rem !important;
+            }
+            
+            .insight-card .card-caption {
+                font-size: 0.85rem;
+                color: #caf0f8;                     /* Light blue tint color for high-contrast context text */
+                font-style: italic;
+                margin-bottom: 14px;
+                line-height: 1.4;
+            }
+
+            .insight-card p {
+                color: #e0e0e0 !important; /* Soft light gray for better readability */
+                font-size: 1.0rem !important;
+                line-height: 1.5;
+                margin-top: 10px !important;
+            }
+            
+            .insight-card ul {
+                padding-left: 18px !important;
+                color: #FFFFFF !important;          /* White bullet list items */
+            }
+            
+            .insight-card li {
+                color: #FFFFFF !important;
+                margin-bottom: 10px;
+                font-size: 0.9rem;
+                line-height: 1.4;
+            }
+            </style>
+        """, unsafe_allow_html=True)
+
 # ==============================================================================
 # DATA LOADING (Executed once and cached via your database.py)
 # ==============================================================================
@@ -208,6 +258,8 @@ with tab_overview:
             use_container_width=False,
             help="Official EU Digital Skills Assessment Tool"
         )
+
+
         with st.container():
             st.markdown("### Key Insights")
             st.warning("""
@@ -436,155 +488,33 @@ with col_explain:
     """)
     st.warning(f"**The Gap:** To hit the official **80% target**, we face a structural deficit of **{structural_deficit:.1f}%**.")
 
-    # # OLD VERSION
-    # # ---------------------------------------------
-    # # MAP WITH TREND OVER TIME (but just three years)
-    # # ---------------------------------------------
-
-    # with col_time:
-    #     st.markdown("""
-    #                 \n_Based on current growth rates for individuals with At Least Basic Digital Skills (2021, 2023, 2025)_
-    #                 """)
-
-    #     # 1. Extract the current 2025 status and historical slope
-    #     df_trend = df_time_series[df_time_series['indicator_code'] == 'I_DSK2_BAB']
-    #     df_eu_avg = df_trend.groupby('reporting_year')['indicator_value'].mean().reset_index()
-    #     df_eu_avg = df_eu_avg.sort_values('reporting_year')
-        
-    #     if df_eu_avg.empty:
-    #         st.warning("No data available for indicator 'I_DSK2_BAB'.")
-    #     else:
-    #         # Dynamically grab the earliest and latest available years (2021 and 2025)
-    #         year_min = df_eu_avg['reporting_year'].min()
-    #         year_max = df_eu_avg['reporting_year'].max()
-            
-    #         val_min = df_eu_avg[df_eu_avg['reporting_year'] == year_min]['indicator_value'].values[0]
-    #         val_max = df_eu_avg[df_eu_avg['reporting_year'] == year_max]['indicator_value'].values[0]
-            
-    #         # Calculate total time spans
-    #         years_passed = year_max - year_min  # e.g., 2025 - 2021 = 4 years
-    #         years_to_target = 2030 - year_max   # e.g., 2030 - 2025 = 5 years
-            
-    #         # Calculate annual growth and run the linear projection out to 2030
-    #         annual_growth = (val_max - val_min) / years_passed
-    #         projected_2030 = val_max + (annual_growth * years_to_target)
-    #         target_value = 80.0
-
-    #         # 2. Build structured comparison dataframe using the variables correctly!
-    #         data = {
-    #             'Status': [
-    #                 f'Current Status ({year_max})', 
-    #                 f'Projected 2030 Status'
-    #             ],
-    #             'Percentage': [val_max, projected_2030],
-    #             'Color': ['#1f77b4', '#aec7e8']
-    #         }
-    #         df_plot = pd.DataFrame(data)
-
-    #         # 3. Create the progress bars
-    #         fig = px.bar(
-    #             df_plot,
-    #             x='Percentage',
-    #             y='Status',
-    #             orientation='h',
-    #             text='Percentage',
-    #             range_x=[0, 100]
-    #         )
-
-    #         # Clean up bar styles and add text strings
-    #         fig.update_traces(
-    #             marker_color=df_plot['Color'],
-    #             texttemplate='%{text:.1f}%',
-    #             textposition='inside',
-    #             insidetextanchor='end',
-    #             hovertemplate='%{y}: %{x:.1f}%<extra></extra>'
-    #         )
-
-    #         # 4. Add the definitive 2030 Target Line
-    #         fig.add_shape(
-    #             type="line",
-    #             x0=target_value, y0=-0.5,
-    #             x1=target_value, y1=1.5,
-    #             line=dict(color="crimson", width=3, dash="dash"),
-    #         )
-
-    #         # Add a clean text annotation directly over the target line
-    #         fig.add_annotation(
-    #             x=target_value,
-    #             y=1.6,
-    #             text="Target: 80% Baseline",
-    #             showarrow=False,
-    #             font=dict(color="crimson", size=12, family="sans-serif"),
-    #             xanchor="center"
-    #         )
-
-    #         # 5. Clean up structural borders and text layout
-    #         fig.update_layout(
-    #             xaxis_title="% of Population",
-    #             yaxis_title="",
-    #             showlegend=False,
-    #             height=300,
-    #             margin=dict(t=40, b=40, l=220, r=40), # Slightly widened left margin for the longer text labels
-    #             plot_bgcolor='rgba(0,0,0,0)',
-    #             paper_bgcolor='rgba(0,0,0,0)'
-    #         )
-            
-    #         fig.update_xaxes(showgrid=True, gridcolor='rgba(220, 220, 220, 0.5)')
-
-    #         st.plotly_chart(fig, use_container_width=True)
-            
-    # with col_explain:
-    #     st.subheader(
-    #         """
-    #         Is EU Going to Meet the 2030 Goal?
-    #         """
-    #     )
-
-    #     with st.expander("Merhodology & Limitations Notice"):
-    #         st.markdown(
-    #             """
-    #             Historical Eurostat data for the updated Digital Competence Framework 
-    #             is currently limited, with assessments occurring biennially in **2021**, **2023**, and **2025**. 
-    #             Because three data points are statistically insufficient for training complex predictive time-series models, 
-    #             this dashboard uses a linear trend projection. By calculating the average annual growth rate across the full 4-year historical baseline, 
-    #             we extend a straight-line trajectory to estimate the 2030 outlook against official policy benchmarks. 
-    #         """
-    #         )
-        
-    #     st.markdown(
-    #         f"""
-    #         **Key Insights**
-    #         - Between 2021 and 2025, the percent of EU citizes with at least basic digital skills grew from {val_min.round(2)}% to 61%. 
-    #         Annual expansion is about **1.5 percentage points**.
-    #         - At the current speed, the EU is on track to reach **66.9%** digital proficiency by 2030. This creates a structural deficit of **13.1** percentage points, meaning that the EU
-    #         will officially fail to meet its Digital Decade milestone unless member states drastically accelerate digital literacy programs.
-    #         - Linear model we used here assumes constant progress, but systemic shifts (e.g., AI adoption or national funding injections) could create non-linear growth.
-    #         At the same time, this experimet illustrates, that **incremental progress is no longer enough**.
-    #         """
-    #     )
-
-
-
+    
 # ==============================================================================
 # --- TAB 2: DEMOGRAPHIC DIMENSIONS (BOXPLOT STUDIO) ---
 # ==============================================================================
 
 with tab_demog:
-    st.header("Socio-Demographic Literacy Layers")
+    cards = [
+            ("The Age Gap Persists", "People aged 65 and over remain our most vulnerable group, facing the highest barriers to digital inclusion"),
+            ("The Power of Education", "Education is a primary driver of digital literacy"),
+            ("The Gender Perspective", "The gap exists in advanced usage, basic entry-level knowledge is balanced"),
+            ("Urban vs. Rural Divide", "Geography creates a significant barrier: rural communities often lack the same level of digital support as in cities"),
+            ("To Research:", "The most important insights emerge where age, education, and location overlap")
+        ]
 
-    col_key1, col_key2, col_key3, col_key4, col_key5 = st.columns(5)
-    with col_key1:
-        st.markdown("**The Age Gap**: People aged 65 and over remain the most vulnerable group (highest concentration of those lacking the foundational skills)")
-    with col_key2:
-        st.markdown("**The Power of Education**: It is clear that formal education is a primary driver of digital literacy")
-    with col_key3: 
-        st.markdown("**The Gender Perspective**: Gender gap can be proven in advanced digital usage, but basic entry-level knowledge remains surprisingly balanced")
-    with col_key4:
-        st.markdown("**Urban vs. Rural Divide**: Living in a major city often means easier access to digital support; those in rural communities face much higher rates of digital exclusion")
-    with col_key5:
-        st.markdown("**Research: Next Step**: There is not much of a surprise to see these inequalities reproduced in the digital sphere. More insights can be found where these factors overlap")
-    
-    st.write('---')
+    cols = st.columns(5)
+
+    for i, (title, content) in enumerate(cards):
+        with cols[i]:
+            st.markdown(f"""
+                <div class="insight-card">
+                    <h4>{title}</h4>
+                    <p>{content}</p>
+                </div>
+            """, unsafe_allow_html=True)
+
+
+
 
     # 1. Ensure skills_map is available
     # Note: Ensure extract_demographic_metrics is returning keys that exist in your df
@@ -876,8 +806,6 @@ with tab_deep_dive:
         col_matrix, col_matrics_comments = st.columns([3,1])
         with col_matrix: 
         
-            st.markdown("_Select an intersection layer to map variance density across all 5 framework dimensions at once. Heatmap works across all 27 EU member states._")
-
             deep_demo_choice = st.selectbox(
                 "Select Demographic Stratification Layer:",
                 options=["Age Cohorts", "Education Levels", "Urbanization Levels"],
@@ -922,20 +850,34 @@ with tab_deep_dive:
                     y=df_heat_pivot.index,
                     color_continuous_scale=styles.EU_CORNFLOWER,
                     text_auto='.1f',
-                    height=450
+                    height=600
                 )
 
                 fig_heat.update_layout(
                     xaxis_title=None,
                     yaxis_title=None,
-                    margin=dict(t=10, b=20, l=10, r=10)
+                    margin=dict(t=10, b=20, l=10, r=10),
+                    font=dict(size=14),
+                    coloraxis_colorbar=dict(
+                        tickfont=dict(size=12),
+                        title_font=dict(size=14)
+                    ),
+                    yaxis=dict(
+                        tickfont=dict(size=18)
+                    ),
+                    
+                    # Force X-axis (age cohorts) labels to be larger
+                    xaxis=dict(
+                        tickfont=dict(size=18)
+                    )
                 )
+
 
                 st.plotly_chart(fig_heat, use_container_width=True)
 
             else:
                 st.warning("Matching metric matrix blocks could not be constructed for this segment setup.")
-
+        
         with col_matrics_comments:
             st.markdown("##### Key Insights:")
             
