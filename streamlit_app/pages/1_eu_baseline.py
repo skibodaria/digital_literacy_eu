@@ -190,7 +190,10 @@ with tab_baseline:
             annotations=[],
             margin={"r":0, "t":0, "l":0, "b":0},
             paper_bgcolor="rgba(0,0,0,0)", # transparent map box
-            plot_bgcolor="rgba(0,0,0,0)"
+            plot_bgcolor="rgba(0,0,0,0)",
+            coloraxis_colorbar=dict(
+                title="Percent"
+            )
         )
 
         st.plotly_chart(fig, use_container_width=True)
@@ -200,15 +203,24 @@ with tab_baseline:
     # --------------------
     with col_key_insights:
         st.subheader("Key Insights")
+        st.info("Nearly everyone in the European Union is now connected to the digital world and using Internet on daily basis. " \
+            "The number of people with absolutely no digital skills has dropped to a **very low 9%**")
         with st.expander("**The Skills Ceiling Paradox**"):
             st.markdown(
                 """
-                While total digital exclusion is nearly extinct in the EU - with the "No Digital Skills" ceiling bottoming out at 
-                a maximum of just **8.9%** - Europe faces a severe structural stagnation. The baseline average for at least basic digital skills 
+                While total digital exclusion is nearly extinct in the EU – with the "No Digital Skills" ceiling bottoming out at 
+                a maximum of just **8.9%** – Europe faces a severe structural stagnation. The baseline average for at least basic digital skills 
                 hovers at roughly 61% (combining basic and above-basic levels), leaving a massive 20-percentage-point deficit below 
                 the official 2030 Digital Decade target of 80%. 
                 The empirical reality is that the problem is no longer digital connection and access to the Internet, but a skills quality.
             """)
+        
+        st.warning("""
+            The digital world is now a part of our daily lives, from how we work and play to how we manage our affairs.
+            Despite this, digital tasks can still be challenging for many people.
+                   In fact, up to 70% of people still report difficulties when using digital tools for these everyday needs.
+            """)
+
         with st.expander("**Access vs. Execution**"):
             st.markdown(
                 """
@@ -218,6 +230,10 @@ with tab_baseline:
                 AI usage sits at a **36.7%** average but shows a high variance between a minimum of **17.5%** and a maximum of **48.8%**,
                 serving as the active indicator for regional digital development.
             """)
+        
+        st.info("""Interacting with government services online – like filing taxes or requesting
+                benefits – varies widely across countries. While some of these differences are due to laws or local institutions,
+                a person’s digital skills play a huge role.""")
         with st.expander("**Institutional Fragmentation**"):
             st.markdown(
                 """
@@ -284,9 +300,9 @@ with tab_baseline:
 # ==============================================================================
 with tab_clusters:
     st.header("European Archetypes: Data-Driven Country Profiles")
-    st.info("""
+    st.captions("""
         This workspace applies an unsupervised machine learning algorithm (**K-Means Clustering**) to group EU member states 
-        not by geographic borders, but by structural intersections of **Digital Literacy, e-Gov Infrastructure Adoption**, and **Systemic Institutional Trust**.
+        not by geographic borders, but by structural intersections of **Digital Literacy, e-Gov Infrastructure Adoption**, and **Systemic Institutional Trust**
     """)
 
     # --------------------------------------------------------------------------
@@ -424,7 +440,7 @@ with tab_clusters:
                         # Render the beautiful, standalone colorful country card using standard markdown
                         card_html = f"""
                         <div style="background-color: {bg_color}; border-radius: 12px; padding: 16px; margin-top: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-                            <b style="font-size: 0.95rem; color: {text_color}; text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 8px;">🎯 {cluster_names[cl_idx]}</b>
+                            <b style="font-size: 0.95rem; color: {text_color}; text-transform: uppercase; letter-spacing: 0.3px; display: block; margin-bottom: 8px;"> {cluster_names[cl_idx]}</b>
                             <span style="font-size: 0.85rem; font-weight: 500; color: {text_color}; line-height: 1.4;">{countries_str}</span>
                         </div>
                         """
@@ -442,10 +458,10 @@ with tab_clusters:
             # LAYOUT SECTION 3: CLUSTER PROFILES (MATHEMATICAL VERIFICATION)
             # ==============================================================================
             st.write("---")
-            with st.expander("View Cluster Empirical Profiles (Feature Averages Matrix)"):
-                st.markdown("""
+            with st.expander("Cluster Empirical Profiles (Feature Averages Matrix)"):
+                st.caption("""
                     This verification matrix displays the raw mean percentages for each feature across the four clusters. 
-                    The color gradient highlights where the highest concentration (`Deep Blue`) or structural deficits (`Light Blue`) sit for each archetype.
+                    The color gradient highlights where the highest levels (`Deep Blue`) or deficits (`Light Blue`) are for each archetype.
                 """)
 
                 # cluster avges:
@@ -483,13 +499,12 @@ with tab_clusters:
             with st.expander("Methodology Note: Unsupervised Machine Learning Pipeline Specifications"):
                 st.markdown("""
                     **Model Implementation Blueprint:**
-                    1. **Feature Engineering & Dimensional Selection:** The analysis isolates exactly 10 multi-domain dimensions per country, spanning Eurostat capabilities (skill levels, authentication barriers, transactional usage) and Eurobarometer sentiment markers (institutional trust tracks).
+                    1. **Feature Engineering & Dimensional Selection:** The analysis isolates 10 multi-domain dimensions per country, merging Eurostat data (sigital skills levels, E-Governance/eID usage barriers, Internet usage) 
+                        and Eurobarometer sentiment markers (institutional trust metrics).
                     2. **Normalization Protocol:** Because percentage indicators and trust indexes operate on different scale boundaries, all parameters undergo **Standardization** ($Z$-score scaling) via standard scalar mapping:
                        $$Z = \\frac{x - \\mu}{\\sigma}$$
                        This guarantees that high-magnitude metrics don't bias cluster distance measurements.
-                    3. **Hyperparameter Selection ($K$):** The partition configuration ($K=4$) was chosen via the **Elbow Method** (minimizing Within-Cluster Sum of Squares / Inertia) paired with Silhouette analysis maximization across testing ranges.
-                    4. **Distance Optimization:** Optimization is performed iteratively using the standard **Euclidean Distance** vector cost formulation:
-                       $$d(p, q) = \\sqrt{\\sum_{i=1}^{n} (q_i - p_i)^2}$$
+                    3. **Number of Clusters ($K$):** The partition configuration ($K=4$) was chosen via the **Elbow Method** (minimizing Within-Cluster Sum of Squares / Inertia).
                 """)
 
 st.warning(

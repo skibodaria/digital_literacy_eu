@@ -95,7 +95,7 @@ DIMENSIONS = {
 # TAB 1: USAGE & ENGAGEMENT FRAMEWORK
 # ==============================================================================
 with tab_usage:
-    col_map_tab1, col_key_insights_tab1 = st.columns([3,2])
+    col_map_tab1, col_key_insights_tab1 = st.columns([4,2])
 
     with col_map_tab1:
         # --- MAP INSERTION (USAGE) ---
@@ -128,7 +128,7 @@ with tab_usage:
                 hover_data=[chosen_indicator_code], 
                 color_continuous_scale=styles.EU_CORNFLOWER,
                 title=None,
-                height=600
+                height=700
             )
             fig.update_traces(hovertemplate="<b>%{hovertext}</b><br><br>Value: %{z:.2f}%<extra></extra>")
             fig.update_geos(
@@ -136,7 +136,13 @@ with tab_usage:
                 visible=False, showframe=False, showcoastlines=True, coastlinecolor="LightGray",
                 resolution=50, bgcolor="rgba(0,0,0,0)"                 
             )
-            fig.update_layout(margin={"r":0, "t":0, "l":0, "b":0}, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)")
+            fig.update_layout(
+                margin={"r":0, "t":0, "l":0, "b":0}, 
+                paper_bgcolor="rgba(0,0,0,0)", 
+                plot_bgcolor="rgba(0,0,0,0)", 
+                coloraxis_colorbar=dict(
+                    title="Percent"
+                ))
             st.plotly_chart(fig, use_container_width=True)
         else:
             st.warning("No data columns located for this indicator setup.")

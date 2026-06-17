@@ -149,7 +149,7 @@ with tab_overview:
     # --------------------------------------------------------------------------
     # TWO COLUMN LAYOUT: MAP (LEFT) & TEXT EXPLANATION (RIGHT)
     # --------------------------------------------------------------------------
-    col_map, col_text = st.columns([3, 1])
+    col_map, col_text = st.columns([4, 2])
 
     with col_map:
         
@@ -195,7 +195,7 @@ with tab_overview:
         
         fig.update_layout(
             margin={"r":0, "t":10, "l":0, "b":0},
-            coloraxis_colorbar=dict(title="% of Pop")
+            coloraxis_colorbar=dict(title="Percent")
         )
         
         st.plotly_chart(fig, use_container_width=True)        
@@ -210,9 +210,19 @@ with tab_overview:
         )
         with st.container():
             st.markdown("### Key Insights")
-            st.warning("**Skills Polarization:** \nThe gap between high-literacy populations and the 'digital tail' remains stagnant: Basic access is not solving skill disparities.")
-            st.info("**Velocity Threshold:** \nThere is linear growth, not the exponential shift required to hit the 2030 EU targets: Need for accelerated upskilling policies.")
-            st.success("**Infrastructure vs. Literacy:** \nConnectivity is high, but functional literacy is lagging. Digital tools and access are present, but the digital literacy is falling behind.")
+            st.warning("""
+                **Persistent Polarization**: A significant gap remains between those with advanced digital literacy and those left in the 
+                "digital tail," proving that basic access alone cannot solve these deep-seated disparities
+                       """)
+
+            st.info("""
+                **Growth Mismatch**: Digital adoption is growing, but it is moving at a steady. To meet the EU’s 2030 targets the EU countries need
+                to shift to targeting and direct upskilling policies""")
+
+            st.warning("""
+                **Quality over Connectivity**: Having the tools and the connection is no longer the bottleneck; 
+                the true challenge is to overcome the growing distance between hardware access and actual digital competence.
+                """)
 
         with st.expander("**What Is Being Measured?**"):
             st.markdown(
@@ -561,7 +571,21 @@ with col_explain:
 
 with tab_demog:
     st.header("Socio-Demographic Literacy Layers")
+
+    col_key1, col_key2, col_key3, col_key4, col_key5 = st.columns(5)
+    with col_key1:
+        st.markdown("**The Age Gap**: People aged 65 and over remain the most vulnerable group (highest concentration of those lacking the foundational skills)")
+    with col_key2:
+        st.markdown("**The Power of Education**: It is clear that formal education is a primary driver of digital literacy")
+    with col_key3: 
+        st.markdown("**The Gender Perspective**: Gender gap can be proven in advanced digital usage, but basic entry-level knowledge remains surprisingly balanced")
+    with col_key4:
+        st.markdown("**Urban vs. Rural Divide**: Living in a major city often means easier access to digital support; those in rural communities face much higher rates of digital exclusion")
+    with col_key5:
+        st.markdown("**Research: Next Step**: There is not much of a surprise to see these inequalities reproduced in the digital sphere. More insights can be found where these factors overlap")
     
+    st.write('---')
+
     # 1. Ensure skills_map is available
     # Note: Ensure extract_demographic_metrics is returning keys that exist in your df
     skills_map = funcs.extract_demographic_metrics(df_skills)
@@ -619,7 +643,7 @@ with tab_demog:
             df_melted_b["Demographic Slice"] = df_melted_b["Demographic Slice"].str.lower().map(suffix_to_label_b)
             
             # 6. Plotting
-            clean_plot_title_b = skills_labels.get(selected_metric_b, selected_metric_b.upper())
+            #clean_plot_title_b = skills_labels.get(selected_metric_b.lower(), selected_metric_b.upper()) 
 
             fig_box_b = px.box(
                 df_melted_b, 
@@ -628,7 +652,7 @@ with tab_demog:
                 color="Demographic Slice",
                 points="all", 
                 hover_data=[country_col],
-                title=f"Distribution Dispersal Matrix: {clean_plot_title_b}"
+                title=""
             )
             fig_box_b.update_layout(height=400, showlegend=False, margin={"t":40, "b":40})
             st.plotly_chart(fig_box_b, use_container_width=True)
@@ -720,10 +744,11 @@ with tab_demog:
 # --- TAB 3: SKILL METRIC DEEP DIVE ---
 # ==============================================================================
 with tab_deep_dive:
-    st.header("Strategic Competence Dimension Deep Dive")
+    st.header("Digital Skills Deep Dive | Cross-Dimensional Fingerprint")
     st.caption("""
-        This module decomposes the overall Digital Skills Indicator into its **five structural foundational vectors** defined by the European Commission's DigComp Framework. Rather than focusing on a single metric, 
-        this workspace visualizes comparative structural footprints and pinpoints exactly where socio-demographic disparities live.
+        This section breaks down digital skills into the five core areas defined by the European Commission. 
+        Instead of just showing one general score, this tool lets you compare how different groups of people perform in each area 
+        to see exactly where the biggest gaps are.
     """)
 
     # --------------------------------------------------------------------------
@@ -751,13 +776,9 @@ with tab_deep_dive:
             'i_dsk2_ps_bab': 'Technical Problem Solving'
         }
 
-        st.write("---")
-
         # ==============================================================================
         # COMPONENT 1: COUNTRY GEOGRAPHIC SIGNATURE FINGERPRINT (Radar Map Matrix)
         # ==============================================================================
-        st.subheader("Cross-Dimension Competence Fingerprint")
-        st.markdown("_Compare a country's baseline performance across all five capability pillars simultaneously._")
 
         # one country to take a closer look:
         fingerprint_country = st.selectbox(
@@ -827,12 +848,13 @@ with tab_deep_dive:
             with col_radar:
                 st.plotly_chart(fig_radar, use_container_width=True)
             with col_radar_desc:
-                st.markdown(f"### {fingerprint_country} Structural Balance Sheet")
-                st.markdown("""
-                    **How to read this chart:**
-                    * A perfectly symmetrical web indicate well-rounded national educational strategies.
-                    * Sharp peaks point out targeted national specializations, while inward indents signal strategic bottlenecks.
-                """)
+                st.markdown(f"### {fingerprint_country} Digital Skills Balance Sheet")
+                with st.expander("**How to read this chart:**", expanded=True):
+                    st.markdown("""
+                        * A perfectly symmetrical web indicate well-rounded national educational and "digital-skills-promotional" strategies
+                        * Sharp peaks point out targeted national specializations and "wow" moments
+                        * Inward sharp "gaps" signal strategic bottlenecks and problems
+                    """)
                 
                 # dynamic key insights:
                 df_radar['Diff'] = df_radar[f"{fingerprint_country} (%)"] - df_radar['EU Average (%)']
@@ -915,7 +937,7 @@ with tab_deep_dive:
                 st.warning("Matching metric matrix blocks could not be constructed for this segment setup.")
 
         with col_matrics_comments:
-            st.markdown("##### Key Insights: Matrix")
+            st.markdown("##### Key Insights:")
             
             max_val = df_heat["Mean Proficiency (%)"].max()
             min_val = df_heat["Mean Proficiency (%)"].min()
@@ -923,10 +945,10 @@ with tab_deep_dive:
             bot_seg = df_heat.loc[df_heat["Mean Proficiency (%)"].idxmin()]
             
             st.markdown(f"""
-                * **Peak Adoption Concentration:** Maximum proficiency is reached inside the **{top_seg['Socio-Demographic Group']}** subgroup evaluating **{top_seg['Core Dimension']}** at **{max_val}%**.
-                * **Core Exclusion Point:** Structural friction is concentrated heaviest in the **{bot_seg['Socio-Demographic Group']}** cohort assessing **{bot_seg['Core Dimension']}**, dropping to **{min_val}%**.
-                * **Horizontal Line Check:** Scan the heatmap horizontally. The colors transition rapidly from dark to light, it proves that **{deep_demo_choice}** exerts a dominant leverage force on digital integration regardless of the specific skill domain.
+                * **Peak Adoption Concentration:** Maximum digital proficiency is reached inside the **{top_seg['Socio-Demographic Group']}** subgroup evaluating **{top_seg['Core Dimension']}** at **{max_val}%**.
+                * **Core Exclusion Point:** Structural friction is concentrated mainly in the **{bot_seg['Socio-Demographic Group']}** cohort assessing **{bot_seg['Core Dimension']}**, dropping to **{min_val}%**.
             """)
+            st.info(f"**Horizontal Line Check:** Scan the heatmap horizontally. The colors transition rapidly from dark to light, it shows that **{deep_demo_choice}** has the most powerful influence on digital skill levels, regardless of the specific type of skill being measured.")
 
 
 

@@ -124,7 +124,7 @@ with tab_overview:
         
     st.write("---")
 
-    col_skills_map, col_skills_text = st.columns([3, 1])
+    col_skills_map, col_skills_text = st.columns([4, 2])
 
     with col_skills_map:
         st.markdown("### Geographic Distribution")
@@ -172,7 +172,8 @@ with tab_overview:
         
         fig.update_layout(
             margin={"r":0, "t":10, "l":0, "b":0},
-            coloraxis_colorbar=dict(title="% of Pop")
+            coloraxis_colorbar=dict(title="Percent"),
+
         )
         st.plotly_chart(fig, use_container_width=True)        
         
