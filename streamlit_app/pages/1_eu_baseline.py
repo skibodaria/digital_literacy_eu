@@ -22,10 +22,8 @@ except Exception as e:
 
 # --- HEADER & PRESENTATION CONTEXT ---
 st.title("🇪🇺 Overview: Digital Skills, Internet Usage, & E-Governance")
-st.markdown("""
-    **Graduation Capstone Project** | An analysis of 27 EU Member States utilizing Eurostat & Eurobarometer data.\n
-    This application investigates how structural digital baselines condition human trust and behavioral outcomes across Europe.
-""")
+st.caption("""**Graduation Capstone Project** | An analysis of 27 EU Member States utilizing Eurostat & Eurobarometer data | 
+           This application investigates how structural digital baselines condition human trust and behavioral outcomes across Europe""")
 
 # --- SIDEBAR GLOBAL FILTERS ---
 st.sidebar.header("Geo Filter")
@@ -208,8 +206,8 @@ with tab_baseline:
         with st.expander("**The Skills Ceiling Paradox**"):
             st.markdown(
                 """
-                While total digital exclusion is nearly extinct in the EU – with the "No Digital Skills" ceiling bottoming out at 
-                a maximum of just **8.9%** – Europe faces a severe structural stagnation. The baseline average for at least basic digital skills 
+                While total digital exclusion is nearly extinct in the EU — with the "No Digital Skills" ceiling bottoming out at 
+                a maximum of just **8.9%** — Europe faces a severe structural stagnation. The baseline average for at least basic digital skills 
                 hovers at roughly 61% (combining basic and above-basic levels), leaving a massive 20-percentage-point deficit below 
                 the official 2030 Digital Decade target of 80%. 
                 The empirical reality is that the problem is no longer digital connection and access to the Internet, but a skills quality.
@@ -231,8 +229,8 @@ with tab_baseline:
                 serving as the active indicator for regional digital development.
             """)
         
-        st.info("""Interacting with government services online – like filing taxes or requesting
-                benefits – varies widely across countries. While some of these differences are due to laws or local institutions,
+        st.info("""Interacting with government services online (filing taxes or requesting
+                benefits) varies widely across countries. While some of these differences are due to laws or local institutions,
                 a person’s digital skills play a huge role""")
         with st.expander("**Institutional Fragmentation**"):
             st.markdown(
@@ -509,7 +507,7 @@ with tab_clusters:
 
 st.warning(
     """
-    **Strange indicators behavior**: Two indicators`i_imt12` (Individuals who used Internet more than a year ago or never) and `i_iux` (Individuals who 
+    **Strange indicators behavior**: Two indicators `I_IMT12` (Individuals who used Internet more than a year ago or never) and `I_IUX` (Individuals who 
     have never used Internet)) behave weirdly for Denmark. For this table, they are taken from the year 2024 instead of 2025. In original tables both
     marked as `:` for 2025, meaning "not available or missing". The main reason for it is that in Denmark in 2025 **99.7\\%** of population
     used Internet.

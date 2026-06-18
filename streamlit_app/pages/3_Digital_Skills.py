@@ -15,7 +15,7 @@ st.set_page_config(layout="wide")
 
 st.markdown("""
             <style>
-            /* Define the structure for your solid color custom Insight Card */
+            /* Define the structure for solid color custom Insight Card */
             .insight-card {
                 background-color: #007792;          /* Solid dark teal background block */
                 border: 1px solid #007792;          /* Matching border color to make it flat */
@@ -26,7 +26,7 @@ st.markdown("""
                 min-height: 280px;                  /* Keeps cards uniformly sized in the row */
             }
             
-            /* High-contrast typography inside your solid dark cards */
+            /* High-contrast typography inside solid dark cards */
             .insight-card h4 {
                 color: #FFFFFF !important;          /* Crisp white title headers */
                 font-weight: 700 !important;
@@ -64,7 +64,7 @@ st.markdown("""
         """, unsafe_allow_html=True)
 
 # ==============================================================================
-# DATA LOADING (Executed once and cached via your database.py)
+# DATA LOADING
 # ==============================================================================
 try:
     df_skills, skills_labels = funcs.load_tab_data("stg_dig_skills_demog", "mart_dig_skills_map")
@@ -145,7 +145,7 @@ with tab_overview:
 
     st.markdown("""
         <style>
-        /* Define the structure for your custom metric card */
+        /* Define the structure for custom metric card */
         .kpi-card {
             background-color: #41748d;       /* Darker teal card background */
             border: 1px solid #4A857A;       /* Crisp, subtle border */
@@ -339,7 +339,7 @@ with tab_overview:
                 df_eu_avg['reporting_year'], df_eu_avg['indicator_value']
             )
             
-            # Append 2030 to our timeline array to plot the extended trendline
+            # append 2030 to the timeline array to plot the extended trendline
             full_years = np.append(df_eu_avg['reporting_year'].values, [2030])
             
             df_proj = pd.DataFrame({
@@ -444,10 +444,10 @@ with tab_overview:
 
             st.plotly_chart(fig_line, use_container_width=True)
 
-        # 1. Ensure your data is sorted
+    # ensure data is sorted
     df_eu_avg = df_eu_avg.sort_values('reporting_year')
 
-    # 2. Get the baseline values
+    # get the baseline values
     year_min = int(df_eu_avg['reporting_year'].min())
     year_max = int(df_eu_avg['reporting_year'].max())
     val_min = df_eu_avg[df_eu_avg['reporting_year'] == year_min]['indicator_value'].values[0]
@@ -458,7 +458,7 @@ with tab_overview:
         df_eu_avg['reporting_year'], df_eu_avg['indicator_value']
     )
 
-    # 4. Define the variables for the explanation
+    # calculate the forecasted numbers:
     annual_growth = slope
     projected_2030 = (slope * 2030) + intercept
     structural_deficit = 80.0 - projected_2030
@@ -466,20 +466,19 @@ with tab_overview:
 with col_explain:
     st.subheader("Is the EU Going to Meet the 2030 Goal?")
 
-    with st.expander("Methodology & Limitations Notice"):
+    with st.expander("Methodology & Limitations Comments"):
         st.markdown("""
-            To build a 10-year outlook, we combined older Eurostat data (2015–2019) with updated metrics (2021–2025). 
-            We used **Linear Regression (OLS)** to determine the average annual growth rate. This mathematical approach 
+            To build a 10-year outlook, I combined older Eurostat data (2015–2019) with updated metrics (2021–2025). 
+            I used **Linear Regression (OLS)** to determine the average annual growth rate. This mathematical approach 
             focuses on the long-term historical trend rather than specific yearly ups or downs
         """)
     
     st.info(
-        "Important Note: This is a mathematical projection, not a formal prediction. A true forecast would "
+        "**Important Note**: This is a mathematical projection, not a formal prediction. A true forecast would "
         "also need to account for future government investment, digital policy changes, and specific "
         "national training initiatives"
     )
 
-    # Narrative output using your specific variables
     st.markdown(f"""
         **Key Findings**
         * **Historical Growth:** Between 2015 and 2025, the percentage of the EU population with at least basic digital skills grew from **{val_min:.1f}%** to **{val_max:.1f}%**.
@@ -494,8 +493,10 @@ with col_explain:
 # ==============================================================================
 
 with tab_demog:
+    st.header("Digital Skills and Social Groups | Possible Exclusion Patterns")
+
     cards = [
-            ("The Age Gap Persists", "People aged 65 and over remain our most vulnerable group, facing the highest barriers to digital inclusion"),
+            ("The Age Gap Persists", "People aged 65 and over remain the most vulnerable group, facing the highest barriers to digital inclusion"),
             ("The Power of Education", "Education is a primary driver of digital literacy"),
             ("The Gender Perspective", "The gap exists in advanced usage, basic entry-level knowledge is balanced"),
             ("Urban vs. Rural Divide", "Geography creates a significant barrier: rural communities often lack the same level of digital support as in cities"),
@@ -513,16 +514,15 @@ with tab_demog:
                 </div>
             """, unsafe_allow_html=True)
 
-
-
-
-    # 1. Ensure skills_map is available
-    # Note: Ensure extract_demographic_metrics is returning keys that exist in your df
+    # ensure skills_map is available + ensure extract_demographic_metrics is returning keys that exist in  df
     skills_map = funcs.extract_demographic_metrics(df_skills)
     
-    # ADJUSTED: Ensure this matches your specific skill metric naming convention
-    # If 'education' isn't the right key for skills, check your funcs.extract output
+    # ensure this matches specific skill metric naming convention
+    # if 'education' isn't the right key for skills, check other funcs.extract output
     skills_base_metrics = [m for m in skills_map.get("education", {}).get("base_metrics", [])]
+
+    st.write('---')
+    st.header("Dynamic Boxplot Lab")
     
     if skills_base_metrics:
         b_col1, b_col2 = st.columns(2)
@@ -532,7 +532,7 @@ with tab_demog:
     
                 if full_key:
                     raw_label = skills_labels[full_key]
-                    # 2. Extract only the part before the first '('
+                    # extract only the part before the first '('
                     # "Digital Skills: Above Basic (% of individuals) - ..." -> "Digital Skills: Above Basic "
                     clean_label = raw_label.split('(')[0].strip()
                     return clean_label
@@ -546,18 +546,24 @@ with tab_demog:
                 key="t2_boxplot_metric_dropdown"
             )
         with b_col2:
-            selected_dim_b = st.selectbox("Select Demographic Dimension Breakout", options=list(DIMENSIONS.keys()), key="barr_dim")
-            
+            dim_options = list(DIMENSIONS.keys())
+            selected_dim_b = st.selectbox(
+                "Select Demographic Dimension Breakout", 
+                options=dim_options, 
+                key="barr_dim",
+                index=dim_options.index("Age Cohorts") # opens the Age Cohorts box plot automatically!
+                )
+
         dim_cfg_b = DIMENSIONS[selected_dim_b]
         
-        # 2. Build target columns based on selected_metric_b + suffixes
+        # build target columns based on selected_metric_b + suffixes
         target_cols_b = [f"{selected_metric_b}{sfx}" for sfx in dim_cfg_b["suffixes"]]
         
-        # 3. Robust lookup: find columns that exist in df_skills (case-insensitive)
+        # find columns that exist in df_skills (case-insensitive)
         df_cols_lower = [c.lower() for c in df_skills.columns]
         real_cols_b = [c for c in df_skills.columns if c.lower() in [tc.lower() for tc in target_cols_b]]
         
-        # Verify we found all required columns
+        # verify that all columns are there:
         if len(real_cols_b) == len(target_cols_b):
             # 4. Melt
             df_melted_b = df_skills.melt(
@@ -567,12 +573,11 @@ with tab_demog:
                 value_name="Percentage"
             )
             
-            # 5. Map column names to clean labels from DIMENSIONS
-            # Ensure the order of real_cols_b corresponds to dim_cfg_b["labels"]
+            # map column names to clean labels from DIMENSIONS
+            # ensure the order of real_cols_b corresponds to dim_cfg_b["labels"]
             suffix_to_label_b = dict(zip([rc.lower() for rc in real_cols_b], dim_cfg_b["labels"]))
             df_melted_b["Demographic Slice"] = df_melted_b["Demographic Slice"].str.lower().map(suffix_to_label_b)
             
-            # 6. Plotting
             #clean_plot_title_b = skills_labels.get(selected_metric_b.lower(), selected_metric_b.upper()) 
 
             fig_box_b = px.box(
@@ -588,8 +593,8 @@ with tab_demog:
             st.plotly_chart(fig_box_b, use_container_width=True)
         else:
             st.caption(f"Missing data: Found {len(real_cols_b)}/{len(target_cols_b)} expected columns for this metric.")
-            
-    st.write("---")
+
+    funcs.read_boxplot()       
 
     # ========================================================
     # STATISTICAL TESTS
@@ -682,10 +687,10 @@ with tab_deep_dive:
     """)
 
     # --------------------------------------------------------------------------
-    # 0. DATABASE DATA EXTRACTION & CONFIGURATION
+    # DATABASE DATA EXTRACTION & CONFIGURATION
     # --------------------------------------------------------------------------
     try:
-        # Load the newly created dbt mart table and its metadata indicators
+        # load the newly created dbt mart table and its metadata indicators
         df_deep, deep_labels = funcs.load_tab_data("stg_skills_deep_dive", "mart_indicators")
     except Exception as e:
         st.error(f"Failed to extract deep dive dimension data: {e}")
@@ -694,10 +699,10 @@ with tab_deep_dive:
     if df_deep.empty:
         st.warning("Deep Dive data asset pipeline empty. Verify your 'stg_skills_deep_dive' table status.")
     else:
-        # Filter deep dive frame down to the user's active sidebar geographic choices
+        # filter deep dive frame down to the user's active sidebar geographic choices
         df_filtered_deep = df_deep[df_deep['clean_country_name'].isin(selected_countries)]
 
-        # Human-readable mapping dictionary for our 5 Core Framework Dimension prefixes
+        # human-readable mapping dictionary for the 5 Core Framework Dimension prefixes
         DIMENSION_MAP = {
             'i_dsk2_il_bab': 'Information & Data Literacy',
             'i_dsk2_cc_bab': 'Communication & Collaboration',
@@ -710,11 +715,14 @@ with tab_deep_dive:
         # COMPONENT 1: COUNTRY GEOGRAPHIC SIGNATURE FINGERPRINT (Radar Map Matrix)
         # ==============================================================================
 
-        # one country to take a closer look:
+        # one country to take a closer look -- I want Romania to be a default:
+        countries = sorted(df_filtered_deep['clean_country_name'].unique())
+        default_index = countries.index("Romania") if "Romania" in countries else 0
+
         fingerprint_country = st.selectbox(
             "Select Target Country for Fingerprint Analysis:",
-            options=sorted(df_filtered_deep['clean_country_name'].unique()),
-            index=0
+            options=countries,
+            index=default_index
         )
 
         df_country_fingerprint = df_filtered_deep[df_filtered_deep['clean_country_name'] == fingerprint_country]
@@ -802,6 +810,8 @@ with tab_deep_dive:
         # COMPONENT 2: INTERACTIVE DISPARITY GRID MATRIX (Heatmap View)
         # ==============================================================================
         st.subheader("Macro Socio-Demographic Disparity Matrix")
+        st.caption("This matrix is _not_ sensitive to the country selection tool: it represents the digital skills components" \
+        "vs demographic dimensions for **all** countries in the dataset")
 
         col_matrix, col_matrics_comments = st.columns([3,1])
         with col_matrix: 
@@ -866,12 +876,11 @@ with tab_deep_dive:
                         tickfont=dict(size=18)
                     ),
                     
-                    # Force X-axis (age cohorts) labels to be larger
+                    # force X-axis (age cohorts) labels to be larger
                     xaxis=dict(
                         tickfont=dict(size=18)
                     )
                 )
-
 
                 st.plotly_chart(fig_heat, use_container_width=True)
 

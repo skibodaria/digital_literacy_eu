@@ -255,7 +255,7 @@ with tab_demographics:
                 st.dataframe(df_urban_res, column_config={"Max Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"), "P-Value": st.column_config.NumberColumn(format="%.4f")}, hide_index=True, use_container_width=True)
 
     with col_insights_right:
-        st.subheader("Keu Insights")
+        st.markdown("##### Key Insights")
         with st.expander("**1. Frontier Tech Skews Men and Urban Hubs**"):
             st.write("""
                 Advanced digital tasks show compounding advantages. Men outpace women in emerging AI adoption by 3.5 points, 

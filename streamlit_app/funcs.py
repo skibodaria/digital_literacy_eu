@@ -336,3 +336,38 @@ def add_authorship_footer():
         unsafe_allow_html=True
     )
 
+def read_boxplot():
+    with st.expander("**How to Read Boxplots**"):
+        st.markdown(
+            """
+            * **The Middle Line**: The line inside the box represents the _median_ (the exact middle value of the data). 
+            Half the data is above this line, and half is below.
+            * **The Box**: The box itself represents the middle **50\\%** of the data (the "_interquartile range_"). 
+            It shows where the bulk of the information is clustered.
+            * **The "Whiskers"**: The lines extending from the box show the _range_ of the rest of the data. 
+            They help spot the typical spread before hitting extreme values.
+            * **The Dots**: Any individual dots outside the whiskers are _outliers_. 
+            These are data points that are unusually high or low compared to the rest of the group.
+        """)
+
+def read_pearson():
+    with st.expander("How to Understand Pearson Correlation Coefficients ($r$):"):
+        st.markdown(
+            """
+            Here Pearson Coefficients ($r$) compare macro institutional sentiment variables with core E-Government adoption actions.
+            There are **two** important characteristics here:
+            * **Strength** ($r$ value): how tightly the data points on a scatter plot follow the line;
+            * **Significance** ($p$ value): is the correlation a **real** thing, or is it a random coincidence.
+            So, the correlation can be strong but abdolutely not statistically significant.
+
+            What is consifered "strong" for $r$ value:
+            * 0.00 - 0.19 : Very weak
+            * 0.20 - 0.39 : Weak
+            * 0.40 - 0.59 : Moderate
+            * 0.60 - 0.79 : Strong
+            * 0.80 - 1.00 : Very Strong
+
+            What is considered "significant" for $p$ value:
+            * $p < 0.05$: statistically significant (we can't say that something is random)
+            * $p > 0.05$: quite a chance (more than 5%) that what we see is just random.
+        """)

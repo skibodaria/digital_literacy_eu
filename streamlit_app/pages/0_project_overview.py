@@ -10,7 +10,7 @@ st.markdown(
         /* Target the exact inner layout div inside the container block */
         div[data-testid="stVerticalBlockBorder"] > div:first-child {
             background-color: #005f73 !important;  /* Pure white background card */
-            border: 1px solid #005f73 !important;  /* Your primary teal accent color */
+            border: 1px solid #005f73 !important;  /* Primary teal accent color */
             border-radius: 12px !important;        /* Crisply rounded corners */
             padding: 24px !important;               /* Inner breathing room layout */
             box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.05) !important; /* Lifts it above the blue canvas */
@@ -42,7 +42,7 @@ with tab_short:
 
     st.markdown("""
             <style>
-            /* Define the structure for your solid color custom Insight Card */
+            /* Define the structure for solid color custom Insight Card */
             .insight-card {
                 background-color: #007792;          /* Solid dark teal background block */
                 border: 1px solid #007792;          /* Matching border color to make it flat */
@@ -53,7 +53,7 @@ with tab_short:
                 min-height: 390px;                  /* Keeps cards uniformly sized in the row */
             }
             
-            /* High-contrast typography inside your solid dark cards */
+            /* High-contrast typography inside solid dark cards */
             .insight-card h4 {
                 color: #FFFFFF !important;          /* Crisp white title headers */
                 font-weight: 700 !important;
@@ -83,7 +83,7 @@ with tab_short:
         """, unsafe_allow_html=True)
     
     st.header("Project Intro")
-    st.caption("This pages helps to understand the core concepts of the project, its goals and hypotheses, data sources, pipeline. For more information," \
+    st.caption("This page helps to understand the core concepts of the project, its goals and hypotheses, data sources, and pipeline. For more information," \
     "please explore additional tabs.")
 
     st.subheader("What I Wanted to Know: Research Questions")
@@ -153,10 +153,10 @@ with tab_short:
         <style>
             .pipeline-arrow {
                 font-size: 2rem;
-                color: #005f73;          /* Matches your deep brand accent teal */
+                color: #005f73;          /* Matches deep brand accent teal */
                 font-weight: bold;
                 text-align: center;
-                line-height: 120px;       /* Vertically aligns arrow with the center of your cards */
+                line-height: 120px;       /* Vertically aligns arrow with the center of cards */
                 opacity: 0.7;
             }
         </style>
@@ -263,7 +263,7 @@ with tab_overview:
             """
             The analysis is fundamentally benchmarked against the European Commission’s 2030 Digital Decade Strategic Target, 
             which mandates that at least **80\\%** of all EU adults possess basic or above-basic digital skills by the end of the decade. 
-            This metric serves as our foundational baseline, separating structural digital frontrunners from lagging regions facing 
+            This metric serves as the foundational baseline, separating structural digital frontrunners from lagging regions facing 
             localized inequality.
             """)
 
@@ -273,7 +273,7 @@ with tab_overview:
             The dashboard aggregates critical macro-indicators to understand regional status and the most vulnerable demographic groups:
             - **Digital Literacy & Skills**: The levels of digital skills are defined inside [**DigComp Framework**](https://joint-research-centre.ec.europa.eu/projects-and-activities/education-and-training/digital-transformation-education/digital-competence-framework-digcomp_en).
             They change from from `I_DSK2_X` (No skills) up to `I_DSK2_AB` (Above-Basic Digital Skills). This lab also gives access to a deep-dive approach,
-            looking into different type of skills - Data and Information Literacy; Digital Content Creation; Problem Solving; Safety; Communication and Collaboration.
+            looking into different type of skills — Data and Information Literacy; Digital Content Creation; Problem Solving; Safety; Communication and Collaboration.
             - **Internet Usage**: Series of metrics presenting wide range of online activities from `I_IUPDG` (Downloading and playing online games) to `I_IUCPP` (Civic and Political Participation Online).
             Other metrics also include Daily Internet Usage (`I_DAY`) and Adoption of Generative AI Tools (`I_IUAI`).
             - **E-Governance Engagement & eID Usage**: Quantifying direct interaction rates with public authorities (`I_IUGOV1`) and complex digital public services, such as online tax submissions (`I_IGOVTAX2`) or 
@@ -297,7 +297,7 @@ with tab_overview:
         st.markdown(
             """
             To ensure cross-national comparability, the indicators in this workspace are synchronized across fixed temporal baselines:
-            - **Cross-Sectional Baseline (2025):** The vast majority of structural indicators—including eID adoption rates, E-Governance metrics, and all Eurobarometer institutional trust layers—reflect **2025**. 
+            - **Cross-Sectional Baseline (2025):** The vast majority of structural indicators (eID adoption rates, E-Governance metrics, and all Eurobarometer institutional trust layers) reflect **2025**. 
             This provides a contemporary, post-pandemic snapshot of digital statecraft.
             - **"Longitudinal" Digital Skills Data (2021, 2023, 2025):** The **Digital Skills** domain features a dedicated macro time-series layer. 
             Because Eurostat updates these comprehensive literacy frameworks biennially, the workspace tracks these metrics across **2021, 2023, and 2025**, 
@@ -369,8 +369,8 @@ with tab_overview:
         with st.expander("Correlation vs. Causality"):
             st.write("""This analysis establishes **correlations, not causation**. Finding a statistical link between high 
                      eID usage and high institutional trust does not mean that using an eID causes someone to trust their government. 
-                     It is highly likely that confounding variables—such as overall satisfaction with the economy, 
-                     political stability, or pre-existing civic engagement—drive both tech adoption and trust simultaneously.""")
+                     It is highly likely that confounding variables — such as overall satisfaction with the economy, 
+                     political stability, or pre-existing civic engagement — drive both tech adoption and trust simultaneously.""")
         
         with st.expander("Self-Reported Survey Bias"):
             st.write("""Because the Eurobarometer and Eurostat datasets rely on self-reported survey responses, the data is subject 
@@ -631,23 +631,23 @@ with tab_methods:
                 """
                 ##### Multi-Source Extraction & Ingestion Architecture
                 
-                Before any data could enter our transformation pipeline, we designed an acquisition strategy to bridge programmatically open public data registries with complex, survey-based institutional datasets.
+                Before any data could enter the transformation pipeline, I designed an acquisition strategy to bridge programmatically open public data registries with complex, survey-based institutional datasets.
                 
                 ---
 
                 **1. Data Ingestion Pathways**
-                We executed two distinct retrieval methodologies tailored to the infrastructure of our source institutions:
-                * **Programmatic Bulk Extraction (Eurostat):** To capture the comprehensive digital skills timelines and e-governance metrics, we bypassed manual downloads and built an automated extraction script utilizing the `eurostat` Python library. This interacted directly with the Eurostat API to pull raw, high-density bulk database sheets, ensuring programmatic reproducibility and caching optimization.
-                * **Targeted Manual Retrieval (Eurobarometer):** Because Eurobarometer institutional trust matrices are delivered as dense, highly segmented research structures, these files were manually retrieved. This ensured precise cohort isolation before entering our custom ingestion framework.
+                I executed two distinct retrieval methodologies tailored to the infrastructure of the source institutions:
+                * **Programmatic Bulk Extraction (Eurostat):** To capture the comprehensive digital skills timelines and e-governance metrics, I bypassed manual downloads and built an automated extraction script utilizing the `eurostat` Python library. This interacted directly with the Eurostat API to pull raw, high-density bulk database sheets, ensuring programmatic reproducibility and caching optimization.
+                * **Targeted Manual Retrieval (Eurobarometer):** Because Eurobarometer institutional trust matrices are delivered as dense, highly segmented research structures, these files were manually retrieved. This ensured precise cohort isolation before entering the custom ingestion framework.
 
                 **2. Custom Python Pre-Processing & ETL Pipeline**
-                The raw Eurobarometer data contained severe structural irregularities that made it entirely incompatible with database tables. To solve this, we engineered a dedicated Python cleaning script to run complex pre-processing routines:
-                * **Deduplication & Language Pruning:** The raw source files contained parallel French and English string duplications for survey questions. We engineered string filtering logic to completely purge the secondary language copies, standardizing the text layers.
-                * **Normalization of Metrics:** We systematically isolated and removed absolute numbers (raw respondent counts), transforming the metrics exclusively into normalized, cross-nationally comparable percentages.
-                * **Schema & Meta-Label Preservation:** To ensure we did not lose granular structural insights, our script systematically renamed raw, cryptic column headers into clear, legible semantic metrics, while preserving the underlying row-level metadata context for every tracked indicator.
+                The raw Eurobarometer data contained severe structural irregularities that made it entirely incompatible with database tables. To solve this, I engineered a dedicated Python cleaning script to run complex pre-processing routines:
+                * **Deduplication & Language Pruning:** The raw source files contained parallel French and English string duplications for survey questions. I engineered string filtering logic to completely purge the secondary language copies, standardizing the text layers.
+                * **Normalization of Metrics:** I systematically isolated and removed absolute numbers (raw respondent counts), transforming the metrics exclusively into normalized, cross-nationally comparable percentages.
+                * **Schema & Meta-Label Preservation:** To ensure I did not lose granular structural insights, the script systematically renamed raw, cryptic column headers into clear, legible semantic metrics, while preserving the underlying row-level metadata context for every tracked indicator.
 
                 **3. The `dbt Seed` Layer**
-                Once both datasets were clean and structured into optimized, flat `.csv` data files, we loaded them into our localized environment. Using the **`dbt seed`** command, these static, raw historical frameworks were natively compiled and inserted directly into our local database warehouse as version-controlled relations. This established an immutable, repeatable foundation for all downstream analytical models.
+                Once both datasets were clean and structured into optimized, flat `.csv` data files, I loaded them int my localized environment. Using the **`dbt seed`** command, these static, raw historical frameworks were natively compiled and inserted directly into the local database warehouse as version-controlled relations. This established an immutable, repeatable foundation for all downstream analytical models.
                 """
             )
             
@@ -655,65 +655,67 @@ with tab_methods:
             st.markdown(
                 """
                 ##### The dbt Transformation Architecture
-                To handle our high-volume datasets with absolute pipeline integrity, we structured our **dbt (Data Build Tool)** architecture into a tailored, three-tiered data modeling system. This decoupled our heavy architectural restructuring from our research-specific slicing logic.
+                To handle the high-volume datasets with absolute pipeline integrity, I structured the **dbt (Data Build Tool)** architecture into a tailored, three-tiered data modeling system. This decoupled the heavy architectural restructuring from the research-specific slicing logic.
                 
                 ---
 
                 **1. The Preparation Layer (`prep_`)**
-                This layer served as our heavy structural engineering gate, handling data from over 35+ disparate Eurostat tables alongside country metadata:
-                * **The 2-Million-Row Melt Operations:** The raw Eurostat inputs were structurally wide and fragmented. We executed comprehensive melting and reshaping operations to transform the data layout. We unpivoted the separate yearly columns into a single longitudinal `time_period` vector and consolidated all disparate metrics into a unified `indicator` column—generating a massive, normalized core table exceeding 2 million rows.
-                * **Geospatial & Reference Harmonization:** We engineered our core country reference model (`prep_countries`). This layer cleaned country-level strings and established a master lookup map to resolve standard administrative geocode inconsistencies.
+                This layer served as the heavy structural engineering gate, handling data from over 35+ disparate Eurostat tables alongside country metadata:
+                * **The 2-Million-Row Melt Operations:** The raw Eurostat inputs were structurally wide and fragmented. I executed comprehensive melting and reshaping operations to transform the data layout. I unpivoted the separate yearly columns into a single longitudinal `time_period` vector and consolidated all disparate metrics into a unified `indicator` column — generating a massive, normalized core table exceeding 2 million rows.
+                * **Geospatial & Reference Harmonization:** I engineered the core country reference model (`prep_countries`). This layer cleaned country-level strings and established a master lookup map to resolve standard administrative geocode inconsistencies.
 
                 **2. The Staging Layer (`stg_`)**
-                Once the data was normalized into a massive, centralized core matrix, our staging layer acted as a specialized filtering gate to isolate our distinct research components:
-                * **Research Vector Extraction:** Instead of passing the entire 2-million-row table downstream, we built dedicated staging models to extract precise subsets of data tailored to our specific research questions (e.g., isolating Digital Skills metrics independently from E-Governance variables).
-                * **Demographic Slicing & Metric Refinement:** In this layer, we performed targeted data cleaning on the metrics and isolated the granular demographic cross-sections (such as isolating male vs. female performance bands) required for our non-parametric statistical testing.
+                Once the data was normalized into a massive, centralized core matrix, the staging layer acted as a specialized filtering gate to isolate the distinct research components:
+                * **Research Vector Extraction:** Instead of passing the entire 2-million-row table downstream, I built dedicated staging models to extract precise subsets of data tailored to my specific research questions (e.g., isolating Digital Skills metrics independently from E-Governance variables).
+                * **Demographic Slicing & Metric Refinement:** In this layer, I performed targeted data cleaning on the metrics and isolated the granular demographic cross-sections (such as isolating male vs. female performance bands) required for the non-parametric statistical testing.
 
                 **3. The Mart Layer (`mart_`)**
-                Our final modeling layer produces highly optimized, lean tables designed specifically to feed our Streamlit app without runtime computational lag:
-                * **Label Enrichment & ISO Mapping:** This layer joins our clean research vectors with definitive country boundary handles (`plotly_country_code`) and appends readable descriptive text labels to our abstract Eurostat indicator handles.
-                * **EU Baseline Aggregations:** The primary output of this tier is our definitive main metrics table (`mart_eu_baseline`), which provides pre-aggregated, sorted, and spatially mapped values ready for instant rendering on our dashboard maps and statistical modules.
+                The final modeling layer produces highly optimized, lean tables designed specifically to feed my Streamlit app without runtime computational lag:
+                * **Label Enrichment & ISO Mapping:** This layer joins the clean research vectors with definitive country boundary handles (`plotly_country_code`) and appends readable descriptive text labels to the abstract Eurostat indicator handles.
+                * **EU Baseline Aggregations:** The primary output of this tier is the definitive main metrics table (`mart_eu_baseline`), which provides pre-aggregated, sorted, and spatially mapped values ready for instant rendering on my dashboard maps and statistical modules.
             """)
 
         with st.expander("**Phase C | EDA, First Visualizations, & Testing Hypotheses**"):
             st.write("""
                 ##### Exploratory Data Analysis & Statistical Iteration
-                Before building our production application, we utilized Jupyter Notebooks (`.ipynb`) as an agile sandbox environment to perform 
-                Exploratory Data Analysis (EDA), profile our distributions, and validate our initial statistical assumptions. 
+                Before building the application, I utilized Jupyter Notebooks (`.ipynb`) as an agile sandbox environment to perform 
+                Exploratory Data Analysis (EDA), profile the distributions, and validate the initial statistical assumptions. 
                 
                 ---
 
                 **1. Data Profiling & Finding Anomaly Triggers**
-                Our initial EDA uncovered several structural vulnerabilities in the raw ingestion files that required immediate intervention:
-                * **Identifying Missing Vectors:** We mapped out the missing data footprints across countries. This revealed that certain critical historical years were completely absent for specific indicators, which forced us to go back to the pipeline, retrieve entirely new data sheets, and engineer a more resilient data strategy.
-                * **Exposing the Methodology Break:** It was during this exploratory phase that we visualized the sharp drop-off in scores between 2019 and 2021. By digging into the metadata, we caught the Eurostat framework overhaul, allowing us to proactively design the "Framework Bridge" before writing production code.
+                The initial EDA uncovered several structural vulnerabilities in the raw ingestion files that required immediate intervention:
+                * **Identifying Missing Vectors:** I mapped out the missing data footprints across countries. This revealed that certain critical historical 
+                years were completely absent for specific indicators, which forced us to go back to the pipeline, retrieve entirely new data sheets, and engineer a more resilient data strategy.
+                * **Exposing the Methodology Break:** It was during this exploratory phase that I visualized the sharp drop-off in scores between 2019 and 2021. 
+                By digging into the metadata, I caught the Eurostat framework overhaul, allowing us to proactively design the "Framework Bridge" before writing production code.
 
                 **2. The Statistical Evolution**
-                Our statistical architecture underwent an iterative design evolution as we refined our research questions:
-                * **Initial Explorations (Correlations & T-Tests):** We began by mapping basic linear correlations and running standard independent t-tests to compare groups. 
-                * **The Non-Parametric Shift:** Realizing that our survey-based percentage distributions violated the assumption of normality required by parametric tests, we pivoted to more robust methods. We deployed the **Friedman Test** to evaluate multi-year macro trends across the EU blocks, and switched our demographic comparisons to the **Wilcoxon Signed-Rank Test** to accurately handle paired, non-normal cohorts (e.g., female vs. male performance within the same country).
+                The statistical architecture underwent an iterative design evolution as I refined my research questions:
+                * **Initial Explorations (Correlations & T-Tests):** I began by mapping basic linear correlations and running standard independent t-tests to compare groups. 
+                * **The Non-Parametric Shift:** Realizing that the survey-based percentage distributions violated the assumption of normality required by parametric tests, I pivoted to more robust methods. I deployed the **Friedman Test** to evaluate multi-year macro trends across the EU blocks, and switched the demographic comparisons to the **Wilcoxon Signed-Rank Test** to accurately handle paired, non-normal cohorts (e.g., female vs. male performance within the same country).
 
                 **3. Notebook Refactoring & Productionization**
                 Moving from an experimental sandbox to an analytics-ready application required strict code refactoring:
-                * **Code Reuse & Adaptation:** We successfully extracted the working SQL queries, data filtering blocks, and statistical routines 
-                (like the Friedman and Wilcoxon calculations) directly from our `.ipynb` exploratory notebooks and integrated them straight into 
+                * **Code Reuse & Adaptation:** I extracted the working SQL queries, data filtering blocks, and statistical routines 
+                (like the Friedman and Wilcoxon calculations) directly from my `.ipynb` exploratory notebooks and integrated them straight into 
                 the Streamlit application framework to make the dashboard instantly operational.
                 """)
 
         with st.expander("**Phase D | App Layer & Final Presentation**"):
             st.write("""
                 ##### App Delivery, Database Integration, & Version Control
-                The final phase of our lifecycle focused on translating our transformed data models into a secure, interactive, and production-ready web application.
+                The final phase of the lifecycle focused on translating the transformed data models into a secure, interactive, and production-ready web application.
         
                 ---
 
-                * **The Streamlit Frontend:** We engineered an interactive dashboard using **Streamlit**, deploying a multi-panel layout to present our 
+                * **The Streamlit Frontend:** I engineered an interactive dashboard using **Streamlit**, deploying a multi-panel layout to present the 
                 findings cleanly.
                 * **PostgreSQL Infrastructure:** The application does not rely on static flat files; instead, it creates a live 
-                secure connection to the localized **PostgreSQL data warehouse**. Streamlit interacts directly with our dbt-generated mart layer via 
+                secure connection to the localized **PostgreSQL data warehouse**. Streamlit interacts directly with the  dbt-generated mart layer via 
                 SQL queries, ensuring dynamic data retrieval. The PostgreSQL database tables can be updated at any moment.
-                * **Version Control & Lineage:** To guarantee project reproducibility, the entire repository—including our dbt schemas, 
-                SQL transformations, seed datasets, and frontend scripts—is managed under Git version control. This establishes a history of the changes 
+                * **Version Control & Lineage:** To guarantee project reproducibility, the entire repository — including the dbt schemas, 
+                SQL transformations, seed datasets, and frontend scripts — is managed under Git version control. This establishes a history of the changes 
                 and protects the structural integrity of the deployment pipeline.
                 """)
     
@@ -721,22 +723,22 @@ with tab_methods:
         st.markdown("#### Analytical Approaches")
         with st.expander("Friedman Test"):
             st. write(""" 
-                Macro-Level Multi-Year Comparison): We used this non-parametric test to evaluate whether digital 
+                Macro-Level Multi-Year Comparison): I used this non-parametric test to evaluate whether digital 
                 literacy and trust scores shifted significantly across the entire European Union over time. 
                 It treats each country as a block and looks across multiple years to prove if the overall EU trajectory 
                 is changing or stagnant.
             """)
         with st.expander("Wilcoxon Signed-Rank Test"):
             st.write(""" 
-                (Paired): We deployed this non-parametric test to evaluate structural inequalities within countries. 
-            By treating each Member State as its own baseline, we directly compared paired demographic cohorts 
+                (Paired): I deployed this non-parametric test to evaluate structural inequalities within countries. 
+            By treating each Member State as its own baseline, I directly compared paired demographic cohorts 
             (specifically female vs. male digital proficiency scores) to determine if the gender capability gap 
             is statistically significant across the EU.
             """)
         with st.expander("K-Means Clustering"):
             st.write("""
                 (Unsupervised Performance Grouping): Instead of relying on traditional, arbitrary geographic definitions (like "Eastern Europe"), 
-                we put our multi-dimensional indicators (skills, trust, eID friction) into a clustering algorithm. This grouped the Member States 
+                I put the multi-dimensional indicators (skills, trust, eID friction) into a clustering algorithm. This grouped the Member States 
                 into distinct, empirical archetypes based on their actual digital maturity and institutional readiness.
             """)
 
