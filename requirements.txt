@@ -31,3 +31,4 @@ statsmodels
 
 # --- Streamlit ---
 streamlit
+base64
