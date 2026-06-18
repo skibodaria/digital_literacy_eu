@@ -75,14 +75,12 @@ df_filtered_baseline = df_baseline[df_baseline[country_col].isin(selected_countr
 # HEADER SECTION
 # ==============================================================================
 st.title("Internet Usage Analysis Workspace")
-st.markdown("""
+st.caption("""
     This module shifts focus from general literacy levels to real-world behavioral utility. 
-    It tracks how individuals engage with the internet across the EU – ranging from baseline communication 
+    It tracks how individuals engage with the internet across the EU, ranging from baseline communication 
     frequency to advanced interactions like generative AI usage, civic engagement, misinformation exposure, 
-    and encountered usage obstacles.
+    and encountered usage obstacles
     """)
-
-st.write("---")
 
 # ==============================================================================
 # COMPACT TWO-TAB ARCHITECTURE
@@ -121,8 +119,8 @@ with tab_overview:
         st.metric(label="Messaging", value=f"{((df_filtered_usage['i_iuchat1_m_y16_74'].mean().round(1)+df_filtered_usage['i_iuchat1_f_y16_74'].mean().round(1))/2).round(1)}%")
     with kpi6:
         st.metric(label="Encountered Difficulties", value=f"{((df_filtered_usage['i_iups_m_y16_74'].mean().round(1)+df_filtered_usage['i_iups_f_y16_74'].mean().round(1))/2).round(1)}%")
-        
-    st.write("---")
+    
+    st.write('---')
 
     col_skills_map, col_skills_text = st.columns([4, 2])
 
@@ -178,17 +176,17 @@ with tab_overview:
         st.plotly_chart(fig, use_container_width=True)        
         
     with col_skills_text:
-        st.markdown("### Section Context")
+        st.markdown("##### Section Context")
         st.markdown(f"""
             This geographic baseline displays aggregated usage trends across individual member states. 
             Use the radio buttons above to shift the spatial layout between communication frequency, 
-            frontier AI adoption, or friction layers.
+            frontier AI adoption, or friction layers
         """)
 
-        with st.expander("Framework Methodology"):
+        with st.expander("Framework Methodology",expanded=True):
             st.markdown("""
-                * **Data Scope:** Uniform country aggregates across selected valid European states.
-                * **Base Variable Evaluation:** Indicators represent percentages of the population aged 16-74.
+                * **Data Scope:** Uniform country aggregates across selected valid European states
+                * **Base Variable Evaluation:** Indicators represent percentages of the population aged 16-74
             """)
 
 # ==============================================================================
@@ -196,7 +194,7 @@ with tab_overview:
 # ==============================================================================
 with tab_demographics:
     st.header("Comparative Demographic Analysis")
-    st.markdown("""
+    st.caption("""
         Analyze structural variations across the European Union across four principal demographic splits.
         The tables below run static statistical validations (Wilcoxon Signed-Rank and Friedman Chi-Square) 
         across all 27 member states to isolate genuine structural gaps from random variance.
@@ -208,7 +206,7 @@ with tab_demographics:
     with col_tables_left:
         
         # --- 1. Gender Significance Matrix ---
-        with st.expander("Gender Gaps Significance Matrix (Usage)", expanded=True):
+        with st.expander("Gender Gaps Significance Matrix (Usage)", expanded=False):
             paired_gen_columns = []
             for metric in gen_metrics:
                 paired_gen_columns.extend([f"{metric}_f_y16_74", f"{metric}_m_y16_74"])
@@ -228,7 +226,7 @@ with tab_demographics:
             )
 
         # --- 2. Age Cohorts Matrix ---
-        with st.expander("Age Cohorts Variance Matrix (Usage)", expanded=True):
+        with st.expander("Age Cohorts Variance Matrix (Usage)", expanded=False):
             df_age_res = funcs.run_friedman_multigroups(df_usage, age_metrics, ['_y16_19', '_y20_24', '_y25_34', '_y35_44', '_y45_54', '_y55_64', '_y65_74'], ['16-19', '20-24', '25-34', '35-44', '45-54', '55-64', '65-74'], usage_labels)
             if not df_age_res.empty:
                 df_age_res['Indicator'] = df_age_res['Indicator'].apply(clean_metric_label)
@@ -237,7 +235,7 @@ with tab_demographics:
                 st.dataframe(df_age_res, column_config={"Max Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"), "P-Value": st.column_config.NumberColumn(format="%.4f")}, hide_index=True, use_container_width=True)
 
         # --- 3. Education Levels Matrix ---
-        with st.expander("Education Level Variance Matrix (Usage)", expanded=True):
+        with st.expander("Education Level Variance Matrix (Usage)", expanded=False):
             df_edu_res = funcs.run_friedman_multigroups(df_usage, edu_metrics, ['_i0_2', '_i3_4', '_i5_8'], ['Low Edu', 'Medium Edu', 'High Edu'], usage_labels)
             if not df_edu_res.empty:
                 df_edu_res['Indicator'] = df_edu_res['Indicator'].apply(clean_metric_label)
@@ -246,7 +244,7 @@ with tab_demographics:
                 st.dataframe(df_edu_res, column_config={"Max Gap (Points)": st.column_config.NumberColumn(format="%.1f pts"), "P-Value": st.column_config.NumberColumn(format="%.4f")}, hide_index=True, use_container_width=True)
 
         # --- 4. Urbanization Density Matrix ---
-        with st.expander("Urbanization Split Variance Matrix (Usage)", expanded=True):
+        with st.expander("Urbanization Split Variance Matrix (Usage)", expanded=False):
             df_urban_res = funcs.run_friedman_multigroups(df_usage, urban_metrics, ['_ind_deg1', '_ind_deg2', '_ind_deg3'], ['Cities', 'Suburbs', 'Rural'], usage_labels)
             if not df_urban_res.empty:
                 df_urban_res['Indicator'] = df_urban_res['Indicator'].apply(clean_metric_label)
@@ -275,19 +273,14 @@ with tab_demographics:
     st.write("---")
     
     # ------------------ INTERACTIVE COMPONENT VISUALIZATION STUDIO ------------------
-    st.subheader("Demographic Component Lab")
-    # st.caption(funcs.get_dynamic_subheader(df_filtered_usage))
+    st.subheader("Distributions Plotting Lab")   
 
-    # Single selector layout to drive any dimension selection on demand
-    col_sel_dim, col_sel_filter = st.columns([2, 2])
-    
-    with col_sel_dim:
-        selected_dimension = st.selectbox(
-            "Select Demographic Dimension to Chart:",
-            options=["Gender", "Age Cohorts", "Education Levels", "Urbanization Levels"]
-        )
+    selected_dimension = st.selectbox(
+        "Select Demographic Dimension to Chart:",
+        options=["Gender", "Age Cohorts", "Education Levels", "Urbanization Levels"]
+    )
 
-    # Contextually update variables based on chosen selection
+    # contextually update variables based on chosen selection
     if selected_dimension == "Gender":
         active_cols = gen_columns
         active_labels = ['Female', 'Male']
@@ -305,7 +298,7 @@ with tab_demographics:
         active_labels = ['City', 'Town/Suburbs', 'Rural Areas']
         active_color = COLOR_MAPS["urban"]
 
-    # Render unified chart dynamically
+    # render unified chart dynamically
     funcs.render_demographic_chart(
         df_filtered_usage, 
         active_cols, 

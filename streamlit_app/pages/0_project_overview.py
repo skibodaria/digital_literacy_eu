@@ -21,6 +21,8 @@ st.markdown(
 )
 
 st.title("🇪🇺 Digital Literacy, E-Government Usage, Institutional Trust Inequality: Mapping the EU Digital Decade")
+st.caption("""**Graduation Capstone Project** | An analysis of 27 EU Member States utilizing Eurostat & Eurobarometer data | 
+           This application investigates how structural digital baselines condition human trust and behavioral outcomes across Europe""")
 st.markdown(
     """
     Welcome to the EU Digital Baseline Workspace. This interface establishes a 

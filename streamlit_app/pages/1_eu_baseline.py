@@ -10,6 +10,50 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 
 st.set_page_config(layout="wide")
+
+# KPI Row
+st.markdown("""
+        <style>
+        /* Define the structure for your custom metric card */
+        .kpi-card {
+            background-color: #41748d;       /* Darker teal card background */
+            border: 1px solid #4A857A;       /* Crisp, subtle border */
+            border-radius: 8px;              /* Clean rounded corners */
+            padding: 10px 10px;              /* Padding inside the card */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* Soft drop shadow */
+            text-align: center;              /* Center align text metrics */
+            margin-bottom: 2px;             /* Spacing below the rows */
+        }
+        
+        /* Style the small uppercase metric label text */
+        .kpi-label {
+            font-size: 0.85rem !important;
+            font-weight: 600 !important;
+            color: #E2E8F0 !important;       /* Light gray for high contrast on teal */
+            text-transform: uppercase;       /* Professional dashboard aesthetic */
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        
+        /* Style the massive bold metric value text */
+        .kpi-value {
+            font-size: 2rem !important;
+            font-weight: 700 !important;
+            color: #FFFFFF !important;       /* Pristine white values */
+        }
+                
+        /* Smaller text inside the card */
+        .kpi-subtext {
+            font-size: 0.70rem !important;   /* Really small */
+            font-weight: 400 !important;
+            margin-top: 0px !important;
+            color: #E2E8F0 !important;
+            text-transform: uppercase;
+        }
+        </style>
+    """, unsafe_allow_html=True) 
+
+
 # ==========================================
 # DATA LOADING
 # ==========================================
@@ -22,8 +66,6 @@ except Exception as e:
 
 # --- HEADER & PRESENTATION CONTEXT ---
 st.title("🇪🇺 Overview: Digital Skills, Internet Usage, & E-Government")
-st.caption("""**Graduation Capstone Project** | An analysis of 27 EU Member States utilizing Eurostat & Eurobarometer data | 
-           This application investigates how structural digital baselines condition human trust and behavioral outcomes across Europe""")
 
 # --- SIDEBAR GLOBAL FILTERS ---
 st.sidebar.header("Geo Filter")
@@ -53,43 +95,11 @@ with tab_baseline:
     filtered_display_options = {
         proper_name: code 
         for proper_name, code in display_name_to_code.items() 
-        if code in available_columns
+        if code in available_columns 
     }
 
     filtered_display_options = dict(sorted(filtered_display_options.items()))
-    
-    # KPI Row
-    st.markdown("""
-        <style>
-        /* Define the structure for your custom metric card */
-        .kpi-card {
-            background-color: #41748d;       /* Darker teal card background */
-            border: 1px solid #4A857A;       /* Crisp, subtle border */
-            border-radius: 8px;              /* Clean rounded corners */
-            padding: 15px 20px;              /* Padding inside the card */
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05); /* Soft drop shadow */
-            text-align: center;              /* Center align text metrics */
-            margin-bottom: 15px;             /* Spacing below the rows */
-        }
-        
-        /* Style the small uppercase metric label text */
-        .kpi-label {
-            font-size: 0.85rem !important;
-            font-weight: 600 !important;
-            color: #E2E8F0 !important;       /* Light gray for high contrast on teal */
-            text-transform: uppercase;       /* Professional dashboard aesthetic */
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-        }
-        
-        /* Style the massive bold metric value text */
-        .kpi-value {
-            font-size: 2rem !important;
-            font-weight: 700 !important;
-            color: #FFFFFF !important;       /* Pristine white values */
-        }
-        </style>
-    """, unsafe_allow_html=True)
+
 
     col1, col2, col3, col4, col5 = st.columns(5)
 
@@ -98,6 +108,7 @@ with tab_baseline:
             <div class="kpi-card">
                 <div class="kpi-label">Basic+ Digital Skills</div>
                 <div class="kpi-value">{df_filtered['i_dsk2_bab'].mean().round(2)}%</div>
+                <div class="kpi-subtext">min: {df_filtered['i_dsk2_bab'].min().round(2)}%</div> 
             </div>
         """, unsafe_allow_html=True)
 
@@ -106,6 +117,7 @@ with tab_baseline:
             <div class="kpi-card">
                 <div class="kpi-label">EU Tagret by 2030</div>
                 <div class="kpi-value">80%</div>
+                <div class="kpi-subtext">deficit: 18%</div>
             </div>
         """, unsafe_allow_html=True)
 
@@ -114,6 +126,7 @@ with tab_baseline:
             <div class="kpi-card">
                 <div class="kpi-label">Daily Internet Usage</div>
                 <div class="kpi-value">{df_filtered['i_iday'].mean().round(2)}%</div>
+                <div class="kpi-subtext">min: {df_filtered['i_iday'].min().round(2)}%</div>
             </div>
         """, unsafe_allow_html=True)
 
@@ -122,6 +135,7 @@ with tab_baseline:
             <div class="kpi-card">
                 <div class="kpi-label">eID Usage</div>
                 <div class="kpi-value">{df_filtered['i_ieid'].mean().round(2)}%</div>
+                <div class="kpi-subtext">min: {df_filtered['i_ieid'].min().round(2)}%</div>
             </div>
         """, unsafe_allow_html=True)
 
@@ -130,10 +144,9 @@ with tab_baseline:
             <div class="kpi-card">
                 <div class="kpi-label">AI Usage</div>
                 <div class="kpi-value">{df_filtered['i_iuai'].mean().round(2)}%</div>
+                <div class="kpi-subtext">min: {df_filtered['i_iuai'].min().round(2)}%</div>
             </div>
         """, unsafe_allow_html=True)
-    
-    st.markdown("---")
 
     col_map, col_key_insights = st.columns([2,1])
 

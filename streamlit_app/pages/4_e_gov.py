@@ -432,7 +432,7 @@ with tab_barriers:
                 </div>
             """, unsafe_allow_html=True)
 
-    col_map_tab2, col_key_insights_tab2 = st.columns([3,2])
+    col_map_tab2, col_key_insights_tab2 = st.columns([4,2])
 
     
     with col_map_tab2:
@@ -808,7 +808,7 @@ with tab_trust_correlations:
                 color_continuous_scale="RdBu",
                 zmin=-1.0, zmax=1.0,
                 text_auto='.2f',
-                height=800
+                height=900
             )
             fig_corr.update_layout(
                 margin=dict(t=10, b=25, l=10, r=10),
@@ -843,6 +843,7 @@ with tab_trust_correlations:
         # ==============================================================================
         # COMPONENT 2: INTERACTIVE OLS REGRESSION SCATTER MODEL
         # ==============================================================================
+        st.write("---")
         st.subheader("Macro Bivariate Scatter & Ordinary Least Squares (OLS) Model")
         st.markdown("_Pick any two indicators from your matrix above to fit a linear regression line across selected EU states._")
 
@@ -904,7 +905,7 @@ with tab_trust_correlations:
 
 
 # ==============================================================================
-# --- TAB: DIGITAL SKILLS VS. E-GOVERMENT ADOPTION ---
+# --- TAB 4: DIGITAL SKILLS VS. E-GOVERMENT ADOPTION ---
 # ==============================================================================
 with tab_skills_vs_egov:
     st.header("Digital Literacy and E-Government Tools | More Literacy Boosts the Usage?")
@@ -985,14 +986,14 @@ with tab_skills_vs_egov:
                 st.markdown("##### Key Insights")
                 st.warning(
                     """ 
-                    **The Digital Divide Trap**: There is a strong negative correlation (as low as $-0.82$) between lower skill levels ("Limited," "Narrow," and "No Digital Skills") 
+                    **The Digital Divide Trap**: There is a strong negative correlation (as low as **-0.82**) between lower skill levels ("Limited," "Narrow," and "No Digital Skills") 
                     and interacting online with public authorities. This confirms that the EU’s goal of 100\\% service availability will likely fail if it 
-                    does not achieve the target of 80\\% of citizens having "above basic" digital skills. Those with lower skills are effectively **excluded from the digital ecosystem**.
+                    does not achieve the target of 80\\% of citizens having "above basic" digital skills. Those with lower skills are effectively **excluded from the digital ecosystem**
                 """)
                 st.info(
                     """
-                    **The "Above Basic" Digital Skills Threshold is the Key Driver**: There is a (moderate) strong, positive correlation ($0.57$ to $0.74$) between having "Above Basic" 
-                    digital skills and active usage of all E-Government tools. This skill level also has a strong negative correlation ($-0.64$) with the barrier of lacking an eID
+                    **The "Above Basic" Digital Skills Threshold is the Key Driver**: There is a (moderate) strong, positive correlation (**0.57** to **0.74**) between having "Above Basic" 
+                    digital skills and active usage of all E-Government tools. This skill level also has a strong negative correlation (**-0.64**) with the barrier of lacking an eID
                 """)
 
 

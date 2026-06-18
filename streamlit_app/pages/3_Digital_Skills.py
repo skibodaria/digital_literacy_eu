@@ -172,29 +172,37 @@ with tab_overview:
             font-weight: 700 !important;
             color: #FFFFFF !important;       /* Pristine white values */
         }
+                
+        /* Smaller text inside the card */
+        .kpi-subtext {
+            font-size: 0.70rem !important;   /* Really small */
+            font-weight: 400 !important;
+            margin-top: 0px !important;
+            color: #E2E8F0 !important;
+            text-transform: uppercase;
+        }
         </style>
     """, unsafe_allow_html=True)
 
     metrics_data = [
-        ("Above Basic", df_filtered_baseline['i_dsk2_ab'].mean()),
-        ("Basic Skills", df_filtered_baseline['i_dsk2_b'].mean()),
-        ("Low Skills", df_filtered_baseline['i_dsk2_lw'].mean()),
-        ("Limited Skills", df_filtered_baseline['i_dsk2_lm'].mean()),
-        ("Narrow Skills", df_filtered_baseline['i_dsk2_n'].mean()),
-        ("No Skills", df_filtered_baseline['i_dsk2_x'].mean())
+        {"label": "Above Basic",    "val": df_filtered_baseline['i_dsk2_ab'].mean(), "sub_label": "min", "sub_val": df_filtered_baseline['i_dsk2_ab'].min()},
+        {"label": "Basic Skills",   "val": df_filtered_baseline['i_dsk2_b'].mean(),  "sub_label": "min", "sub_val": df_filtered_baseline['i_dsk2_b'].min()},
+        {"label": "Low Skills",     "val": df_filtered_baseline['i_dsk2_lw'].mean(), "sub_label": "min", "sub_val": df_filtered_baseline['i_dsk2_lw'].min()},
+        {"label": "Limited Skills", "val": df_filtered_baseline['i_dsk2_lm'].mean(), "sub_label": "max", "sub_val": df_filtered_baseline['i_dsk2_lm'].max()},
+        {"label": "Narrow Skills",  "val": df_filtered_baseline['i_dsk2_n'].mean(),  "sub_label": "max", "sub_val": df_filtered_baseline['i_dsk2_n'].max()},
+        {"label": "No Skills",      "val": df_filtered_baseline['i_dsk2_x'].mean(),  "sub_label": "max", "sub_val": df_filtered_baseline['i_dsk2_x'].max()}
     ]
     
     for i, col in enumerate(cols):
-        label, val = metrics_data[i]
+        data = metrics_data[i]
         with col:
             st.markdown(f"""
                 <div class="kpi-card">
-                    <div class="kpi-label">{label}</div>
-                    <div class="kpi-value">{val:.2f}%</div>
+                    <div class="kpi-label">{data["label"]}</div>
+                    <div class="kpi-value">{data["val"]:.2f}%</div>
+                    <div class="kpi-subtext">{data["sub_label"]}: {data["sub_val"]:.2f}%</div>
                 </div>
             """, unsafe_allow_html=True)
-
-    st.write("---")
 
     # --------------------------------------------------------------------------
     # TWO COLUMN LAYOUT: MAP (LEFT) & TEXT EXPLANATION (RIGHT)
@@ -704,11 +712,11 @@ with tab_deep_dive:
 
         # human-readable mapping dictionary for the 5 Core Framework Dimension prefixes
         DIMENSION_MAP = {
-            'i_dsk2_il_bab': 'Information & Data Literacy',
+            'i_dsk2_il_bab': 'Data Literacy',
             'i_dsk2_cc_bab': 'Communication & Collaboration',
             'i_dsk2_dcc_bab': 'Digital Content Creation',
-            'i_dsk2_sf_bab': 'Safety & Privacy Competence',
-            'i_dsk2_ps_bab': 'Technical Problem Solving'
+            'i_dsk2_sf_bab': 'Safety Competence',
+            'i_dsk2_ps_bab': 'Problem Solving'
         }
 
         # ==============================================================================
@@ -773,8 +781,9 @@ with tab_deep_dive:
 
             fig_radar.update_layout(
                 polar=dict(
-                    radialaxis=dict(visible=True, range=[0, 100], ticksuffix="%"),
-                    bgcolor='rgba(0,0,0,0)'
+                    radialaxis=dict(visible=True, range=[0, 100], ticksuffix="%", tickfont=dict(size=16, color="black")), # font size for scale
+                    bgcolor='rgba(0,0,0,0)',
+                    angularaxis=dict(tickfont=dict(size=16),color="black") # font size for labels
                 ),
                 showlegend=True,
                 height=450,
