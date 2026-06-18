@@ -25,6 +25,8 @@ plotly
 
 # --- Analysis ---
 scikit-learn
+sklearn.preprocessing
+sklearn.cluster
 scipy
 numpy
 statsmodels
@@ -32,3 +34,5 @@ statsmodels
 # --- Streamlit ---
 streamlit
 base64
+plotly.express
+plotly.graph_objects
