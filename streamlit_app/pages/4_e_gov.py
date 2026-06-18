@@ -1062,7 +1062,6 @@ with tab_skills_vs_egov:
         else:
             st.error("Schema lookup breakdown: Required indicators missing inside your database baseline table columns.")
 
-
 # ==============================================================================
 # FOOTER SECTION
 # ==============================================================================
