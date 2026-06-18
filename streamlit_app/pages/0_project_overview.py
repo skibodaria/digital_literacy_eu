@@ -20,12 +20,12 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.title("🇪🇺 Digital Literacy, E-Governance Usage, Institutional Trust Inequality: Mapping the EU Digital Decade")
+st.title("🇪🇺 Digital Literacy, E-Government Usage, Institutional Trust Inequality: Mapping the EU Digital Decade")
 st.markdown(
     """
     Welcome to the EU Digital Baseline Workspace. This interface establishes a 
-    macro-level diagnostic of digital literacy, Internet usage, and E-Governance and eID adoptions across the European Union. It helps to
-    explore and understand the basic trends related to digital literacy in the EU member states and connect usage of E-Governance tools to
+    macro-level diagnostic of digital literacy, Internet usage, and E-Government and eID adoptions across the European Union. It helps to
+    explore and understand the basic trends related to digital literacy in the EU member states and connect usage of E-Government tools to
     institutionall trust, barriers, and inequality.
     """)
 
@@ -122,12 +122,12 @@ with tab_short:
     with col_q3:
         st.markdown("""
             <div class="insight-card">
-                <h4>Do digital literacy and E-Governance vary across demographic groups?</h4>
+                <h4>Do digital literacy and E-Government vary across demographic groups?</h4>
                 <div class="card-caption">Analyzing variance components across population segments</div>
                 <ul>
                     <li>How gender, age, education, and urbanization levels correlate with digital skills?</li>
                     <li>Is there difference between those groups? Is it statistically significant?</li>
-                    <li>How the groups differ in terms of E-Governance tools usage?</li>
+                    <li>How the groups differ in terms of E-Government tools usage?</li>
                     <li>Are there any excluded groups?</li>
                 </ul>
             </div>
@@ -136,10 +136,10 @@ with tab_short:
     with col_q4:
         st.markdown("""
             <div class="insight-card">
-                <h4>Does active E-Governance usage foster higher trust in political institutions?</h4>
+                <h4>Does active E-Government usage foster higher trust in political institutions?</h4>
                 <div class="card-caption">Empirical correlations between digital statecraft and institutional confidence layers</div>
                 <ul>
-                    <li>Is there correlation between E-Governance and eID usage and different metrics for institutional trust?</li>
+                    <li>Is there correlation between E-Government and eID usage and different metrics for institutional trust?</li>
                     <li>Is this correlation statistically significant?</li>
                     <li>What does it mean?</li>
                 </ul>
@@ -276,7 +276,7 @@ with tab_overview:
             looking into different type of skills — Data and Information Literacy; Digital Content Creation; Problem Solving; Safety; Communication and Collaboration.
             - **Internet Usage**: Series of metrics presenting wide range of online activities from `I_IUPDG` (Downloading and playing online games) to `I_IUCPP` (Civic and Political Participation Online).
             Other metrics also include Daily Internet Usage (`I_DAY`) and Adoption of Generative AI Tools (`I_IUAI`).
-            - **E-Governance Engagement & eID Usage**: Quantifying direct interaction rates with public authorities (`I_IUGOV1`) and complex digital public services, such as online tax submissions (`I_IGOVTAX2`) or 
+            - **E-Government Engagement & eID Usage**: Quantifying direct interaction rates with public authorities (`I_IUGOV1`) and complex digital public services, such as online tax submissions (`I_IGOVTAX2`) or 
             Requesting Benefits Online (`I_IUGOBE`), including eID Adoption (`I_IEID`) or barriers in using this technology (`I_IREIDNA`, `I_IREIDNO`, `I_IREISEC` and other).
             """)
 
@@ -297,7 +297,7 @@ with tab_overview:
         st.markdown(
             """
             To ensure cross-national comparability, the indicators in this workspace are synchronized across fixed temporal baselines:
-            - **Cross-Sectional Baseline (2025):** The vast majority of structural indicators (eID adoption rates, E-Governance metrics, and all Eurobarometer institutional trust layers) reflect **2025**. 
+            - **Cross-Sectional Baseline (2025):** The vast majority of structural indicators (eID adoption rates, E-Government metrics, and all Eurobarometer institutional trust layers) reflect **2025**. 
             This provides a contemporary, post-pandemic snapshot of digital statecraft.
             - **"Longitudinal" Digital Skills Data (2021, 2023, 2025):** The **Digital Skills** domain features a dedicated macro time-series layer. 
             Because Eurostat updates these comprehensive literacy frameworks biennially, the workspace tracks these metrics across **2021, 2023, and 2025**, 
@@ -353,7 +353,7 @@ with tab_overview:
             the project highlights which countries are leading the transition and which regions risk falling behind 
             the EU’s 2030 uniformity targets.""")
 
-        with st.expander('**2. Connecting E-Governance and eID Usage with Institutional Trust:**'):
+        with st.expander('**2. Connecting E-Government and eID Usage with Institutional Trust:**'):
             st.write("""This analysis investigates whether the digitization of essential public services actively improves 
             the relationship between citizens and the state. Specifically, it tests the hypothesis that seamless 
             interactions with tools like national eIDs and online public portals can statistically correlate with higher 
@@ -410,7 +410,7 @@ with tab_overview:
                      migrant communities from institutional support.""")
         with st.expander("Longitudinal Analysis: Tracking Trust Dynamics Over Time"):
             st.write("""While the current project offers a cross-sectional snapshot, a future longitudinal study could track the development of digital skills
-                     and E-Governance tools adoption across multiple years.""")
+                     and E-Government tools adoption across multiple years.""")
         st.write('---')
 
         st.markdown("#### Hey! Nice to meet you!")
@@ -547,7 +547,7 @@ with tab_data:
     with expander_iv:
         st.markdown(
             """
-            * **E-Governance & eID Adoption:** Frequency of website interaction with public authorities (`isoc_ciegi_ac`) and utilization of electronic IDs (`isoc_eid_ieid`).
+            * **E-Government & eID Adoption:** Frequency of website interaction with public authorities (`isoc_ciegi_ac`) and utilization of electronic IDs (`isoc_eid_ieid`).
             * **Digital Literacy & Fluency:** Baseline digital skills scores (`isoc_sk_dskl_i21`) and everyday internet consumption habits (`i_day`).
             """
         )
@@ -637,7 +637,7 @@ with tab_methods:
 
                 **1. Data Ingestion Pathways**
                 I executed two distinct retrieval methodologies tailored to the infrastructure of the source institutions:
-                * **Programmatic Bulk Extraction (Eurostat):** To capture the comprehensive digital skills timelines and e-governance metrics, I bypassed manual downloads and built an automated extraction script utilizing the `eurostat` Python library. This interacted directly with the Eurostat API to pull raw, high-density bulk database sheets, ensuring programmatic reproducibility and caching optimization.
+                * **Programmatic Bulk Extraction (Eurostat):** To capture the comprehensive digital skills timelines and e-Government metrics, I bypassed manual downloads and built an automated extraction script utilizing the `eurostat` Python library. This interacted directly with the Eurostat API to pull raw, high-density bulk database sheets, ensuring programmatic reproducibility and caching optimization.
                 * **Targeted Manual Retrieval (Eurobarometer):** Because Eurobarometer institutional trust matrices are delivered as dense, highly segmented research structures, these files were manually retrieved. This ensured precise cohort isolation before entering the custom ingestion framework.
 
                 **2. Custom Python Pre-Processing & ETL Pipeline**
@@ -666,7 +666,7 @@ with tab_methods:
 
                 **2. The Staging Layer (`stg_`)**
                 Once the data was normalized into a massive, centralized core matrix, the staging layer acted as a specialized filtering gate to isolate the distinct research components:
-                * **Research Vector Extraction:** Instead of passing the entire 2-million-row table downstream, I built dedicated staging models to extract precise subsets of data tailored to my specific research questions (e.g., isolating Digital Skills metrics independently from E-Governance variables).
+                * **Research Vector Extraction:** Instead of passing the entire 2-million-row table downstream, I built dedicated staging models to extract precise subsets of data tailored to my specific research questions (e.g., isolating Digital Skills metrics independently from E-Government variables).
                 * **Demographic Slicing & Metric Refinement:** In this layer, I performed targeted data cleaning on the metrics and isolated the granular demographic cross-sections (such as isolating male vs. female performance bands) required for the non-parametric statistical testing.
 
                 **3. The Mart Layer (`mart_`)**

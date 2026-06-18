@@ -21,7 +21,7 @@ except Exception as e:
     st.stop()
 
 # --- HEADER & PRESENTATION CONTEXT ---
-st.title("🇪🇺 Overview: Digital Skills, Internet Usage, & E-Governance")
+st.title("🇪🇺 Overview: Digital Skills, Internet Usage, & E-Government")
 st.caption("""**Graduation Capstone Project** | An analysis of 27 EU Member States utilizing Eurostat & Eurobarometer data | 
            This application investigates how structural digital baselines condition human trust and behavioral outcomes across Europe""")
 
@@ -235,7 +235,7 @@ with tab_baseline:
         with st.expander("**Institutional Fragmentation**"):
             st.markdown(
                 """
-                E-governance adoption in the EU is fundamentally bottlenecked by state-level administrative routines, not civic resistance. 
+                E-Government tools adoption in the EU is fundamentally bottlenecked by state-level administrative routines, not civic resistance. 
                 While **64.5%** of citizens interact with public authorities online, deep systemic friction appears in many services: 
                 online tax declaration averages **40%** but collapses to a near-zero floor of **0.36%** in some countries. This probably not a digital
                 limitation but an institutional problem: access to online services needs to be provided and invested into. 
@@ -497,7 +497,7 @@ with tab_clusters:
             with st.expander("Methodology Note: Unsupervised Machine Learning Pipeline Specifications"):
                 st.markdown("""
                     **Model Implementation Blueprint:**
-                    1. **Feature Engineering & Dimensional Selection:** The analysis isolates 10 multi-domain dimensions per country, merging Eurostat data (sigital skills levels, E-Governance/eID usage barriers, Internet usage) 
+                    1. **Feature Engineering & Dimensional Selection:** The analysis isolates 10 multi-domain dimensions per country, merging Eurostat data (sigital skills levels, E-Government/eID usage barriers, Internet usage) 
                         and Eurobarometer sentiment markers (institutional trust metrics).
                     2. **Normalization Protocol:** Because percentage indicators and trust indexes operate on different scale boundaries, all parameters undergo **Standardization** ($Z$-score scaling) via standard scalar mapping:
                        $$Z = \\frac{x - \\mu}{\\sigma}$$
