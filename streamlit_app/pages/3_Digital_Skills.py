@@ -6,9 +6,6 @@ import plotly.graph_objects as go
 import funcs
 import styles
 import scipy.stats as stats 
-import seaborn as sns
-import matplotlib.pyplot as plt
-import altair as alt
 
 # -- Page configuration:
 st.set_page_config(layout="wide")
