@@ -20,7 +20,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.title("🇪🇺 Digital Literacy, E-Government Usage, Institutional Trust Inequality: Mapping the EU Digital Decade")
+st.title("🇪🇺 Digital Literacy, E-Government Usage, Institutional Trust, and Inequality: Mapping the EU Digital Decade")
 st.caption("""**Graduation Capstone Project** | An analysis of 27 EU Member States utilizing Eurostat & Eurobarometer data | 
            This application investigates how structural digital baselines condition human trust and behavioral outcomes across Europe""")
 st.markdown(
@@ -43,110 +43,100 @@ tab_short, tab_overview, tab_data, tab_methods = st.tabs([
 with tab_short:
 
     st.markdown("""
-            <style>
-            /* Define the structure for solid color custom Insight Card */
-            .insight-card {
-                background-color: #007792;          /* Solid dark teal background block */
-                border: 1px solid #007792;          /* Matching border color to make it flat */
-                border-radius: 12px;                /* Modern curved corners */
-                padding: 22px;                      /* Breathing room inside the card */
-                box-shadow: 0 4px 10px rgba(0,0,0,0.08); /* Soft drop shadow layer for subtle lift */
-                margin-bottom: 15px;
-                min-height: 390px;                  /* Keeps cards uniformly sized in the row */
-            }
-            
-            /* High-contrast typography inside solid dark cards */
-            .insight-card h4 {
-                color: #FFFFFF !important;          /* Crisp white title headers */
-                font-weight: 700 !important;
-                margin-top: 0px !important;
-                font-size: 1.15rem !important;
-            }
-            
-            .insight-card .card-caption {
-                font-size: 0.85rem;
-                color: #caf0f8;                     /* Light blue tint color for high-contrast context text */
-                font-style: italic;
-                margin-bottom: 14px;
-                line-height: 1.4;
-            }
-            
-            .insight-card ul {
-                padding-left: 18px !important;
-                color: #FFFFFF !important;          /* White bullet list items */
-            }
-            
-            .insight-card li {
-                margin-bottom: 10px;
-                font-size: 0.9rem;
-                line-height: 1.4;
-            }
-            </style>
-        """, unsafe_allow_html=True)
+        <style>
+        /* 1. Base Container Setup */
+        .card-base {
+            border-radius: 12px;
+            padding: 22px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            margin-bottom: 15px;
+            min-height: 350px;
+        }
+
+        /* 2. Color Variations */
+        .card-teal { background-color: #007792; border: 1px solid #007792; }
+        .card-blue { background-color: #001f63; border: 1px solid #001f63; }
+        .card-mustard { background-color: #d4a017; border: 1px solid #d4a017; }
+
+        /* 3. Typography: Uniform sizes for all cards */
+        .card-h4 {
+            font-size: 1.15rem !important;
+            font-weight: 700 !important;
+            margin-top: 0px !important;
+            margin-bottom: 14px !important;
+        }
+        
+        .card-text { font-size: 1.0rem !important; line-height: 1.5 !important;}
+        .card-list { font-size: 1.0rem !important; padding-left: 20px !important; }
+        .card-list li { margin-bottom: 8px !important; }
+        .card-caption {
+            font-size: 0.85rem !important;
+            color: rgba(255, 255, 255, 0.7) !important; /* Slightly transparent white for teal/blue cards */
+            font-style: italic !important;
+            margin-bottom: 14px !important;
+        }
+
+        /* 4. Color Overrides for readable contrast */
+        .card-teal .card-h4, .card-teal .card-text, .card-teal .card-list { color: #FFFFFF !important; }
+        .card-blue .card-h4, .card-blue .card-text, .card-blue .card-list { color: #FFFFFF !important; }
+        
+        .card-mustard .card-h4, .card-mustard .card-text, .card-mustard .card-list { color: #000000 !important; }
+        .card-mustard .card-caption { color: rgba(0, 0, 0, 0.7) !important; } /* Black-based caption for mustard */
+        </style>
+    """, unsafe_allow_html=True)
     
     st.header("Project Intro")
     st.caption("This page helps to understand the core concepts of the project, its goals and hypotheses, data sources, and pipeline. For more information," \
-    "please explore additional tabs.")
+    " please explore additional tabs")
+
+    st.subheader("Why This Project")
+    col_why1, col_why2 = st.columns([1.5, 1])
+
+    with col_why1:
+        st.markdown("""
+            <div class="card-base card-blue">
+                <h4 class="card-h4">EU Digital Decade Targets 2030</h4>
+                <div class="card-text"> 
+                    In 2022 the European Union adopted a policy establishing several goals for Europe's digital transformation.
+                    The <a href="https://eur-lex.europa.eu/eli/dec/2022/2481/oj" style="color: #caf0f8;">Digital Decade Policy Programme 2030</a> focuses on:
+                </div>
+                <ul class="card-list">
+                    <li><b>Basic Digital Skills:</b> At least 80% of all adults (16-74 years old) should possess at least basic digital skills;</li>
+                    <li><b>eGovernment:</b> 100% online availability of key public services for citizens and businesses;</li>
+                    <li><b>Digital Identity:</b> 100% of EU citizens should have voluntary access to a secure electronic identification (eID) system.</li>
+                </ul>
+            </div>
+        """, unsafe_allow_html=True)
+
+    with col_why2:
+        st.markdown("""
+            <div class="card-base card-mustard">
+                <h4 class="card-h4">Access Is Not a Problem</h4>
+                <ul class="card-list">
+                    <li><b>Digital Infrastructure:</b> 96.8% of EU households have access to 5G Internet coverage;</li>
+                    <li><b>Digital Skills</b> are no longer "extra" skills; they are a core requirement for nearly every job sector;</li>
+                    <li><b>Digital First:</b> governments moving to "digital-first" models for healthcare, taxes, and social support; lacking digital skills → being "locked out" of public services.</li>
+                </ul> 
+            </div>
+        """, unsafe_allow_html=True)
 
     st.subheader("What I Wanted to Know: Research Questions")
     col_q1, col_q2, col_q3, col_q4 = st.columns(4)
-    with col_q1:
-        st.markdown("""
-            <div class="insight-card">
-                <h4>What are the levels of digital skills in the EU countries?</h4>
-                <div class="card-caption">
-                    Digital skills are measured in the EU on the following scale: above basic, basic, low, narrow, and limited. 
-                    The methodology to estimate digital skills recently changed (2021)
-                </div>
-                <ul>
-                    <li>What is the average level of digital skills?</li>
-                    <li>What is the prospect for 2030?</li>
-                    <li>Is EU going to reach the target of 80%?</li>
-                </ul>
-            </div>
-        """, unsafe_allow_html=True)
 
-    with col_q2:
-        st.markdown("""
-            <div class="insight-card">
-                <h4>What is the structure of digital skills literacy?</h4>
-                <div class="card-caption">
-                    To estimate digital skills, the EU survey uses several components: Information and Data Literacy, Communication and Collaboration,
-                    Digital Content Creation, Safety and Security, and Problem Solving
+    for col, title, caption, text in [
+        (col_q1, "What are the levels of digital skills in the EU countries?", "Digital skills are measured in the EU on the following scale: above basic, basic, low, narrow, and limited. The methodology to estimate digital skills recently changed (2021)", "What is the average level of digital skills?<br>What is the prospect for 2030?<br>Is EU going to reach the target of 80%?"),
+        (col_q2, "What is the structure of digital skills literacy?", "To estimate digital skills, the EU survey uses several components: Information and Data Literacy, Communication and Collaboration, Digital Content Creation, Safety and Security, and Problem Solving", "Which skills are 'stronger' and which are 'weaker'?<br>What are the countries digital skills profiles?"),
+        (col_q3, "Do digital literacy and E-Government vary across demographic groups?", "Analyzing variance across population segments", "How gender, age, education, and urbanization levels correlate with digital skills?<br>Is there difference between those groups? Is it statistically significant?<br>Are there any excluded groups?"),
+        (col_q4, "Does active E-Government usage foster higher trust in political institutions?", "Looking for correlations between digital literacy and institutional trust", "Is there correlation between E-Government and eID usage and different metrics for institutional trust?<br>Is this correlation statistically significant?<br>What does it mean?")
+    ]:
+        with col:
+            st.markdown(f"""
+                <div class="card-base card-teal">
+                    <h4 class="card-h4">{title}</h4>
+                    <div class="card-caption">{caption}</div>
+                    <div class="card-text">{text}</div>
                 </div>
-                <ul>
-                    <li>Which skills are "stronger" and which are "weaker"?</li>
-                    <li>What are the countries digital skills profiles?</li>
-                </ul>
-            </div>
-        """, unsafe_allow_html=True)
-            
-    with col_q3:
-        st.markdown("""
-            <div class="insight-card">
-                <h4>Do digital literacy and E-Government vary across demographic groups?</h4>
-                <div class="card-caption">Analyzing variance components across population segments</div>
-                <ul>
-                    <li>How gender, age, education, and urbanization levels correlate with digital skills?</li>
-                    <li>Is there difference between those groups? Is it statistically significant?</li>
-                    <li>How the groups differ in terms of E-Government tools usage?</li>
-                    <li>Are there any excluded groups?</li>
-                </ul>
-            </div>
-        """, unsafe_allow_html=True)
-    
-    with col_q4:
-        st.markdown("""
-            <div class="insight-card">
-                <h4>Does active E-Government usage foster higher trust in political institutions?</h4>
-                <div class="card-caption">Empirical correlations between digital statecraft and institutional confidence layers</div>
-                <ul>
-                    <li>Is there correlation between E-Government and eID usage and different metrics for institutional trust?</li>
-                    <li>Is this correlation statistically significant?</li>
-                    <li>What does it mean?</li>
-                </ul>
-            </div>
-        """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
 
 
     st.subheader("How Did I Do It: Project Pipeline")
