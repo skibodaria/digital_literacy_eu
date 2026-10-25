@@ -90,7 +90,7 @@ with tab_short:
     " please explore additional tabs")
 
     st.subheader("Why This Project")
-    col_why1, col_why2 = st.columns([1.5, 1])
+    col_why1, col_why2, col_me = st.columns([1.5, 1, 1])
 
     with col_why1:
         st.markdown("""
@@ -119,6 +119,34 @@ with tab_short:
                 </ul> 
             </div>
         """, unsafe_allow_html=True)
+
+    with col_me:
+        st.markdown("#### Hey! Nice to meet you!")
+        with open("./assets/author_pic.jpeg", "rb") as img_file:
+            img_base64 = base64.b64encode(img_file.read()).decode()
+            col1, col2 = st.columns([1, 4], gap="small")
+            with col1:
+                st.markdown(
+                    f"""
+                    <img src="data:image/jpeg;base64,{img_base64}" 
+                    style="border-radius: 50%; width: 80px; height: 80px; object-fit: cover;">
+                    """,
+                    unsafe_allow_html=True
+                )
+        
+            with col2:
+                st.markdown(
+                    """
+                    Hey! I'm Dasha. I am a social scientist and also - now! - a data analyst.
+                    \nThis entire project was born, raised, and heavily caffeinated within the walls of an **Data Analytics Bootcamp** at Spiced Academy. 
+                    For me it's not only charts and metrics I'm presenting today, but also the deep-dive rabbit hole I happily fell into along the way,
+                    tracking everything from casual mailing habits to general tech fluency just to see what makes the data fun. 
+                    It turns out that wrangling massive EU datasets, untangling complex pipelines, and surviving a high-intensity bootcamp 
+                    is the ultimate test of both data literacy and institutional trust!
+                    \nIf you like the project, connect with me on [LinkedIn](https://www.linkedin.com/in/daria-skibo-56b9036a/).
+                    """)
+                        
+
 
     st.subheader("What I Wanted to Know: Research Questions")
     col_q1, col_q2, col_q3, col_q4 = st.columns(4)
@@ -405,35 +433,6 @@ with tab_overview:
                      and E-Government tools adoption across multiple years.""")
         st.write('---')
 
-        st.markdown("#### Hey! Nice to meet you!")
-        with st.expander("**Meet the Author**"):
-            with open("./assets/author_pic.jpeg", "rb") as img_file:
-                img_base64 = base64.b64encode(img_file.read()).decode()
-
-                col1, col2 = st.columns([1, 4], gap="small")
-
-                with col1:
-                    st.markdown(
-                        f"""
-                        <img src="data:image/jpeg;base64,{img_base64}" 
-                            style="border-radius: 50%; width: 80px; height: 80px; object-fit: cover;">
-                        """,
-                        unsafe_allow_html=True
-                    )
-
-                with col2:
-
-                    st.markdown(
-                        """
-                        Hey! I'm Dasha. I am a social scientist and also - now! - a data analyst.
-                                \nThis entire project was born, raised, and heavily caffeinated within the walls of an **Data Analytics Bootcamp** at Spiced Academy. 
-                                For me it's not only charts and metrics I'm presenting today, but also the deep-dive rabbit hole I happily fell into along the way,
-                                tracking everything from casual gaming habits to general tech fluency just to see what makes the data fun. 
-                                It turns out that wrangling massive EU datasets, untangling complex pipelines, and surviving a high-intensity bootcamp 
-                                is the ultimate test of both data literacy and institutional trust!
-                                \nIf you like the project, connect with me on [LinkedIn](https://www.linkedin.com/in/daria-skibo-56b9036a/).
-            """)
-                
             
 # ==========================================
 # TAB 2: DATA & SOURCES
