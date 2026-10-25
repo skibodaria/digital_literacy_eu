@@ -407,7 +407,7 @@ with tab_overview:
 
         st.markdown("#### Hey! Nice to meet you!")
         with st.expander("**Meet the Author**"):
-            with open("./.streamlit/author_pic.jpeg", "rb") as img_file:
+            with open("./assets/author_pic.jpeg", "rb") as img_file:
                 img_base64 = base64.b64encode(img_file.read()).decode()
 
                 col1, col2 = st.columns([1, 4], gap="small")
