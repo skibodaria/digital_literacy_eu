@@ -50,5 +50,5 @@ digital_skills = st.Page(os.path.join(base_dir, "pages/3_digital_skills.py"), ti
 e_gov = st.Page(os.path.join(base_dir, "pages/4_e_gov.py"), title="E-Gov & eID")
 
 # Declare and run the routing engine
-pg = st.navigation([overview_page, baseline, digital_skills, e_gov, usage])
+pg = st.navigation([overview_page, baseline, usage, digital_skills, e_gov])
 pg.run() # runs particular page
