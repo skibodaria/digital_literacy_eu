@@ -122,31 +122,27 @@ with tab_short:
         """, unsafe_allow_html=True)
 
     with col_me:
-        st.markdown(""" #### Hey! Nice to meet you!
-            <div class="card-base card-me">""")
         with open("./assets/author_pic.jpeg", "rb") as img_file:
-            img_base64 = base64.b64encode(img_file.read()).decode()
-            col1, col2 = st.columns([1, 4], gap="small")
-            with col1:
-                st.markdown(
-                    f"""
-                    <img src="data:image/jpeg;base64,{img_base64}" 
-                    style="border-radius: 50%; width: 80px; height: 80px; object-fit: cover;">
-                    """,
-                    unsafe_allow_html=True
-                )
-        
-            with col2:
-                st.markdown(
-                    """
-                    Hey! I'm Dasha. I am a social scientist and also - now! - a data analyst.
-                    \nThis entire project was born, raised, and heavily caffeinated within the walls of an **Data Analytics Bootcamp** at Spiced Academy. 
-                    For me it's not only charts and metrics I'm presenting today, but also the deep-dive rabbit hole I happily fell into along the way,
-                    tracking everything from casual mailing habits to general tech fluency just to see what makes the data fun. 
-                    It turns out that wrangling massive EU datasets, untangling complex pipelines, and surviving a high-intensity bootcamp 
-                    is the ultimate test of both data literacy and institutional trust!
-                    \nIf you like the project, connect with me on [LinkedIn](https://www.linkedin.com/in/daria-skibo-56b9036a/).
-                    """)
+                    img_base64 = base64.b64encode(img_file.read()).decode()
+
+            st.markdown(
+                f"""
+                <div class="card-base card-me" style="display: flex; gap: 20px; align-items: start; padding: 20px; border-radius: 12px;">
+                <img src="data:image/jpeg;base64,{img_base64}" 
+                 style="border-radius: 50%; width: 80px; height: 80px; object-fit: cover; flex-shrink: 0;">
+                <div>
+                <p style="margin-top: 0;">Hey! I'm Dasha. I am a social scientist and also - now! - a data analyst.</p>
+                <p>This entire project was born, raised, and heavily caffeinated within the walls of a <strong>Data Analytics Bootcamp</strong> at Spiced Academy. 
+                For me it's not only charts and metrics I'm presenting today, but also the deep-dive rabbit hole I happily fell into along the way,
+                tracking everything from casual mailing habits to general tech fluency just to see what makes the data fun. 
+                It turns out that wrangling massive EU datasets, untangling complex pipelines, and surviving a high-intensity bootcamp 
+                is the ultimate test of both data literacy and institutional trust!</p>
+                <p>If you like the project, connect with me on <a href="https://www.linkedin.com/in/daria-skibo-56b9036a/" target="_blank">LinkedIn</a>.</p>
+                </div>
+            </div>
+                """,
+                unsafe_allow_html=True
+            )
                         
 
 
