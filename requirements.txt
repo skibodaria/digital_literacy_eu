@@ -1,6 +1,5 @@
 # --- Data Manipulation ---
 pandas
-psycopg2
 psycopg2-binary
 dbt-postgres
 
@@ -10,7 +9,7 @@ python-dotenv
 # --- API & Data Retrieval ---
 requests
 eurostat
-lxml # coordinates script
+lxml
 html5lib      
 
 # --- Excel Processing (Eurobarometer) ---
@@ -25,14 +24,9 @@ plotly
 
 # --- Analysis ---
 scikit-learn
-sklearn.preprocessing
-sklearn.cluster
 scipy
 numpy
 statsmodels
 
 # --- Streamlit ---
 streamlit
-base64
-plotly.express
-plotly.graph_objects
