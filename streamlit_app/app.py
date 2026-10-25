@@ -1,4 +1,10 @@
 import streamlit as st
+import os
+
+# ==========================================
+# GET THE FOLDER
+# ==========================================
+base_dir = os.path.dirname(__file__)
 
 # ==========================================
 # PAGE SETTINGS & GLOBAL THEME
@@ -37,11 +43,11 @@ st.markdown("""
 # ==========================================
 # NAVIGATION 
 # ==========================================
-overview_page = st.Page("pages/0_project_overview.py", title="Project Overview", icon="🇪🇺", default=True)
-baseline = st.Page("pages/1_eu_baseline.py", title="Baseline & Clustering")
-usage = st.Page("pages/2_internet_usage.py", title="Internet Usage")
-digital_skills = st.Page("pages/3_digital_skills.py", title="Digital Skills")
-e_gov = st.Page("pages/4_e_gov.py", title="E-Gov & eID")
+overview_page = st.Page(os.path.join(base_dir, "pages/0_project_overview.py"), title="Project Overview", icon="🇪🇺", default=True)
+baseline = st.Page(os.path.join(base_dir, "pages/1_eu_baseline.py"), title="Baseline & Clustering")
+usage = st.Page(os.path.join(base_dir, "pages/2_internet_usage.py"), title="Internet Usage")
+digital_skills = st.Page(os.path.join(base_dir, "pages/3_digital_skills.py"), title="Digital Skills")
+e_gov = st.Page(os.path.join(base_dir, "pages/4_e_gov.py"), title="E-Gov & eID")
 
 # Declare and run the routing engine
 pg = st.navigation([overview_page, baseline, digital_skills, e_gov, usage])
