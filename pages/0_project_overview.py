@@ -57,6 +57,7 @@ with tab_short:
         .card-teal { background-color: #007792; border: 1px solid #007792; }
         .card-blue { background-color: #001f63; border: 1px solid #001f63; }
         .card-mustard { background-color: #d4a017; border: 1px solid #d4a017; }
+        .card-me { background-color: #d7bfdc; border: 1px solid #d7bfdc; }
 
         /* 3. Typography: Uniform sizes for all cards */
         .card-h4 {
@@ -90,7 +91,7 @@ with tab_short:
     " please explore additional tabs")
 
     st.subheader("Why This Project")
-    col_why1, col_why2, col_me = st.columns([1.1, 1, 1.1])
+    col_why1, col_why2, col_me = st.columns([1.1, 0.9, 1.2])
 
     with col_why1:
         st.markdown("""
@@ -121,7 +122,8 @@ with tab_short:
         """, unsafe_allow_html=True)
 
     with col_me:
-        st.markdown("#### Hey! Nice to meet you!")
+        st.markdown(""" #### Hey! Nice to meet you!
+            <div class="card-base card-me">""")
         with open("./assets/author_pic.jpeg", "rb") as img_file:
             img_base64 = base64.b64encode(img_file.read()).decode()
             col1, col2 = st.columns([1, 4], gap="small")
