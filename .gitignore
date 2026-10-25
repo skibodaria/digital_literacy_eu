@@ -13,8 +13,7 @@ dbt_packages/
 logs/
 
 # streamlit
-.streamlit
-*.toml
+.streamlit/secrets.toml
 
 # Mac
 .DS_Store
