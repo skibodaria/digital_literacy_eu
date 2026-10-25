@@ -91,7 +91,7 @@ with tab_short:
     " please explore additional tabs")
 
     st.subheader("Why This Project")
-    col_why1, col_why2, col_me = st.columns([1.1, 0.9, 1.2])
+    col_why1, col_why2, col_me = st.columns([1.1, 0.8, 1.3])
 
     with col_why1:
         st.markdown("""
