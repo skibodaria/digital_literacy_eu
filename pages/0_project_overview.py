@@ -123,7 +123,7 @@ with tab_short:
 
     with col_me:
         with open("./assets/author_pic.jpeg", "rb") as img_file:
-                    img_base64 = base64.b64encode(img_file.read()).decode()
+            img_base64 = base64.b64encode(img_file.read()).decode()
 
             st.markdown(
                 f"""
