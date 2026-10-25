@@ -1,0 +1,14 @@
+[theme]
+primaryColor = "#005f73"
+backgroundColor = "#caf0f8"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#31333F"
+borderColor = "#adb5bd"
+
+[client]
+# Hides the default "Made with Streamlit" footer at the bottom of the page
+showFooter = false
+
+# Hides the top-right options menu button (the three dots '⋮') 
+# to prevent users from changing settings or switching themes manually
+showSidebarNavigation = true
