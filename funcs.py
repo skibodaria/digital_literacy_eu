@@ -24,7 +24,7 @@ def load_tab_data(data_table_name, map_table_name):
     Generic helper to load both the metrics table and its corresponding 
     indicator metadata dictionary table for any given tab.
     """
-    conn = init_connection()
+    conn = init_connection() 
     print(f'Here is your connection: ', conn)
     
     df_data = pd.read_sql_query(f"SELECT * FROM {data_table_name};", conn)
