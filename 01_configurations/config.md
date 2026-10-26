@@ -37,13 +37,24 @@ In case some updates are needed, the following command can be used:
 
 2. Install `dbt-postgres`:  
 `pip install dbt-postgres`  
-Documentation on `dbt-postgres` is provided on [official website](https://docs.getdbt.com/docs/local/connect-data-platform/postgres-setup?version=1.12_). 
+Documentation on `dbt-postgres` is provided on [official website](https://docs.getdbt.com/docs/local/connect-data-platform/postgres-setup?version=1.12_).
 
-3. Test if dbt works locally:  
+3. After installing, start PostgreSQL database:
+`brew services start postgresql@18 # control for the version installed!`
+
+You can check the status, running:
+`brew services list`:
+if start was successful, you will see a list (with at least one instance of a database) and it's status will be `started` (green):
+```
+Name                Status    User    File
+postgresql@18        started    [username]    [~/Library/.../sh.brew.postgresql@18.list]
+```
+
+5. Test if dbt works locally:  
 `dbt init dbt_test_project`  
 where `dbt_test_project` is ust a name of a folder `dbt` will create to keep the project files together. Initiation of   `dtb` also automatically starts creation of multople sub-folders (e.g., seed, models, test, etc) and `.yaml` files.
 
-4. In order to create a connection between `dbt` and `PostgreSQL`, I needed to provide information about the database I will use. For this capstone peoject, I use a locally set PostgreSQL database: 
+6. In order to create a connection between `dbt` and `PostgreSQL`, I needed to provide information about the database I will use. For this capstone peoject, I use a locally set PostgreSQL database: 
     * type of database:  
         > [1] (PostgreSQL)
     * host:
@@ -74,11 +85,15 @@ To check the connection, terminal will offer to run `dbt debug`. For successfull
 - `psql -U <username>` connect to PostgreSQL (admin user) > opens console (you can type commands in SQL directly in terminal when the line starts with prefix `postgres=#`)
 - run `CREATE DATABASE <name>;`
 - check that is was created: `\l` 
-- make a connection in `DBeaver` to double-check.
+- make a connection in `DBeaver` to double-check;
+- to leave editing more, type `\q` in terminal.
 
 7. Connect the `dbt-postgres` (local version) to the new PostgreSQL database:
 - go to the Home folder (~/.dbt)
 - find file `profiles.yaml`
 - change the credentials inside (e.g., database name).
 
-If when you open the project repository again, and VS Code (or another EDA) throws an error and marks `.yaml` project file as un-executable, select a different interpreter (the one which has access to `dbt-postgres` installed). Find command `Select Interpreter` and choose one from the conda environment with the libraries installed (in this case -- `dbt_project` coda env).
+If when you open the project repository again, and VS Code (or another EDA) throws an error and marks `.yaml` project file as un-executable, select a different interpreter (the one which has access to `dbt-postgres` installed). Find command `Select Interpreter` and choose one from the conda environment with the libraries installed (in this case -- `dbt_project` coda env). How:
+* `Cmd + Shift + P` (for Mac) --> entering Command Palette
+* type and select **Python: Select Interpreter**
+* select the one with environment for dbt project (in this setup -- `dbt_project`).
