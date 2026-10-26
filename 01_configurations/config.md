@@ -46,8 +46,9 @@ You can check the status, running:
 `brew services list`:
 if start was successful, you will see a list (with at least one instance of a database) and it's status will be `started` (green):
 ```
-Name                Status    User    File
-postgresql@18        started    [username]    [~/Library/.../sh.brew.postgresql@18.list]
+| Name | Status | User | File |
+| --- | --- | --- | --- |
+| `postgresql@18` | started | `[username]` | `~/Library/.../sh.brew.postgresql@18.list` |
 ```
 
 5. Test if dbt works locally:  
@@ -97,3 +98,6 @@ If when you open the project repository again, and VS Code (or another EDA) thro
 * `Cmd + Shift + P` (for Mac) --> entering Command Palette
 * type and select **Python: Select Interpreter**
 * select the one with environment for dbt project (in this setup -- `dbt_project`).
+
+Nota Bene: Every time, if one needs to check if there is a PostgreSQL database running, check the status with `brew services list`. If a running service needs to be stopped: `brew services stop postgresql`, and started again: `brew services start postgresql`.
+
