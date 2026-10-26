@@ -80,6 +80,11 @@ To check the connection, terminal will offer to run `dbt debug`. For successfull
 - Select `Power User for dbt`
 - Trust and Install
 **- Don't forget to SELECT PROPER INTERPRETER!!!**
+> In case one forgot to select proper interpreter for the **Power User for dbt** extension:
+> * select correct env + select correct interpreter (see below) in Command Palette (`Cmd + Shift + P`--> Python: Select Interpreter);
+> * call Command Palette again `Cmd + Shift + P`;
+> * type **Power User for dbt: Detect Python from terminal**
+> * when asked to confirm the Python detected in terminal -- confirm. Done.
 
 6. Configurate a new database for the project:
 - `psql --version` to check if the `psql` is there
