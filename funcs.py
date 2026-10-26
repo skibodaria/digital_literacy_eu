@@ -25,6 +25,7 @@ def load_tab_data(data_table_name, map_table_name):
     indicator metadata dictionary table for any given tab.
     """
     conn = init_connection()
+    print(f'Here is your connection: ', conn)
     
     df_data = pd.read_sql_query(f"SELECT * FROM {data_table_name};", conn)
     df_map = pd.read_sql_query(f"SELECT * FROM {map_table_name};", conn)
